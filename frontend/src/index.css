@@ -1,0 +1,193 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "DM Sans", system-ui, sans-serif;
+  --font-display: "Cormorant Garamond", Georgia, serif;
+
+  --color-brand: #0c0f14;
+  --color-brand-soft: #161b24;
+  --color-accent: #b8956a;
+  --color-accent-light: #d4b896;
+  --color-accent-dark: #96784f;
+  --color-surface: #faf8f5;
+  --color-surface-elevated: #ffffff;
+  --color-ink: #1a1f28;
+  --color-ink-muted: #6b7280;
+  --color-ink-faint: #9ca3af;
+  --color-line: #e8e4de;
+  --color-success: #2d6a4f;
+  --color-warning: #b45309;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-surface);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+/* Underline-style inputs used on login */
+.input-underline {
+  width: 100%;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  padding-left: 0;
+  padding-right: 0;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--color-line);
+  font-size: 0.9375rem;
+  color: var(--color-ink);
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+/* When the input is inside a relative wrapper with a toggle button, allow space */
+.input-underline.pr-10 {
+  padding-right: 2.5rem;
+}
+
+.input-underline::placeholder {
+  color: var(--color-ink-faint);
+}
+
+.input-underline:focus {
+  border-bottom-color: var(--color-accent);
+}
+
+/* Primary button */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  background: var(--color-brand);
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--color-brand-soft);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.hero-shape {
+  transform-origin: center;
+  animation: float 14s ease-in-out infinite;
+}
+
+.form-shape {
+  transform-origin: center;
+  animation: driftSoft 12s ease-in-out infinite;
+}
+
+.form-shape-1 {
+  animation-duration: 10s;
+}
+
+.form-shape-2 {
+  animation-duration: 12s;
+  animation-delay: 0.25s;
+}
+
+.form-shape-3 {
+  animation-duration: 14s;
+  animation-delay: 0.5s;
+}
+
+.hero-shape-1 {
+  animation-duration: 11s;
+}
+
+.hero-shape-2 {
+  animation-duration: 13s;
+  animation-delay: 0.4s;
+}
+
+.hero-shape-3 {
+  animation-duration: 15s;
+  animation-delay: 0.8s;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-12px) rotate(6deg);
+  }
+}
+
+@keyframes driftSoft {
+  0%, 100% {
+    transform: translateY(0) translateX(0) scale(1);
+  }
+
+  50% {
+    transform: translateY(-14px) translateX(10px) scale(1.04);
+  }
+}
+
+/* Additional subtle horizontal drift and scale for more life */
+.hero-shape {
+  animation-name: float, drift, scalePulse;
+  animation-duration: 14s, 20s, 8s;
+  animation-timing-function: ease-in-out, linear, ease-in-out;
+  animation-iteration-count: infinite, infinite, infinite;
+}
+
+@keyframes drift {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(-18px); }
+}
+
+@keyframes scalePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+
+/* App-wide card */
+.card {
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-line);
+  border-radius: 0.75rem;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: #d1cdc7;
+  border-radius: 3px;
+}

@@ -1,0 +1,42 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: occassia-db
+    environment:
+      POSTGRES_DB: occassia
+      POSTGRES_USER: occassia
+      POSTGRES_PASSWORD: occassia
+    ports:
+      - "5432:5432"
+    volumes:
+      - occassia_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U occassia -d occassia"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    container_name: occassia-backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/occassia
+      SPRING_DATASOURCE_USERNAME: occassia
+      SPRING_DATASOURCE_PASSWORD: occassia
+      JWT_SECRET: occassia-dev-secret-key-change-in-production-min-256-bits-long!!
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    container_name: occassia-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  occassia_pgdata:
