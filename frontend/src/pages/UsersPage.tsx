@@ -264,7 +264,7 @@ export default function UsersPage() {
                 <td className="p-3 font-medium text-slate-900">{u.fullName}</td>
                 <td className="p-3 text-slate-600">{u.email}</td>
                 {currentUser?.role === 'SUPER_ADMIN' && (
-                  <td className="p-3 text-slate-600">{u.organizationName || u.organizationId || '—'}</td>
+                  <td className="p-3 text-slate-600">{u.organizationName || u.organizationId || '-'}</td>
                 )}
                 <td className="p-3 text-slate-600">{u.role.replace('_', ' ')}</td>
                 <td className="p-3">

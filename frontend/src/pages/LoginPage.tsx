@@ -44,7 +44,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex">
-      {/* Left — full-bleed event media */}
+      {/* Left - full-bleed event media */}
       <div className="hidden lg:block lg:w-[52%] xl:w-[55%] relative overflow-hidden bg-[#0c0f14]">
         {!videoFailed ? (
           <video
@@ -95,7 +95,7 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Right — clean open form */}
+      {/* Right - clean open form */}
       <div className="flex-1 flex flex-col justify-center px-8 sm:px-16 xl:px-24 py-12 bg-[#faf8f5] relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className="absolute right-[-2rem] top-10 h-32 w-32 rounded-full border border-[#0c0f14]/10 bg-[#0c0f14]/5 form-shape form-shape-1" />

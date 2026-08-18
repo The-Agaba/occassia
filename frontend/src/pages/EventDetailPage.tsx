@@ -96,20 +96,20 @@ export default function EventDetailPage() {
 
   /** Build a human-friendly date range string */
   const renderDateRange = () => {
-    if (!effectiveStartDate) return '—';
+    if (!effectiveStartDate) return '-';
     if (isSameDay) {
       return formatDate(effectiveStartDate);
     }
     const start = formatDate(effectiveStartDate);
     const end = effectiveEndDate ? formatDate(effectiveEndDate) : null;
-    return end ? `${start} – ${end}` : start;
+    return end ? `${start} - ${end}` : start;
   };
 
   /** Build a human-friendly time range string */
   const renderTimeRange = () => {
     const st = event.startTime ? formatTime(event.startTime) : null;
     const et = event.endTime ? formatTime(event.endTime) : null;
-    if (st && et) return `${st} – ${et}`;
+    if (st && et) return `${st} - ${et}`;
     if (st) return `From ${st}`;
     if (et) return `Until ${et}`;
     return null;

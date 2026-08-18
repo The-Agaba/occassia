@@ -262,7 +262,7 @@ export default function OrganizationPage() {
                 <tr key={org.id} className="border-t hover:bg-slate-50">
                   <td className="p-3 font-medium text-slate-900">{org.name}</td>
                   <td className="p-3 text-slate-600">{org.contactEmail}</td>
-                  <td className="p-3 text-slate-500">{org.contactPhone || '—'}</td>
+                  <td className="p-3 text-slate-500">{org.contactPhone || '-'}</td>
                   <td className="p-3">
                     <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                       org.status === 'ACTIVE'

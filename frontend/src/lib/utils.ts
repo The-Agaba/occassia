@@ -13,16 +13,16 @@ export const statusColors: Record<string, string> = {
 };
 
 export function formatDate(date: string | Date | null | undefined): string {
-  if (!date) return '—';
+  if (!date) return '-';
   const d = new Date(date);
-  if (isNaN(d.getTime())) return '—';
+  if (isNaN(d.getTime())) return '-';
   return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
 export function formatDateTime(date: string | Date | null | undefined): string {
-  if (!date) return '—';
+  if (!date) return '-';
   const d = new Date(date);
-  if (isNaN(d.getTime())) return '—';
+  if (isNaN(d.getTime())) return '-';
   return d.toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 
@@ -39,8 +39,8 @@ export function formatTime(time: string | null | undefined): string {
 
 /**
  * Format an event date range for display.
- * - Same day: "Aug 15, 2026"  (with optional "2:00 PM – 6:00 PM")
- * - Different days: "Aug 15 – Aug 17, 2026"
+ * - Same day: "Aug 15, 2026"  (with optional "2:00 PM - 6:00 PM")
+ * - Different days: "Aug 15 - Aug 17, 2026"
  */
 export function formatEventDateRange(
   startDate: string | null | undefined,
@@ -48,12 +48,12 @@ export function formatEventDateRange(
   startTime?: string | null,
   endTime?: string | null
 ): string {
-  if (!startDate) return '—';
+  if (!startDate) return '-';
 
   const start = new Date(startDate);
   const end = endDate ? new Date(endDate) : null;
 
-  if (isNaN(start.getTime())) return '—';
+  if (isNaN(start.getTime())) return '-';
 
   const opts: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'short', day: 'numeric' };
 
@@ -63,7 +63,7 @@ export function formatEventDateRange(
     if (startTime || endTime) {
       const times = [startTime && formatTime(startTime), endTime && formatTime(endTime)]
         .filter(Boolean)
-        .join(' – ');
+        .join(' - ');
       if (times) result += `  ·  ${times}`;
     }
     return result;
@@ -72,5 +72,5 @@ export function formatEventDateRange(
   // Different days
   const startFmt = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   const endFmt = end.toLocaleDateString('en-US', opts);
-  return `${startFmt} – ${endFmt}`;
+  return `${startFmt} - ${endFmt}`;
 }

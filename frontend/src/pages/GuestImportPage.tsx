@@ -243,9 +243,9 @@ export default function GuestImportPage() {
                       {result.errors.map((e, i) => (
                         <tr key={i} className="border-t border-slate-100 hover:bg-slate-50">
                           <td className="p-3 font-medium text-slate-900">{e.row}</td>
-                          <td className="p-3 text-slate-700 font-mono text-xs">{e.field || '—'}</td>
+                          <td className="p-3 text-slate-700 font-mono text-xs">{e.field || '-'}</td>
                           <td className="p-3 text-red-600 font-medium">{e.reason}</td>
-                          <td className="p-3 text-slate-500 text-xs">{e.suggestion || '—'}</td>
+                          <td className="p-3 text-slate-500 text-xs">{e.suggestion || '-'}</td>
                         </tr>
                       ))}
                     </tbody>
