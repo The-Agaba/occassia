@@ -183,7 +183,7 @@ sequenceDiagram
 | Node.js | 20+ |
 | PostgreSQL | 16+ (or Docker) |
 
-### Option A — Docker (recommended)
+### Option A - Docker (recommended)
 
 ```bash
 git clone <your-repo-url>
@@ -198,7 +198,7 @@ docker compose up --build
 | Swagger UI | http://localhost:8080/swagger-ui.html |
 | PostgreSQL | `localhost:5432` |
 
-### Option B — Manual
+### Option B - Manual
 
 **1. Database**
 
@@ -236,7 +236,7 @@ All seeded passwords: **`admin123`**
 | Email | Role | Access |
 |-------|------|--------|
 | `admin@occassia.com` | SUPER_ADMIN | All organizations, system-wide |
-| `jane@elegantevents.com` | ADMIN | Full org access — Elegant Events Co. |
+| `jane@elegantevents.com` | ADMIN | Full org access - Elegant Events Co. |
 | `mike@elegantevents.com` | EVENT_MANAGER | Guests, cards, events |
 | `sam@elegantevents.com` | CHECKIN_STAFF | Check-in screen + read-only views |
 | `vera@elegantevents.com` | VIEWER | Dashboard & reports (read-only) |
@@ -247,11 +247,11 @@ A sample **Kiprotich Wedding** event (DRAFT) is pre-seeded with VIP / Family / R
 
 ## 📡 API Documentation
 
-Occassia uses **SpringDoc OpenAPI 3** (Swagger). Documentation lives on the **backend only** — it is not embedded in the React UI.
+Occassia uses **SpringDoc OpenAPI 3** (Swagger). Documentation lives on the **backend only** - it is not embedded in the React UI.
 
 | Endpoint | Description |
 |----------|-------------|
-| [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html) | Interactive Swagger UI — try endpoints in browser |
+| [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html) | Interactive Swagger UI - try endpoints in browser |
 | [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs) | OpenAPI 3 JSON spec |
 | [http://localhost:8080/v3/api-docs.yaml](http://localhost:8080/v3/api-docs.yaml) | OpenAPI 3 YAML spec |
 | [http://localhost:8080/api/v1/docs](http://localhost:8080/api/v1/docs) | Discovery JSON with links to all doc endpoints |
@@ -393,7 +393,7 @@ curl -X POST http://localhost:8080/api/v1/auth/login \
 
 ## 📄 License
 
-Proprietary — Occassia v1.0. All rights reserved.
+Proprietary - Occassia v1.0. All rights reserved.
 
 ---
 
@@ -401,6 +401,6 @@ Proprietary — Occassia v1.0. All rights reserved.
 
 <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorLeft=6366f1&customColorRight=8b5cf6&height=100&section=footer&reversal=true" alt="Footer wave" />
 
-**Occassia** — *Every guest. Every gate. One platform.*
+**Occassia** - *Every guest. Every gate. One platform.*
 
 </div>

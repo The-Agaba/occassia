@@ -17,7 +17,7 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "Check-in", description = "NFC, QR, and manual check-in — IoT gate device contract")
+@Tag(name = "Check-in", description = "NFC, QR, and manual check-in - IoT gate device contract")
 public class CheckInController {
 
     private final CheckInService checkInService;

@@ -1,4 +1,4 @@
-# Occassia — Developer Guide
+# Occassia - Developer Guide
 
 > **Audience:** Backend engineers, frontend engineers, IoT/hardware integrators, and DevOps.
 > **Companion doc:** [README.md](./README.md) (product overview & quick start)
@@ -114,14 +114,14 @@ APP/
 
 ### Recommended IDE setup
 
-- **IntelliJ IDEA** — import `backend/` as Maven project, enable Lombok plugin
-- **VS Code / Cursor** — open `frontend/`, install ESLint + Tailwind IntelliSense
+- **IntelliJ IDEA** - import `backend/` as Maven project, enable Lombok plugin
+- **VS Code / Cursor** - open `frontend/`, install ESLint + Tailwind IntelliSense
 
 ---
 
 ## 4. Local Development Setup
 
-### Step 1 — Clone & database
+### Step 1 - Clone & database
 
 ```bash
 git clone <repo-url>
@@ -142,7 +142,7 @@ Flyway runs automatically on backend startup. Migrations:
 | `V1__init.sql` | All tables, enums, indexes |
 | `V2__seed_data.sql` | Demo orgs, users, sample event |
 
-### Step 2 — Backend
+### Step 2 - Backend
 
 ```bash
 cd backend
@@ -156,7 +156,7 @@ curl http://localhost:8080/api/v1/docs
 curl http://localhost:8080/swagger-ui.html   # opens in browser
 ```
 
-### Step 3 — Frontend
+### Step 3 - Frontend
 
 ```bash
 cd frontend
@@ -166,7 +166,7 @@ npm run dev
 
 Vite proxies `/api` and `/ws` to `localhost:8080` (see `vite.config.ts`).
 
-### Step 4 — Smoke test
+### Step 4 - Smoke test
 
 ```bash
 # Login
@@ -192,10 +192,10 @@ curl -s http://localhost:8080/api/v1/events \
 | `spring.datasource.username` | `SPRING_DATASOURCE_USERNAME` | `occassia` | |
 | `spring.datasource.password` | `SPRING_DATASOURCE_PASSWORD` | `occassia` | |
 | `occassia.jwt.secret` | `JWT_SECRET` | dev default | **Must change in prod** |
-| `occassia.jwt.access-expiration-ms` | — | `28800000` (8h) | |
-| `occassia.jwt.refresh-expiration-ms` | — | `604800000` (7d) | |
-| `springdoc.swagger-ui.path` | — | `/swagger-ui.html` | Swagger UI |
-| `springdoc.api-docs.path` | — | `/v3/api-docs` | OpenAPI JSON |
+| `occassia.jwt.access-expiration-ms` | - | `28800000` (8h) | |
+| `occassia.jwt.refresh-expiration-ms` | - | `604800000` (7d) | |
+| `springdoc.swagger-ui.path` | - | `/swagger-ui.html` | Swagger UI |
+| `springdoc.api-docs.path` | - | `/v3/api-docs` | OpenAPI JSON |
 
 ### `frontend/vite.config.ts`
 
@@ -232,9 +232,9 @@ organizations
 
 1. **Never edit applied Flyway migrations.** Create `V3__description.sql`, etc.
 2. Use PostgreSQL native `ENUM` types (already defined in V1).
-3. `audit_logs.detail` is `JSONB` — use for flexible context.
+3. `audit_logs.detail` is `JSONB` - use for flexible context.
 4. `guests.qr_token` is unique and auto-generated on insert.
-5. `check_ins.guest_id` has a `UNIQUE` constraint — one check-in per guest.
+5. `check_ins.guest_id` has a `UNIQUE` constraint - one check-in per guest.
 
 ### Reset local database
 
@@ -258,10 +258,10 @@ POST /api/v1/auth/logout  →  blocklists access token JTI
 
 ### Token contents (access token claims)
 
-- `sub` — user UUID
+- `sub` - user UUID
 - `email`, `role`, `organizationId`
-- `type` — `"access"` or `"refresh"`
-- `jti` — unique token ID (used for blocklist on logout)
+- `type` - `"access"` or `"refresh"`
+- `jti` - unique token ID (used for blocklist on logout)
 
 ### Security filter chain
 
@@ -273,7 +273,7 @@ POST /api/v1/auth/logout  →  blocklists access token JTI
 | `/api/v1/docs` | No |
 | `/swagger-ui/**`, `/v3/api-docs/**` | No |
 | `/ws/**` | No (add auth in prod if needed) |
-| Everything else | Yes — `Authorization: Bearer <token>` |
+| Everything else | Yes - `Authorization: Bearer <token>` |
 
 ### Org isolation
 
@@ -321,7 +321,7 @@ BCrypt via `PasswordEncoder` bean. Seed password `admin123` hash is in `V2__seed
 
 ### Pagination
 
-Not implemented in v1.0 — list endpoints return full result sets. Add before scaling.
+Not implemented in v1.0 - list endpoints return full result sets. Add before scaling.
 
 ---
 
@@ -396,7 +396,7 @@ Uses `@stomp/stompjs` + `sockjs-client`. JWT passed in STOMP connect headers.
 
 ### Publisher
 
-`CheckInEventPublisher` in `websocket/` package — called from `CheckInService` and `CardService`.
+`CheckInEventPublisher` in `websocket/` package - called from `CheckInService` and `CardService`.
 
 ### Subscribing (example)
 
@@ -411,7 +411,7 @@ stompClient.subscribe(`/topic/checkin/${eventId}`, (message) => {
 
 ## 11. Business Rules (Must Not Break)
 
-These are **contractual** — especially for the IoT team.
+These are **contractual** - especially for the IoT team.
 
 | # | Rule | Enforcement |
 |---|------|-------------|
@@ -424,7 +424,7 @@ These are **contractual** — especially for the IoT team.
 | 7 | Check-in only when event `ACTIVE` | `CheckInService` |
 | 8 | Only DRAFT events can be deleted | `EventService.delete()` |
 | 9 | Important actions write audit log | `AuditService.log()` |
-| 10 | No PII on NFC chip — UID only | Hardware contract |
+| 10 | No PII on NFC chip - UID only | Hardware contract |
 
 ---
 
@@ -446,8 +446,8 @@ SecurityUtils.requireOrgAccess(event.getOrganization().getId());
 
 ### Frontend guards
 
-`ProtectedRoute` — requires JWT.
-`RoleGuard` — wraps admin-only pages.
+`ProtectedRoute` - requires JWT.
+`RoleGuard` - wraps admin-only pages.
 
 ---
 
@@ -455,10 +455,10 @@ SecurityUtils.requireOrgAccess(event.getOrganization().getId());
 
 ### Auth (`auth/`)
 
-- `JwtService` — token create/parse
-- `AuthService` — login, refresh, logout
+- `JwtService` - token create/parse
+- `AuthService` - login, refresh, logout
 - `RefreshToken` + `TokenBlocklistEntry` entities
-- `JwtAuthenticationFilter` — per-request auth
+- `JwtAuthenticationFilter` - per-request auth
 
 ### Events (`event/`)
 
@@ -470,8 +470,8 @@ DRAFT ──► ACTIVE ──► CLOSED ──► ARCHIVED
 
 ### Guests (`guest/`)
 
-- `GuestService` — CRUD, confirm, paid, QR generation (ZXing)
-- `GuestImportService` — CSV + Excel parsing (OpenCSV + POI)
+- `GuestService` - CRUD, confirm, paid, QR generation (ZXing)
+- `GuestImportService` - CSV + Excel parsing (OpenCSV + POI)
 
 ### Cards (`card/`)
 
@@ -497,9 +497,9 @@ See [CONFIGURE.md](./CONFIGURE.md) for reader compatibility, UID formatting, ser
 
 Entry points:
 
-- `POST /api/v1/checkin/nfc` — `{ nfcUid, gateId? }`
-- `POST /api/v1/checkin/qr` — `{ qrToken, gateId? }`
-- `POST /api/v1/checkin/manual` — `{ guestId, gateId? }`
+- `POST /api/v1/checkin/nfc` - `{ nfcUid, gateId? }`
+- `POST /api/v1/checkin/qr` - `{ qrToken, gateId? }`
+- `POST /api/v1/checkin/manual` - `{ guestId, gateId? }`
 
 ---
 
@@ -529,7 +529,7 @@ POST /api/v1/checkin/nfc
 }
 ```
 
-### Success (first check-in) — HTTP 200
+### Success (first check-in) - HTTP 200
 
 ```json
 {
@@ -546,7 +546,7 @@ POST /api/v1/checkin/nfc
 }
 ```
 
-### Already checked in — HTTP 200 (NOT an error)
+### Already checked in - HTTP 200 (NOT an error)
 
 ```json
 {
@@ -614,8 +614,8 @@ All routes under `ProtectedRoute` except `/login`.
 
 ### State
 
-- **Auth** — Zustand `authStore` (token in memory, refreshToken persisted)
-- **API** — Axios with JWT interceptor + auto-refresh on 401
+- **Auth** - Zustand `authStore` (token in memory, refreshToken persisted)
+- **API** - Axios with JWT interceptor + auto-refresh on 401
 
 ### Key pages
 
@@ -682,7 +682,7 @@ Nginx in frontend container proxies `/api` and `/ws` to backend.
 - [ ] Enable HTTPS (TLS termination at load balancer)
 - [ ] Restrict or disable Swagger UI (`springdoc.swagger-ui.enabled=false`)
 - [ ] Set CORS allowed origins explicitly (not `*`)
-- [ ] Rotate demo/seed passwords — do not deploy `V2__seed_data.sql` to prod
+- [ ] Rotate demo/seed passwords - do not deploy `V2__seed_data.sql` to prod
 - [ ] Configure log aggregation
 - [ ] Set up health checks on `/api/v1/docs` or add Spring Actuator
 - [ ] Review WebSocket auth (currently open endpoint)
@@ -691,7 +691,7 @@ Nginx in frontend container proxies `/api` and `/ws` to backend.
 
 ## 20. Troubleshooting
 
-### Backend won't start — Flyway error
+### Backend won't start - Flyway error
 
 ```
 Migration checksum mismatch
@@ -766,4 +766,4 @@ Demo admin:  jane@elegantevents.com / admin123
 
 ---
 
-*Occassia Developer Guide v1.0 — last updated with Swagger/OpenAPI integration*
+*Occassia Developer Guide v1.0 - last updated with Swagger/OpenAPI integration*

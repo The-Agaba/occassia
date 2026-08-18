@@ -53,7 +53,7 @@ Do not show payment processing, face recognition, photo capture, QR codes being 
 | 0:03-0:07 | Close-up of a staff member viewing a clean Occassia dashboard on a laptop or tablet. Show short, legible cards such as `Guest Management`, `Confirmed`, and `Live Dashboard`. | “Occassia gives your team one clear view of every guest and every arrival.” | `Guest Management` |
 | 0:07-0:11 | A staff member selects an eligible guest and assigns an NFC card. Show a small NFC card moving toward a compact reader; show a tasteful confirmation state: `Card Assigned`. | “Register NFC cards by UID, assign them to confirmed guests, and keep entry moving.” | `Register Card` → `Assign Card` |
 | 0:11-0:15 | A guest presents the NFC card at the gate. The reader gives a subtle green confirmation light. Cut to the screen showing `Checked In`. Staff greet the guest with a smile. | “At the gate, a quick tap confirms the right guest in seconds.” | `NFC` · `Checked In` |
-| 0:15-0:19 | Fast but clear montage: another guest presents a QR code on a phone, then a staff member completes a manual check-in for a guest who needs assistance. Keep all actions realistic. | “NFC, QR, or manual check-in—your team has the workflow that fits the moment.” | `NFC` · `QR` · `Manual Check-in` |
+| 0:15-0:19 | Fast but clear montage: another guest presents a QR code on a phone, then a staff member completes a manual check-in for a guest who needs assistance. Keep all actions realistic. | “NFC, QR, or manual check-in-your team has the workflow that fits the moment.” | `NFC` · `QR` · `Manual Check-in` |
 | 0:19-0:23 | Cut to the live operations dashboard. Animated counters update subtly; a gate activity feed and category breakdown refresh. Use abstract fictional data and no personal information. | “See live activity, attendance, and gate updates as the event unfolds.” | `Live Dashboard` |
 | 0:23-0:27 | Show a calm event manager watching the dashboard while the entrance flows smoothly. Intercut with happy guests entering the venue. | “Less confusion at the door. More attention on the experience.” | `Stay in control` |
 | 0:27-0:30 | Clean end card with Occassia wordmark, soft indigo gradient, and a simple event venue background. Hold long enough to read. | “Occassia. Manage guests. Assign cards. Check in with confidence.” | `Occassia` / `Manage guests. Assign cards. Check in with confidence.` |
@@ -89,7 +89,7 @@ Do not show payment processing, face recognition, fake unreadable text, random b
 | 0:00-0:03 | Busy but elegant event entrance; staff organize the queue. | “Event entry should feel effortless.” | `The smarter way in` |
 | 0:03-0:06 | Occassia dashboard on a tablet: guest list, categories, and a clean live status panel. | “Meet Occassia.” | `Occassia` |
 | 0:06-0:10 | NFC card taps a reader; green confirmation appears; guest is welcomed through the gate. | “Register cards, check in guests, and keep the line moving.” | `NFC` → `Checked In` |
-| 0:10-0:13 | Live dashboard updates while guests enter; quick flash of QR and manual check-in options. | “NFC, QR, or manual—stay in control.” | `Live Dashboard` |
+| 0:10-0:13 | Live dashboard updates while guests enter; quick flash of QR and manual check-in options. | “NFC, QR, or manual-stay in control.” | `Live Dashboard` |
 | 0:13-0:15 | Indigo/violet end card with Occassia name and concise promise. | “Occassia. Events, in flow.” | `Occassia` / `Events, in flow.` |
 
 ### 15-second audio direction
@@ -103,7 +103,7 @@ Use one of these short captions without adding unsupported claims:
 - “Manage guests. Assign NFC cards. Check in with confidence.”
 - “A smoother guest experience starts at the door.”
 - “From guest list to live check-in, keep every event in flow.”
-- “NFC, QR, or manual check-in—one clear event workflow.”
+- “NFC, QR, or manual check-in-one clear event workflow.”
 
 Suggested CTA end text:
 
