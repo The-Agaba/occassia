@@ -13,16 +13,16 @@ export const statusColors: Record<string, string> = {
 };
 
 export function formatDate(date: string | Date | null | undefined): string {
-  if (!date) return '-';
+  if (!date) return '—';
   const d = new Date(date);
-  if (isNaN(d.getTime())) return '-';
+  if (isNaN(d.getTime())) return '—';
   return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
 export function formatDateTime(date: string | Date | null | undefined): string {
-  if (!date) return '-';
+  if (!date) return '—';
   const d = new Date(date);
-  if (isNaN(d.getTime())) return '-';
+  if (isNaN(d.getTime())) return '—';
   return d.toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 
@@ -48,12 +48,12 @@ export function formatEventDateRange(
   startTime?: string | null,
   endTime?: string | null
 ): string {
-  if (!startDate) return '-';
+  if (!startDate) return '—';
 
   const start = new Date(startDate);
   const end = endDate ? new Date(endDate) : null;
 
-  if (isNaN(start.getTime())) return '-';
+  if (isNaN(start.getTime())) return '—';
 
   const opts: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'short', day: 'numeric' };
 

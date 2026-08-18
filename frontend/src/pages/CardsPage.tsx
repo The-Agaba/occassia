@@ -341,7 +341,7 @@ export default function CardsPage() {
                         'bg-red-100 text-red-700'
                       }`}>{c.status}</span>
                     </td>
-                    <td className="p-3 text-slate-600">{c.assignedGuestName || '-'}</td>
+                    <td className="p-3 text-slate-600">{c.assignedGuestName || '—'}</td>
                   </tr>
                 ))}
               </tbody>

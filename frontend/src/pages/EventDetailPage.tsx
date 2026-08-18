@@ -96,7 +96,7 @@ export default function EventDetailPage() {
 
   /** Build a human-friendly date range string */
   const renderDateRange = () => {
-    if (!effectiveStartDate) return '-';
+    if (!effectiveStartDate) return '—';
     if (isSameDay) {
       return formatDate(effectiveStartDate);
     }

@@ -192,10 +192,10 @@ curl -s http://localhost:8080/api/v1/events \
 | `spring.datasource.username` | `SPRING_DATASOURCE_USERNAME` | `occassia` | |
 | `spring.datasource.password` | `SPRING_DATASOURCE_PASSWORD` | `occassia` | |
 | `occassia.jwt.secret` | `JWT_SECRET` | dev default | **Must change in prod** |
-| `occassia.jwt.access-expiration-ms` | - | `28800000` (8h) | |
-| `occassia.jwt.refresh-expiration-ms` | - | `604800000` (7d) | |
-| `springdoc.swagger-ui.path` | - | `/swagger-ui.html` | Swagger UI |
-| `springdoc.api-docs.path` | - | `/v3/api-docs` | OpenAPI JSON |
+| `occassia.jwt.access-expiration-ms` | — | `28800000` (8h) | |
+| `occassia.jwt.refresh-expiration-ms` | — | `604800000` (7d) | |
+| `springdoc.swagger-ui.path` | — | `/swagger-ui.html` | Swagger UI |
+| `springdoc.api-docs.path` | — | `/v3/api-docs` | OpenAPI JSON |
 
 ### `frontend/vite.config.ts`
 

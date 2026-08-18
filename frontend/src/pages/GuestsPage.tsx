@@ -254,7 +254,7 @@ export default function GuestsPage() {
                       {g.checkedIn && <span className="text-xs bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded">Checked in</span>}
                     </div>
                   </td>
-                  <td className="p-3 text-slate-500 font-mono text-xs">{g.nfcCardUid || '-'}</td>
+                  <td className="p-3 text-slate-500 font-mono text-xs">{g.nfcCardUid || '—'}</td>
                   <td className="p-3">
                     <div className="flex gap-1">
                       {canManage && !g.confirmed && (
