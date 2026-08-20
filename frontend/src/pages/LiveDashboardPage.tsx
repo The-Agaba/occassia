@@ -96,11 +96,11 @@ export default function LiveDashboardPage() {
   return (
     <div>
       <EventTabs />
-      <div className="p-8">
+      <div className="p-4 sm:p-8">
         
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-6">
           <h2 className="text-xl font-bold">Live Dashboard</h2>
-          <div className="flex items-center gap-2 text-xs font-medium bg-white border px-3 py-1.5 rounded-full shadow-sm">
+          <div className="flex items-center gap-2 text-xs font-medium bg-white border px-3 py-1.5 rounded-full shadow-sm self-start sm:self-auto">
             {connState === 'CONNECTED' ? (
               <><span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]" /> Live</>
             ) : connState === 'CONNECTING' || connState === 'RECONNECTING' ? (
@@ -114,7 +114,7 @@ export default function LiveDashboardPage() {
         <ConnectionStatusBanner />
 
         {stats && (
-          <div className="grid md:grid-cols-3 gap-4 mb-8">
+          <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-8">
             <div className="bg-white border rounded-xl p-6 text-center shadow-sm">
               <p className="text-3xl font-bold text-slate-900">{stats.totalGuests}</p>
               <p className="text-slate-500 text-sm mt-1">Total Invited</p>

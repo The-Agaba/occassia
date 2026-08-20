@@ -135,7 +135,7 @@ export default function CardsPage() {
   return (
     <div>
       <EventTabs />
-      <div className="p-8 grid lg:grid-cols-2 gap-8">
+      <div className="p-4 sm:p-8 grid md:grid-cols-2 gap-6 sm:gap-8">
         {canManage ? (
           <div className="space-y-6">
             <div className="bg-white border rounded-xl p-6">
@@ -322,7 +322,7 @@ export default function CardsPage() {
         <div className="bg-white border rounded-xl overflow-hidden">
           <div className="p-4 border-b font-semibold">Organization Cards ({cards.length})</div>
           <div className="max-h-[500px] overflow-y-auto overflow-x-auto">
-            <table className="w-full text-sm min-w-[450px]">
+            <table className="w-full text-sm min-w-[380px]">
               <thead className="bg-slate-50 sticky top-0">
                 <tr>
                   <th className="text-left p-3">UID</th>

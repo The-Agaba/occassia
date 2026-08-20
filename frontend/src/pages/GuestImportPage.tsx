@@ -196,7 +196,7 @@ export default function GuestImportPage() {
               </button>
             </div>
 
-            <div className="grid grid-cols-3 gap-4 mb-8">
+            <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-8">
               <div className="bg-white border rounded-xl p-5 text-center shadow-sm">
                 <CheckCircle2 size={24} className="mx-auto text-emerald-500 mb-2" />
                 <p className="text-3xl font-bold text-slate-900">{result.imported}</p>

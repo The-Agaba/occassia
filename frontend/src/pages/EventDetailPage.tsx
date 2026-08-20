@@ -119,12 +119,12 @@ export default function EventDetailPage() {
 
   return (
     <div>
-      <div className="p-8 pb-0">
-        <div className="flex items-start justify-between">
-          <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold">{event.name}</h1>
-              <span className={`text-xs px-2 py-1 rounded-full font-medium ${statusColors[event.status]}`}>
+      <div className="p-4 sm:p-8 pb-0">
+        <div className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-0 justify-between">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h1 className="text-xl sm:text-2xl font-bold">{event.name}</h1>
+              <span className={`text-xs px-2 py-1 rounded-full font-medium shrink-0 ${statusColors[event.status]}`}>
                 {event.status}
               </span>
             </div>
@@ -153,14 +153,14 @@ export default function EventDetailPage() {
             {event.venue && (
               <p className="mt-1 flex items-center gap-1.5 text-sm text-slate-400">
                 <MapPin size={14} />
-                {event.venue}
+                <span className="truncate">{event.venue}</span>
               </p>
             )}
           </div>
           {canChangeStatus && nextStatus && (
             <button
               onClick={() => changeStatus(nextStatus)}
-              className="px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700"
+              className="px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 shrink-0 self-start"
             >
               Set {nextStatus}
             </button>
@@ -168,7 +168,7 @@ export default function EventDetailPage() {
         </div>
       </div>
       <EventTabs />
-      <div className="p-8 grid lg:grid-cols-2 gap-8">
+      <div className="p-4 sm:p-8 grid lg:grid-cols-2 gap-6 sm:gap-8">
         <div>
           <h3 className="font-semibold mb-3">Guest Categories</h3>
           <div className="flex flex-wrap gap-2 mb-4">
@@ -179,11 +179,13 @@ export default function EventDetailPage() {
             ))}
           </div>
           {canManage && (
-            <form onSubmit={addCategory} className="flex gap-2 flex-wrap">
-              <input placeholder="Name" value={newCat.name} onChange={(e) => setNewCat({ ...newCat, name: e.target.value })} className="px-3 py-2 border rounded-lg" required />
-              <input type="number" placeholder="Priority" value={newCat.priorityLevel} onChange={(e) => setNewCat({ ...newCat, priorityLevel: +e.target.value })} className="w-20 px-3 py-2 border rounded-lg" />
-              <input type="color" value={newCat.colorHex} onChange={(e) => setNewCat({ ...newCat, colorHex: e.target.value })} className="h-10 w-12 border rounded" />
-              <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm">Add</button>
+            <form onSubmit={addCategory} className="flex flex-col sm:flex-row gap-2 flex-wrap">
+              <input placeholder="Name" value={newCat.name} onChange={(e) => setNewCat({ ...newCat, name: e.target.value })} className="flex-1 min-w-0 px-3 py-2 border rounded-lg" required />
+              <div className="flex gap-2">
+                <input type="number" placeholder="Priority" value={newCat.priorityLevel} onChange={(e) => setNewCat({ ...newCat, priorityLevel: +e.target.value })} className="w-24 px-3 py-2 border rounded-lg" />
+                <input type="color" value={newCat.colorHex} onChange={(e) => setNewCat({ ...newCat, colorHex: e.target.value })} className="h-10 w-12 border rounded" />
+                <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm">Add</button>
+              </div>
             </form>
           )}
         </div>
@@ -195,10 +197,12 @@ export default function EventDetailPage() {
             ))}
           </ul>
           {canManage && (
-            <form onSubmit={addGate} className="flex gap-2 flex-wrap">
-              <input placeholder="Gate name" value={newGate.name} onChange={(e) => setNewGate({ ...newGate, name: e.target.value })} className="px-3 py-2 border rounded-lg" required />
-              <input placeholder="Location" value={newGate.location} onChange={(e) => setNewGate({ ...newGate, location: e.target.value })} className="px-3 py-2 border rounded-lg" />
-              <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm">Add</button>
+            <form onSubmit={addGate} className="flex flex-col sm:flex-row gap-2 flex-wrap">
+              <input placeholder="Gate name" value={newGate.name} onChange={(e) => setNewGate({ ...newGate, name: e.target.value })} className="flex-1 min-w-0 px-3 py-2 border rounded-lg" required />
+              <div className="flex gap-2">
+                <input placeholder="Location" value={newGate.location} onChange={(e) => setNewGate({ ...newGate, location: e.target.value })} className="flex-1 min-w-0 px-3 py-2 border rounded-lg" />
+                <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm shrink-0">Add</button>
+              </div>
             </form>
           )}
         </div>

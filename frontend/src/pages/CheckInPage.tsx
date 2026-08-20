@@ -139,7 +139,7 @@ export default function CheckInPage() {
   return (
     <div>
       <EventTabs />
-      <div className="p-8">
+      <div className="p-4 sm:p-8">
         <div className="max-w-2xl mx-auto">
           
           <div className="mb-6 flex gap-3">
@@ -211,14 +211,14 @@ export default function CheckInPage() {
                   <p className="text-sm text-slate-500 mb-4">
                     Use this mode if you are using an external USB/Bluetooth scanner that acts as a keyboard, or if you need to manually type a UID.
                   </p>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2">
                     <input
                       ref={inputRef}
                       placeholder="Scan or type UID..."
                       value={nfcUid}
                       onChange={(e) => setNfcUid(e.target.value)}
                       onKeyDown={handleManualKeyDown}
-                      className="flex-1 px-4 py-2.5 border rounded-lg font-mono text-lg shadow-inner bg-slate-50 focus:bg-white transition-colors"
+                      className="flex-1 min-w-0 px-4 py-2.5 border rounded-lg font-mono text-lg shadow-inner bg-slate-50 focus:bg-white transition-colors"
                       autoFocus
                     />
                     <button onClick={() => executeCheckIn(nfcUid)} className="px-6 py-2.5 bg-slate-800 text-white rounded-lg font-medium hover:bg-slate-900 transition-colors">
@@ -251,7 +251,7 @@ export default function CheckInPage() {
                 </div>
               )}
               
-              <p className="text-4xl font-bold text-slate-900 tracking-tight">{lastCheckIn.guest.fullName}</p>
+              <p className="text-2xl sm:text-4xl font-bold text-slate-900 tracking-tight break-words">{lastCheckIn.guest.fullName}</p>
               
               <div className="mt-5 flex justify-center items-center gap-3">
                 <span

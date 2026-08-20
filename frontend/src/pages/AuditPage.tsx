@@ -19,7 +19,7 @@ export default function AuditPage() {
   );
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-8">
       <h1 className="text-2xl font-bold mb-6">Audit Log</h1>
       <input
         placeholder="Filter by action or entity..."
@@ -27,8 +27,8 @@ export default function AuditPage() {
         onChange={(e) => setFilter(e.target.value)}
         className="mb-4 px-3 py-2 border rounded-lg w-full max-w-md"
       />
-      <div className="bg-white border rounded-xl overflow-hidden">
-        <table className="w-full text-sm">
+      <div className="bg-white border rounded-xl overflow-hidden overflow-x-auto">
+        <table className="w-full text-sm min-w-[560px]">
           <thead className="bg-slate-50">
             <tr>
               <th className="text-left p-3">Time</th>

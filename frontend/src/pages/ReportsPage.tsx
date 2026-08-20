@@ -45,7 +45,7 @@ export default function ReportsPage() {
   return (
     <div>
       <EventTabs />
-      <div className="p-8">
+      <div className="p-4 sm:p-8">
         
         {exportError && (
           <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center gap-2 text-sm shadow-sm">
@@ -54,12 +54,12 @@ export default function ReportsPage() {
           </div>
         )}
 
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-6">
           <h2 className="text-xl font-bold">Attendance Report</h2>
           <button
             onClick={handleExport}
             disabled={isExporting}
-            className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded-lg shadow-sm transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded-lg shadow-sm transition-colors disabled:opacity-70 disabled:cursor-not-allowed self-start sm:self-auto"
           >
             {isExporting ? (
               <><Loader2 size={16} className="animate-spin" /> Exporting...</>
@@ -71,7 +71,7 @@ export default function ReportsPage() {
 
         {stats && (
           <>
-            <div className="grid md:grid-cols-4 gap-4 mb-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
               <div className="bg-white border rounded-xl p-4">
                 <p className="text-2xl font-bold">{stats.totalGuests}</p>
                 <p className="text-sm text-slate-500">Total</p>

@@ -119,12 +119,12 @@ export default function GuestsPage() {
   return (
     <div>
       {event && (
-        <div className="px-8 pt-4">
+        <div className="px-4 sm:px-8 pt-4">
           <h2 className="text-lg font-semibold text-slate-700">{event.name}</h2>
         </div>
       )}
       <EventTabs />
-      <div className="p-8">
+      <div className="p-4 sm:p-8">
         
         {/* QR Modal */}
         {qrModalGuest && (
@@ -172,53 +172,57 @@ export default function GuestsPage() {
           </div>
         )}
 
-        <div className="flex flex-wrap gap-3 mb-6">
+        <div className="flex flex-col sm:flex-row flex-wrap gap-3 mb-6">
           <input
             placeholder="Search guests..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="px-3 py-2 border rounded-lg flex-1 min-w-[200px]"
+            className="px-3 py-2 border rounded-lg flex-1 min-w-0"
           />
-          <select
-            value={filterCategory}
-            onChange={(e) => setFilterCategory(e.target.value)}
-            className="px-3 py-2 border rounded-lg"
-          >
-            <option value="">All categories</option>
-            {categories.map((c) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
-            ))}
-          </select>
-          {canManage && (
-            <button
-              onClick={() => setShowAdd(!showAdd)}
-              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+          <div className="flex gap-2 flex-wrap">
+            <select
+              value={filterCategory}
+              onChange={(e) => setFilterCategory(e.target.value)}
+              className="flex-1 sm:flex-none px-3 py-2 border rounded-lg"
             >
-              Add Guest
-            </button>
-          )}
-          {canManage && (
-            <Link
-              to={`/events/${id}/guests/import`}
-              className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-slate-50"
-            >
-              <Upload size={16} /> Import CSV
-            </Link>
-          )}
+              <option value="">All categories</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </select>
+            {canManage && (
+              <button
+                onClick={() => setShowAdd(!showAdd)}
+                className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+              >
+                Add Guest
+              </button>
+            )}
+            {canManage && (
+              <Link
+                to={`/events/${id}/guests/import`}
+                className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-slate-50"
+              >
+                <Upload size={16} /> Import CSV
+              </Link>
+            )}
+          </div>
         </div>
 
         {showAdd && canManage && (
-          <form onSubmit={handleAddGuest} className="bg-white border rounded-xl p-4 mb-4 grid md:grid-cols-4 gap-3">
-            <input placeholder="Full name" value={newGuest.fullName} onChange={(e) => setNewGuest({ ...newGuest, fullName: e.target.value })} className="px-3 py-2 border rounded-lg" required />
-            <select value={newGuest.attendanceType} onChange={(e) => setNewGuest({ ...newGuest, attendanceType: e.target.value })} className="px-3 py-2 border rounded-lg">
-              <option value="SINGLE">Single</option>
-              <option value="DOUBLE">Double</option>
-            </select>
-            <select value={newGuest.categoryId} onChange={(e) => setNewGuest({ ...newGuest, categoryId: e.target.value })} className="px-3 py-2 border rounded-lg" required>
-              <option value="">Category</option>
-              {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-            </select>
-            <button type="submit" className="px-4 py-2 bg-emerald-600 text-white rounded-lg">Save</button>
+          <form onSubmit={handleAddGuest} className="bg-white border rounded-xl p-4 mb-4 flex flex-col gap-3">
+            <input placeholder="Full name" value={newGuest.fullName} onChange={(e) => setNewGuest({ ...newGuest, fullName: e.target.value })} className="w-full px-3 py-2 border rounded-lg" required />
+            <div className="flex flex-col sm:flex-row gap-3">
+              <select value={newGuest.attendanceType} onChange={(e) => setNewGuest({ ...newGuest, attendanceType: e.target.value })} className="flex-1 px-3 py-2 border rounded-lg">
+                <option value="SINGLE">Single</option>
+                <option value="DOUBLE">Double</option>
+              </select>
+              <select value={newGuest.categoryId} onChange={(e) => setNewGuest({ ...newGuest, categoryId: e.target.value })} className="flex-1 px-3 py-2 border rounded-lg" required>
+                <option value="">Category</option>
+                {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+              <button type="submit" className="px-6 py-2 bg-emerald-600 text-white rounded-lg shrink-0">Save</button>
+            </div>
           </form>
         )}
 
