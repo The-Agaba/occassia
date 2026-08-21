@@ -1,0 +1,14 @@
+# robots.txt for Occassia
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://occassia.com/sitemap.xml
+
+# Disallow admin areas if needed
+# Disallow: /admin
+# Disallow: /api
+
+# Crawl-delay (optional, adjust based on server capacity)
+# Crawl-delay: 1

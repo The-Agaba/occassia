@@ -7,6 +7,7 @@ import type { Event } from '../types';
 import { formatDate, statusColors } from '../lib/utils';
 import { Plus } from 'lucide-react';
 import Spinner from '../components/Spinner';
+import SEO from '../components/SEO';
 
 export default function DashboardPage() {
   const [events, setEvents] = useState<Event[]>([]);
@@ -28,7 +29,13 @@ export default function DashboardPage() {
   }, [setLoading, showToast]);
 
   return (
-    <div className="p-4 sm:p-8 lg:p-10">
+    <>
+      <SEO 
+        title="Events Dashboard - Occassia"
+        description="View and manage all your wedding and events in one place. Track event status, guest lists, and operational details."
+        keywords="events dashboard, event management, wedding events overview, event tracking"
+      />
+      <div className="p-4 sm:p-8 lg:p-10">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10">
         <div>
           <h1 className="font-display text-3xl font-semibold text-[#0c0f14]">Events</h1>
@@ -78,5 +85,6 @@ export default function DashboardPage() {
         </div>
       )}
     </div>
+    </>
   );
 }

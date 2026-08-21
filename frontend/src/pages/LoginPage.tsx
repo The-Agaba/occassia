@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { authApi } from '../api';
 import { useAuthStore } from '../store/authStore';
 import { ArrowRight, Eye, EyeOff } from 'lucide-react';
+import SEO from '../components/SEO';
 
 const schema = z.object({
   email: z.string().email('Enter a valid email'),
@@ -24,6 +25,7 @@ export default function LoginPage() {
   const setAuth = useAuthStore((s) => s.setAuth);
   const [error, setError] = useState('');
   const [videoFailed, setVideoFailed] = useState(false);
+  const [videoLoaded, setVideoLoaded] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const {
     register,
@@ -43,21 +45,39 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <>
+      <SEO 
+        title="Login - Occassia Event Management"
+        description="Sign in to Occassia to manage your wedding and event guests, track attendance, and streamline event operations."
+        keywords="login, sign in, event management login, wedding guest management access"
+      />
+      <div className="min-h-screen flex">
       {/* Left - full-bleed event media */}
       <div className="hidden lg:block lg:w-[52%] xl:w-[55%] relative overflow-hidden bg-[#0c0f14]">
         {!videoFailed ? (
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            poster={EVENT_POSTER}
-            onError={() => setVideoFailed(true)}
-            className="absolute inset-0 w-full h-full object-cover"
-          >
-            <source src={EVENT_VIDEO} type="video/mp4" />
-          </video>
+          <>
+            {!videoLoaded && (
+              <div 
+                className="absolute inset-0 bg-cover bg-center transition-opacity duration-500"
+                style={{ backgroundImage: `url(${EVENT_POSTER})` }}
+              />
+            )}
+            <video
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              poster={EVENT_POSTER}
+              onError={() => setVideoFailed(true)}
+              onCanPlay={() => setVideoLoaded(true)}
+              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
+                videoLoaded ? 'opacity-100' : 'opacity-0'
+              }`}
+            >
+              <source src={EVENT_VIDEO} type="video/mp4" />
+            </video>
+          </>
         ) : (
           <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${EVENT_POSTER})` }} />
         )}
@@ -183,5 +203,6 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }

@@ -8,6 +8,7 @@ import { useAuthStore } from '../store/authStore';
 import { useUiStore } from '../store/uiStore';
 import { CalendarDays, Clock, MapPin } from 'lucide-react';
 import Spinner from '../components/Spinner';
+import SEO from '../components/SEO';
 
 export default function EventDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -118,8 +119,16 @@ export default function EventDetailPage() {
 
   const timeRange = renderTimeRange();
 
+  if (!event) return <div className="p-8"><Spinner text="Loading event…" useLogo={true} size="lg" /></div>;
+
   return (
-    <div>
+    <>
+      <SEO 
+        title={`${event.name} - Occassia`}
+        description={`Manage ${event.name} details, guest categories, gates, and operational settings. Track event status and coordinate wedding or event operations.`}
+        keywords="event details, event management, wedding event operations, guest categories, event gates"
+      />
+      <div>
       <div className="p-4 sm:p-8 pb-0">
         <div className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-0 justify-between">
           <div className="min-w-0">
@@ -209,5 +218,6 @@ export default function EventDetailPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }
