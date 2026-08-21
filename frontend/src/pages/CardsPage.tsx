@@ -134,9 +134,6 @@ export default function CardsPage() {
 
   return (
     <div>
-      <div className="p-4 sm:p-8 pb-0">
-        {/* Page header can be added here if needed */}
-      </div>
       <EventTabs />
       <div className="p-4 sm:p-8 grid md:grid-cols-2 gap-6 sm:gap-8">
         {canManage ? (

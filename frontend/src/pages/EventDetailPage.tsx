@@ -18,42 +18,35 @@ export default function EventDetailPage() {
   const [newCat, setNewCat] = useState({ name: '', priorityLevel: 1, colorHex: '#6B7280' });
   const [newGate, setNewGate] = useState({ name: '', location: '' });
   const user = useAuthStore((s) => s.user);
-  const setLoading = useUiStore((s) => s.setLoading);
   const showToast = useUiStore((s) => s.showToast);
   const canChangeStatus = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
   const canManage = user?.role === 'ADMIN' || user?.role === 'EVENT_MANAGER';
 
   useEffect(() => {
     if (!id) return;
-    setLoading(true);
     Promise.all([eventsApi.get(id), categoriesApi.list(id), gatesApi.list(id)])
       .then(([eventRes, categoryRes, gateRes]) => {
         setEvent(eventRes.data);
         setCategories(categoryRes.data);
         setGates(gateRes.data);
       })
-      .catch((err: any) => showToast(err.response?.data?.message || 'Failed to load event details', 'error'))
-      .finally(() => setLoading(false));
-  }, [id, setLoading, showToast]);
+      .catch((err: any) => showToast(err.response?.data?.message || 'Failed to load event details', 'error'));
+  }, [id, showToast]);
 
   const changeStatus = async (status: string) => {
     if (!id) return;
-    setLoading(true);
     try {
       const res = await eventsApi.updateStatus(id, status);
       setEvent(res.data);
       showToast(`Event status updated to ${status}`, 'success');
     } catch (err: any) {
       showToast(err.response?.data?.message || 'Failed to update event status', 'error');
-    } finally {
-      setLoading(false);
     }
   };
 
   const addCategory = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!id) return;
-    setLoading(true);
     try {
       await categoriesApi.create(id, newCat);
       setNewCat({ name: '', priorityLevel: 1, colorHex: '#6B7280' });
@@ -62,15 +55,12 @@ export default function EventDetailPage() {
       showToast('Category added successfully', 'success');
     } catch (err: any) {
       showToast(err.response?.data?.message || 'Failed to add category', 'error');
-    } finally {
-      setLoading(false);
     }
   };
 
   const addGate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!id) return;
-    setLoading(true);
     try {
       await gatesApi.create(id, newGate);
       setNewGate({ name: '', location: '' });
@@ -79,8 +69,6 @@ export default function EventDetailPage() {
       showToast('Gate added successfully', 'success');
     } catch (err: any) {
       showToast(err.response?.data?.message || 'Failed to add gate', 'error');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -129,7 +117,7 @@ export default function EventDetailPage() {
         keywords="event details, event management, wedding event operations, guest categories, event gates"
       />
       <div>
-      <div className="p-4 sm:p-8 pb-0">
+      <div className="p-4 sm:p-8 pb-2">
         <div className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-0 justify-between">
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
