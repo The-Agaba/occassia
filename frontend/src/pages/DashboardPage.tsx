@@ -6,6 +6,7 @@ import { useUiStore } from '../store/uiStore';
 import type { Event } from '../types';
 import { formatDate, statusColors } from '../lib/utils';
 import { Plus } from 'lucide-react';
+import Spinner from '../components/Spinner';
 
 export default function DashboardPage() {
   const [events, setEvents] = useState<Event[]>([]);
@@ -48,7 +49,7 @@ export default function DashboardPage() {
       </div>
 
       {loading ? (
-        <div className="text-[#9ca3af] text-sm">Loading events…</div>
+        <div className="py-12"><Spinner text="Loading events…" useLogo={true} size="lg" /></div>
       ) : events.length === 0 ? (
         <div className="text-center py-20 card">
           <p className="text-[#6b7280]">No events yet. Create your first event to get started.</p>

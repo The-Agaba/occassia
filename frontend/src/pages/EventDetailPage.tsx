@@ -7,6 +7,7 @@ import { formatDate, formatTime, statusColors } from '../lib/utils';
 import { useAuthStore } from '../store/authStore';
 import { useUiStore } from '../store/uiStore';
 import { CalendarDays, Clock, MapPin } from 'lucide-react';
+import Spinner from '../components/Spinner';
 
 export default function EventDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -82,7 +83,7 @@ export default function EventDetailPage() {
     }
   };
 
-  if (!event) return <div className="p-8 text-slate-500">Loading event…</div>;
+  if (!event) return <div className="p-8"><Spinner text="Loading event…" useLogo={true} size="lg" /></div>;
 
   const nextStatus =
     event.status === 'DRAFT' ? 'ACTIVE' :

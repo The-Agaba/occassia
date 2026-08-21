@@ -4,6 +4,7 @@ import type { Organization } from '../types';
 import { Plus, Edit2, Power, X, Building2, AlertCircle } from 'lucide-react';
 import { useUiStore } from '../store/uiStore';
 import { formatDateTime } from '../lib/utils';
+import Spinner from '../components/Spinner';
 
 interface OrgForm {
   name: string;
@@ -235,7 +236,7 @@ export default function OrganizationPage() {
 
       {/* Loading */}
       {loading ? (
-        <div className="text-slate-400 text-sm py-12 text-center">Loading organizations…</div>
+        <div className="py-12"><Spinner text="Loading organizations…" useLogo={true} size="lg" /></div>
       ) : orgs.length === 0 ? (
         <div className="text-center py-20 bg-white border rounded-xl">
           <Building2 size={40} className="mx-auto text-slate-200 mb-3" />

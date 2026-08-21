@@ -106,12 +106,7 @@ export default function LoginPage() {
         <div className="w-full max-w-sm mx-auto relative z-10">
           <div className="mb-12">
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-[#0c0f14]/10 bg-white shadow-sm">
-              <svg viewBox="0 0 64 64" className="h-7 w-7" aria-label="Occassia logo">
-                <rect width="64" height="64" rx="16" fill="#0c0f14" />
-                <path d="M20 44V20h10c7 0 12 4.4 12 12s-5 12-12 12H20Z" fill="#d4b896" />
-                <path d="M34 44V20h10c7 0 12 4.4 12 12s-5 12-12 12H34Z" fill="#b8956a" />
-                <circle cx="20" cy="20" r="6" fill="#fff" fill-opacity="0.92" />
-              </svg>
+              <img src="/new-favicon.svg" alt="Occassia logo" className="h-7 w-7" />
             </div>
             <h1 className="font-display text-4xl text-[#0c0f14] font-semibold tracking-tight">
               Occassia

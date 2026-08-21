@@ -95,6 +95,9 @@ export default function LiveDashboardPage() {
 
   return (
     <div>
+      <div className="p-4 sm:p-8 pb-0">
+        {/* Page header can be added here if needed */}
+      </div>
       <EventTabs />
       <div className="p-4 sm:p-8">
         

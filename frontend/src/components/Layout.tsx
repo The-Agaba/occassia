@@ -96,11 +96,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-[#faf8f5]">
       <div className="md:hidden flex items-center justify-between border-b border-[#0c0f14]/10 bg-[#0c0f14] px-4 py-3 text-white">
-        <div>
-          <h1 className="font-display text-xl font-semibold tracking-tight">Occassia</h1>
-          <p className="text-[10px] uppercase tracking-[0.3em] text-[#b8956a]">
-            Cotronix · Events
-          </p>
+        <div className="flex items-center gap-3">
+          <img src="/new-favicon.svg" alt="Occassia logo" className="h-8 w-8" />
+          <div>
+            <h1 className="font-display text-xl font-semibold tracking-tight">Occassia</h1>
+            <p className="text-[10px] uppercase tracking-[0.3em] text-[#b8956a]">
+              Cotronix · Events
+            </p>
+          </div>
         </div>
         <button
           type="button"
@@ -123,9 +126,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
       <aside className="hidden w-64 shrink-0 flex-col bg-[#0c0f14] text-white md:flex">
         <div className="p-6">
-          <h1 className="font-display text-2xl font-semibold tracking-tight text-white">
-            Occassia
-          </h1>
+          <div className="flex items-center gap-3 mb-2">
+            <img src="/new-favicon.svg" alt="Occassia logo" className="h-10 w-10" />
+            <h1 className="font-display text-2xl font-semibold tracking-tight text-white">
+              Occassia
+            </h1>
+          </div>
           <p className="mt-1 text-xs uppercase tracking-[0.3em] text-[#b8956a]">
             Cotronix · Weddings & Events
           </p>
@@ -162,13 +168,16 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         }`}
       >
         <div className="flex items-center justify-between p-4">
-          <div>
-            <h1 className="font-display text-xl font-semibold tracking-tight text-white">
-              Occassia
-            </h1>
-            <p className="mt-1 text-[10px] uppercase tracking-[0.3em] text-[#b8956a]">
-              Cotronix · Events
-            </p>
+          <div className="flex items-center gap-3">
+            <img src="/new-favicon.svg" alt="Occassia logo" className="h-8 w-8" />
+            <div>
+              <h1 className="font-display text-xl font-semibold tracking-tight text-white">
+                Occassia
+              </h1>
+              <p className="mt-1 text-[10px] uppercase tracking-[0.3em] text-[#b8956a]">
+                Cotronix · Events
+              </p>
+            </div>
           </div>
           <button
             type="button"

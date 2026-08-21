@@ -118,11 +118,13 @@ export default function GuestsPage() {
 
   return (
     <div>
-      {event && (
-        <div className="px-4 sm:px-8 pt-4">
-          <h2 className="text-lg font-semibold text-slate-700">{event.name}</h2>
-        </div>
-      )}
+      <div className="p-4 sm:p-8 pb-0">
+        {event && (
+          <div>
+            <h2 className="text-lg font-semibold text-slate-700">{event.name}</h2>
+          </div>
+        )}
+      </div>
       <EventTabs />
       <div className="p-4 sm:p-8">
         
