@@ -11,7 +11,6 @@ export default function ReportsPage() {
   const [stats, setStats] = useState<EventStats | null>(null);
   const [isExporting, setIsExporting] = useState(false);
   const [exportError, setExportError] = useState('');
-  const setLoading = useUiStore((s) => s.setLoading);
   const showToast = useUiStore((s) => s.showToast);
 
   useEffect(() => {
@@ -21,7 +20,6 @@ export default function ReportsPage() {
   const handleExport = async () => {
     if (!id) return;
     setIsExporting(true);
-    setLoading(true);
     setExportError('');
     try {
       const res = await reportsApi.export(id);
@@ -38,12 +36,14 @@ export default function ReportsPage() {
       showToast(message, 'error');
     } finally {
       setIsExporting(false);
-      setLoading(false);
     }
   };
 
   return (
     <div>
+      <div className="p-4 sm:p-8 pb-2">
+        {/* Consistent header area for positioning */}
+      </div>
       <EventTabs />
       <div className="p-4 sm:p-8">
         

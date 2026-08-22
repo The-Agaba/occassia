@@ -13,20 +13,17 @@ export default function DashboardPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoadingState] = useState(true);
   const user = useAuthStore((s) => s.user);
-  const setLoading = useUiStore((s) => s.setLoading);
   const showToast = useUiStore((s) => s.showToast);
   const canCreateEvent = user?.role === 'ADMIN';
 
   useEffect(() => {
-    setLoading(true);
     eventsApi.list()
       .then((r) => setEvents(r.data))
       .catch((err: any) => showToast(err.response?.data?.message || 'Failed to load events', 'error'))
       .finally(() => {
         setLoadingState(false);
-        setLoading(false);
       });
-  }, [setLoading, showToast]);
+  }, [showToast]);
 
   return (
     <>

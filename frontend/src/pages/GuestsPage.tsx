@@ -22,7 +22,6 @@ export default function GuestsPage() {
   const [qrModalGuest, setQrModalGuest] = useState<Guest | null>(null);
   const [loadingQr, setLoadingQr] = useState(false);
   const user = useAuthStore((s) => s.user);
-  const setLoading = useUiStore((s) => s.setLoading);
   const showToast = useUiStore((s) => s.showToast);
   const canManage = user?.role === 'ADMIN' || user?.role === 'EVENT_MANAGER';
 
@@ -53,7 +52,6 @@ export default function GuestsPage() {
 
   const openGuestQr = async (guest: Guest) => {
     setLoadingQr(true);
-    setLoading(true);
     setQrModalGuest(guest);
     try {
       const response = await guestsApi.qrBlob(guest.id);
@@ -65,7 +63,6 @@ export default function GuestsPage() {
       closeQrModal();
     } finally {
       setLoadingQr(false);
-      setLoading(false);
     }
   };
 
@@ -118,11 +115,11 @@ export default function GuestsPage() {
 
   return (
     <div>
-      {event && (
-        <div className="p-4 sm:p-8 pb-2">
+      <div className="p-4 sm:p-8 pb-2">
+        {event && (
           <h2 className="text-lg font-semibold text-slate-700">{event.name}</h2>
-        </div>
-      )}
+        )}
+      </div>
       <EventTabs />
       <div className="p-4 sm:p-8">
         

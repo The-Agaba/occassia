@@ -16,7 +16,6 @@ export default function CheckInPage() {
   const [nfcUid, setNfcUid] = useState('');
   const [lastCheckIn, setLastCheckIn] = useState<CheckInResult | null>(null);
   const [error, setError] = useState('');
-  const setLoading = useUiStore((s) => s.setLoading);
   const showToast = useUiStore((s) => s.showToast);
   
   // NFC states
@@ -69,7 +68,6 @@ export default function CheckInPage() {
   const executeCheckIn = useCallback(async (uid: string) => {
     if (!uid.trim()) return;
     setError('');
-    setLoading(true);
     try {
       const res = await checkinApi.nfc(uid.trim(), gateId || undefined);
       setLastCheckIn(res.data);
@@ -82,10 +80,8 @@ export default function CheckInPage() {
       const message = err.response?.data?.message || 'Check-in failed';
       setError(message);
       showToast(message, 'error');
-    } finally {
-      setLoading(false);
     }
-  }, [gateId, mode, setLoading, showToast]);
+  }, [gateId, mode, showToast]);
 
   const handleManualKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -138,6 +134,9 @@ export default function CheckInPage() {
 
   return (
     <div>
+      <div className="p-4 sm:p-8 pb-2">
+        {/* Consistent header area for positioning */}
+      </div>
       <EventTabs />
       <div className="p-4 sm:p-8">
         <div className="max-w-2xl mx-auto">

@@ -19,7 +19,6 @@ export default function OrganizationPage() {
   const [loading, setLocalLoading] = useState(true);
   const [error, setError] = useState('');
   const [showForm, setShowForm] = useState(false);
-  const setLoading = useUiStore((s) => s.setLoading);
   const showToast = useUiStore((s) => s.showToast);
   const confirmAction = useUiStore((s) => s.confirmAction);
   const [editingOrg, setEditingOrg] = useState<Organization | null>(null);
@@ -30,7 +29,6 @@ export default function OrganizationPage() {
 
   const load = async () => {
     try {
-      setLoading(true);
       setLocalLoading(true);
       setError('');
       const res = await organizationsApi.list();
@@ -40,7 +38,6 @@ export default function OrganizationPage() {
       setError(message);
       showToast(message, 'error');
     } finally {
-      setLoading(false);
       setLocalLoading(false);
     }
   };

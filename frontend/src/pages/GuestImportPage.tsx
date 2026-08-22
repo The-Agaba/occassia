@@ -12,7 +12,6 @@ export default function GuestImportPage() {
   const [result, setResult] = useState<ImportResult | null>(null);
   const [loading, setLoadingState] = useState(false);
   const [error, setError] = useState('');
-  const setLoading = useUiStore((s) => s.setLoading);
   const showToast = useUiStore((s) => s.showToast);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -20,7 +19,6 @@ export default function GuestImportPage() {
   const handleImport = async () => {
     if (!id || !file) return;
     setLoadingState(true);
-    setLoading(true);
     setError('');
     try {
       const res = await guestsApi.import(id, file);
@@ -32,7 +30,6 @@ export default function GuestImportPage() {
       showToast(message, 'error');
     } finally {
       setLoadingState(false);
-      setLoading(false);
     }
   };
 
@@ -95,6 +92,9 @@ export default function GuestImportPage() {
 
   return (
     <div>
+      <div className="p-4 sm:p-8 pb-2">
+        {/* Consistent header area for positioning */}
+      </div>
       <EventTabs />
       <div className="p-4 sm:p-8 max-w-4xl mx-auto">
         
