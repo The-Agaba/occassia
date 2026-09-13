@@ -393,3 +393,36 @@ button, a, input, select { -webkit-tap-highlight-color: transparent; }
   .visual-card { max-width:240px; }
   .feature-card,.ops-panel,.nfc-capture,.dashboard-welcome { min-width:0; }
 }
+/* Phone-first landing layout. These explicit width constraints prevent the
+   decorative hero and navigation from forcing a desktop canvas on phones. */
+@media (max-width: 767px) {
+  html,body,#root { width:100%; min-width:0; max-width:100%; overflow-x:hidden; }
+  .landing-shell { width:100%; min-width:0; overflow:hidden; }
+  .landing-nav { width:100%; min-width:0; flex-wrap:wrap; gap:12px; padding:16px 14px; }
+  .brand-lockup { flex:1 1 auto; min-width:0; }
+  .brand-lockup span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .landing-nav-links { flex:0 1 auto; min-width:0; margin-left:auto; gap:7px; }
+  .landing-nav-links .landing-login { padding:9px 11px; font-size:10px; }
+  .landing-nav-links .landing-login svg { width:14px; height:14px; }
+  .landing-hero { width:100%; min-width:0; display:flex; flex-direction:column; padding:38px 14px 48px; gap:0; }
+  .hero-copy { width:100%; max-width:none; min-width:0; }
+  .eyebrow { max-width:100%; font-size:9px; letter-spacing:.12em; }
+  .hero-copy h1 { max-width:100%; font-size:clamp(38px,12vw,58px); overflow-wrap:anywhere; }
+  .hero-copy p { width:100%; max-width:100%; font-size:14px; }
+  .hero-actions { width:100%; }
+  .hero-proof { align-items:flex-start; line-height:1.45; }
+  .hero-visual { width:100%; min-width:0; min-height:330px; height:330px; margin:0; transform:none; overflow:hidden; }
+  .visual-card { width:min(230px,64vw); max-width:100%; padding:18px; }
+  .visual-card strong { font-size:16px; text-align:center; }
+  .visual-scan-ring { width:90px; height:90px; margin:28px 0 18px; }
+  .visual-scan-ring svg { width:50px; height:50px; }
+  .visual-float { max-width:43%; padding:8px 9px; font-size:9px; line-height:1.25; }
+  .float-top { top:10%; right:0; }
+  .float-bottom { bottom:8%; left:0; }
+  .feature-grid { width:100%; min-width:0; grid-template-columns:1fr; padding:48px 14px; gap:12px; }
+  .landing-shell .section-intro { grid-column:auto; }
+  .section-intro h2 { font-size:26px; }
+  .feature-card { width:100%; padding:20px; }
+  .landing-footer { width:100%; min-width:0; padding:22px 14px; display:grid; grid-template-columns:1fr; gap:12px; }
+  .landing-footer div { width:100%; display:flex; flex-wrap:wrap; gap:12px; }
+}
