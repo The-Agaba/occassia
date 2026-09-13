@@ -188,7 +188,7 @@ export default function LoginPage() {
                 {deactivationMsg}
               </div>
             )}
-            <div>
+            <div className="login-field">
               <label className="block text-xs font-medium login-label uppercase tracking-widest mb-2">
                 Email
               </label>
@@ -204,7 +204,7 @@ export default function LoginPage() {
               )}
             </div>
 
-            <div>
+            <div className="login-field">
               <label className="block text-xs font-medium login-label uppercase tracking-widest mb-2">
                 Password
               </label>
