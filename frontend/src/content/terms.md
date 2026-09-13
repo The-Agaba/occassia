@@ -18,4 +18,4 @@ Copyright © 2026 Cotronix. All rights reserved. The software, branding, documen
 
 ## Changes
 
-Cotronix may update these terms as the product changes. Update this file to publish revised wording in the app.
+These terms may be revised as the product changes. The current version is the one published in the app.

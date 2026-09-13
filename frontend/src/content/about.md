@@ -21,7 +21,7 @@ This information is provided from the business registration certificate supplied
 
 ## The people behind it
 
-All product direction, design, and creation is by **Agaba**. Update this file whenever you want to change this page, including your social links and contact details.
+All product direction, design, and creation is by **Agaba**.
 
 ## Connect
 

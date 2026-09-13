@@ -368,7 +368,7 @@ button, a, input, select { -webkit-tap-highlight-color: transparent; }
 }
 /* Tablet layouts need the same drawer navigation as phones; keeping the
    sidebar open at these widths squeezes every internal page unnecessarily. */
-@media (min-width: 801px) and (max-width: 1100px) {
+@media (min-width: 801px) and (max-width: 1200px) {
   .app-sidebar { position:fixed; left:0; top:0; transform:translateX(-100%); transition:transform .25s ease; box-shadow:20px 0 60px rgba(0,0,0,.2); }
   .app-sidebar.is-open { transform:none; }
   .sidebar-close,.menu-button { display:block; }
@@ -376,7 +376,7 @@ button, a, input, select { -webkit-tap-highlight-color: transparent; }
   .mobile-scrim.is-open { opacity:1; pointer-events:auto; }
   .app-content { padding:24px clamp(20px,4vw,38px); }
   .app-header { padding-inline:24px; }
-  .feature-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .landing-shell .feature-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
   .landing-shell .section-intro { grid-column:1 / -1; }
   .ops-stat-grid { grid-template-columns:repeat(2,1fr); }
 }
@@ -419,7 +419,7 @@ button, a, input, select { -webkit-tap-highlight-color: transparent; }
   .visual-float { max-width:43%; padding:8px 9px; font-size:9px; line-height:1.25; }
   .float-top { top:10%; right:0; }
   .float-bottom { bottom:8%; left:0; }
-  .feature-grid { width:100%; min-width:0; grid-template-columns:1fr; padding:48px 14px; gap:12px; }
+  .landing-shell .feature-grid { width:100%; min-width:0; grid-template-columns:1fr; padding:48px 14px; gap:12px; }
   .landing-shell .section-intro { grid-column:auto; }
   .section-intro h2 { font-size:26px; }
   .feature-card { width:100%; padding:20px; }
