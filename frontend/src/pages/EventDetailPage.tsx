@@ -117,6 +117,7 @@ export default function EventDetailPage() {
         keywords="event details, event management, wedding event operations, guest categories, event gates"
       />
       <div>
+      <EventTabs />
       <div className="p-4 sm:p-8 pb-4">
         <div className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-0 justify-between">
           <div className="min-w-0">
@@ -165,7 +166,6 @@ export default function EventDetailPage() {
           )}
         </div>
       </div>
-      <EventTabs />
       <div className="p-4 sm:p-8 grid lg:grid-cols-2 gap-6 sm:gap-8">
         <div>
           <h3 className="font-semibold mb-3">Guest Categories</h3>

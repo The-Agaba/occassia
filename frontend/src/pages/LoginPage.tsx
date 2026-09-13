@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -30,6 +30,7 @@ export default function LoginPage() {
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [slowRequest, setSlowRequest] = useState(false);
+  const loginInFlight = useRef(false);
   const {
     register,
     handleSubmit,
@@ -62,6 +63,8 @@ export default function LoginPage() {
   }, []);
 
   const onSubmit = async (data: FormData) => {
+    if (loginInFlight.current) return;
+    loginInFlight.current = true;
     setError('');
     try {
       const res = await authApi.login(data.email, data.password);
@@ -75,6 +78,8 @@ export default function LoginPage() {
           ? 'The sign-in service rejected the request without confirming your credentials. Please try again.'
         : apiErrorMessage(requestError, 'Sign-in could not be completed. Please try again.');
       setError(message);
+    } finally {
+      loginInFlight.current = false;
     }
   };
 
@@ -197,7 +202,7 @@ export default function LoginPage() {
                 type="email"
                 autoComplete="email"
                 placeholder="you@company.com"
-                className="input-underline"
+                className="input-underline login-input"
               />
               {errors.email && (
                 <p className="text-red-600 text-xs mt-2">{errors.email.message}</p>
@@ -214,7 +219,7 @@ export default function LoginPage() {
                   type={showPassword ? 'text' : 'password'}
                   autoComplete="current-password"
                   placeholder="••••••••"
-                  className="input-underline pr-10"
+                  className="input-underline pr-10 login-input"
                 />
                 <button
                   type="button"

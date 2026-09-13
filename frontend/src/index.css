@@ -69,6 +69,7 @@ body {
 .input-underline:focus {
   border-bottom-color: var(--color-accent);
 }
+.login-input { display:block; margin-bottom:14px; }
 
 /* Primary button */
 .btn-primary {
