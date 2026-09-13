@@ -1,5 +1,19 @@
 # NFC Scanner and Card Configuration
 
+## In-app operator experience
+
+The deployed frontend starts at the public Occassia landing page. Operators select **Sign in** to enter the protected workspace. The application is a Progressive Web App: serve it over HTTPS, open it in a supported browser, and use the browser's install command when available. The service worker caches the application shell only; API data remains network-backed so event state is not silently stale.
+
+The app supports three intentional entry paths:
+
+1. Device Web NFC: tap the card against the back of the phone while the browser's NFC scan is active.
+2. External NFC reader: use a USB or Bluetooth reader in keyboard/HID mode, or the documented serial bridge.
+3. QR backup: scan the guest's unique QR token when NFC is unavailable.
+
+There is no manual/type-in gate check-in workflow. The external-reader field exists to receive a reader's UID, not to replace the card or QR control.
+
+About and terms content is editable in `frontend/src/content/about.md` and `frontend/src/content/terms.md`; rebuild and redeploy the frontend after changing those files.
+
 This guide explains how to connect custom NFC readers and NFC cards to Occassia. Occassia identifies a card by its NFC UID. The system does not use batch codes or other card metadata.
 
 ## How the integration works

@@ -42,6 +42,12 @@
 
 ## 📖 About
 
+### Frontend experience
+
+The web app opens on a public, responsive Cotronix/Occassia landing page. Sign in takes operators to the protected workspace. The workspace is installable as a Progressive Web App, uses a responsive navigation shell, and includes editable `/about` and `/terms` pages sourced from `frontend/src/content/about.md` and `frontend/src/content/terms.md`.
+
+The operational NFC contract is unchanged: a gate accepts device Web NFC when available, an external reader that emits a UID, or a unique guest QR token as the backup. Manual guest type-in is intentionally not a gate check-in method.
+
 **Occassia** is a web-based event access management platform. It starts with weddings as the primary use case and is architected from day one to support conferences, parties, corporate dinners, and any event that needs guest management and controlled entry.
 
 The system has two independent layers:
@@ -85,7 +91,7 @@ NFC hardware can integrate through HID/keyboard mode, browser Web NFC, or the lo
 <td>
 
 ### 🚪 Check-in
-- NFC tap, QR scan, or manual check-in
+- NFC tap, external NFC reader, or QR scan backup
 - Duplicate taps return success with warning flag
 - Gate assignment per check-in
 - Ticket printed tracking
@@ -291,7 +297,7 @@ APP/
 │   │   ├── event/           # Events, status transitions
 │   │   ├── guest/           # Guests, CSV import, QR
 │   │   ├── card/            # NFC card registry
-│   │   ├── checkin/         # NFC / QR / manual check-in
+│   │   ├── checkin/         # NFC check-in / QR backup
 │   │   ├── dashboard/       # Live stats
 │   │   ├── websocket/       # STOMP publisher
 │   │   └── config/          # Security, CORS, OpenAPI

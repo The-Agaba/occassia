@@ -14,12 +14,17 @@ import ReportsPage from './pages/ReportsPage';
 import UsersPage from './pages/UsersPage';
 import AuditPage from './pages/AuditPage';
 import OrganizationPage from './pages/OrganizationPage';
+import LandingPage from './pages/LandingPage';
+import MarkdownPage from './pages/MarkdownPage';
 
 export default function App() {
   return (
     <AuthBootstrap>
       <BrowserRouter>
         <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/about" element={<MarkdownPage kind="about" />} />
+          <Route path="/terms" element={<MarkdownPage kind="terms" />} />
           <Route path="/login" element={<LoginPage />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<DashboardPage />} />

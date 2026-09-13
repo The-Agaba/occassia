@@ -7,6 +7,7 @@ import { authApi } from '../api';
 import { useAuthStore } from '../store/authStore';
 import { ArrowRight, Eye, EyeOff } from 'lucide-react';
 import SEO from '../components/SEO';
+import { ThemeToggle } from '../components/ThemeProvider';
 
 const schema = z.object({
   email: z.string().email('Enter a valid email'),
@@ -123,6 +124,7 @@ export default function LoginPage() {
           <div className="absolute right-16 bottom-8 h-16 w-24 rounded-full border border-[#0c0f14]/10 bg-[#0c0f14]/5 form-shape form-shape-3" />
         </div>
 
+        <div className="login-theme-control"><ThemeToggle /></div>
         <div className="w-full max-w-sm mx-auto relative z-10">
           <div className="mb-12">
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-[#0c0f14]/10 bg-white shadow-sm">
