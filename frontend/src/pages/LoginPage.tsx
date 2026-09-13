@@ -177,7 +177,7 @@ export default function LoginPage() {
             {isSubmitting && (
               <div className="login-request-status" role="status" aria-live="polite">
                 <span className="login-request-spinner" />
-                <span>{slowRequest ? 'The free-tier server is waking up. We are still waiting for a response.' : 'Contacting the secure sign-in service…'}</span>
+                <span>{slowRequest ? 'We are still waiting for a response.' : 'Contacting the secure sign-in service…'}</span>
               </div>
             )}
             <fieldset disabled={isSubmitting} className="login-form-controls">

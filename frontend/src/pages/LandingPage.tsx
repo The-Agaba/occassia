@@ -43,7 +43,7 @@ export default function LandingPage() {
         </div>
         <div className="hero-visual" aria-label="Abstract event access illustration">
           <div className="visual-orbit orbit-one" /><div className="visual-orbit orbit-two" /><div className="visual-orbit orbit-three" />
-          <div className="visual-card"><div className="visual-card-top"><span className="status-dot" /> LIVE GATE</div><div className="visual-scan-ring"><Radio size={64} strokeWidth={1.2} /></div><strong>Tap to welcome</strong><span>Secure · instant · human</span></div>
+          <div className="visual-card"><div className="visual-card-top"><span className="status-dot" /> LIVE GATE</div><div className="visual-scan-ring"><Radio size={64} strokeWidth={1.2} /></div><strong>Tap to welcome</strong><span>Secure · instant · intuitive</span></div>
           <div className="visual-float float-top"><ShieldCheck size={16} /><span>Verified guest</span></div><div className="visual-float float-bottom"><span className="mini-avatar">A</span><span>{totalCheckIns === null ? 'Loading live count…' : `+ ${totalCheckIns.toLocaleString()} checked in`}</span></div>
         </div>
       </section>

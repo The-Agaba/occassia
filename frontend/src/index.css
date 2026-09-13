@@ -366,3 +366,30 @@ button, a, input, select { -webkit-tap-highlight-color: transparent; }
   .hero-copy h1 { font-size:clamp(72px,6.4vw,112px); }
   .ops-page-inner { padding-inline:clamp(50px,6vw,110px); }
 }
+/* Tablet layouts need the same drawer navigation as phones; keeping the
+   sidebar open at these widths squeezes every internal page unnecessarily. */
+@media (min-width: 801px) and (max-width: 1100px) {
+  .app-sidebar { position:fixed; left:0; top:0; transform:translateX(-100%); transition:transform .25s ease; box-shadow:20px 0 60px rgba(0,0,0,.2); }
+  .app-sidebar.is-open { transform:none; }
+  .sidebar-close,.menu-button { display:block; }
+  .mobile-scrim { display:block; position:fixed; inset:0; z-index:19; background:rgba(12,20,40,.35); border:0; opacity:0; pointer-events:none; transition:.2s; }
+  .mobile-scrim.is-open { opacity:1; pointer-events:auto; }
+  .app-content { padding:24px clamp(20px,4vw,38px); }
+  .app-header { padding-inline:24px; }
+  .feature-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .landing-shell .section-intro { grid-column:1 / -1; }
+  .ops-stat-grid { grid-template-columns:repeat(2,1fr); }
+}
+@media (min-width: 801px) and (max-width: 980px) {
+  .landing-hero { grid-template-columns:1fr; min-height:auto; padding-top:54px; }
+  .hero-copy { max-width:680px; }
+  .hero-visual { min-height:380px; }
+}
+@media (max-width: 800px) {
+  .app-main { overflow-x:hidden; }
+  .app-content { width:100%; max-width:none; overflow-x:hidden; }
+  .landing-shell { overflow-x:hidden; }
+  .landing-nav-links .theme-toggle span:last-child { display:none; }
+  .visual-card { max-width:240px; }
+  .feature-card,.ops-panel,.nfc-capture,.dashboard-welcome { min-width:0; }
+}
