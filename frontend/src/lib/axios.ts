@@ -6,7 +6,9 @@ export const API_BASE_URL = import.meta.env.VITE_API_URL || '/api/v1';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000,
+  // Let normal page reads survive a cold free-tier wake-up while keeping
+  // login's explicit five-minute timeout independent below.
+  timeout: 30000,
   headers: { 'Content-Type': 'application/json' },
 });
 

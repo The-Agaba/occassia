@@ -55,6 +55,12 @@ export default function LoginPage() {
     }
   }, [navigate]);
 
+  useEffect(() => {
+    // Warm the first authenticated route while the user is entering credentials.
+    // This keeps the dashboard chunk from becoming a second visible wait.
+    void import('./DashboardPage');
+  }, []);
+
   const onSubmit = async (data: FormData) => {
     setError('');
     try {
@@ -167,7 +173,14 @@ export default function LoginPage() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-8" aria-busy={isSubmitting}>
+            {isSubmitting && (
+              <div className="login-request-status" role="status" aria-live="polite">
+                <span className="login-request-spinner" />
+                <span>{slowRequest ? 'The free-tier server is waking up. We are still waiting for a response.' : 'Contacting the secure sign-in service…'}</span>
+              </div>
+            )}
+            <fieldset disabled={isSubmitting} className="login-form-controls">
             {deactivationMsg && (
               <div className="bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-lg px-4 py-3">
                 {deactivationMsg}
@@ -229,6 +242,7 @@ export default function LoginPage() {
                 </span>
               )}
             </button>
+            </fieldset>
           </form>
 
         </div>
