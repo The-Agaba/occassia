@@ -23,7 +23,9 @@ export default function NfcCapture({ onUid, disabled = false, label = 'Read NFC 
       reader.addEventListener('reading', ({ serialNumber }: { serialNumber?: string }) => {
         if (!readerRef.current) return;
         if (!serialNumber) { const message = 'The NFC card did not provide a UID. Try another card.'; setError(message); console.error('[NFC] Missing serial number'); return; }
-        setScanning(false); onUid(serialNumber);
+        // Keep the reader active so registration can collect a batch without
+        // requiring the operator to restart scanning after every tap.
+        onUid(serialNumber);
       });
       reader.addEventListener('readingerror', () => { const message = 'The phone could not read that card. Hold it still against the back of the phone and try again.'; setError(message); console.error('[NFC] Reading error'); });
     } catch (err: any) {

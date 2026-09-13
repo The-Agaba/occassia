@@ -22,6 +22,8 @@ export default function EventTabs() {
   const visibleTabs = tabs.filter((tab) => !tab.roles || (user && tab.roles.includes(user.role)));
 
   return (
+    <>
+    <div className="event-workspace-nav-spacer" aria-hidden="true" />
     <div className="event-workspace-nav">
       <div className="event-workspace-nav-inner"><Link to="/dashboard" className="event-back-link"><ArrowLeft size={15} /> All events</Link><div className="event-tab-strip">
         {visibleTabs.map((tab) => {
@@ -42,5 +44,6 @@ export default function EventTabs() {
         })}
       </div></div>
     </div>
+    </>
   );
 }

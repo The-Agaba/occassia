@@ -8,6 +8,38 @@ import { useUiStore } from '../store/uiStore';
 
 export default function CardRegistrationPage() {
   const { id } = useParams<{ id: string }>(); const [uid, setUid] = useState(''); const [saving, setSaving] = useState(false); const [success, setSuccess] = useState(''); const showToast = useUiStore((s) => s.showToast);
-  const register = async () => { if (!uid.trim()) { showToast('Capture or enter a card UID before registering.', 'error'); return; } setSaving(true); setSuccess(''); try { await cardsApi.register(uid.trim()); setSuccess(`Card ${uid.trim()} is registered and ready for assignment.`); setUid(''); showToast('NFC card registered successfully.', 'success'); } catch (err: any) { console.error('[Cards] Registration failed', err); showToast(err.response?.data?.message || 'This card could not be registered. Confirm the UID is valid and not already registered.', 'error'); } finally { setSaving(false); } };
-  return <div className="ops-page"><EventTabs /><div className="ops-page-inner narrow"><Link to={`/events/${id}/cards`} className="back-link"><ArrowLeft size={16} /> Card inventory</Link><div className="ops-page-heading compact"><div><span className="eyebrow-label">CARD CONTROL / 01</span><h2>Register an NFC card</h2><p>Capture a card UID without leaving this workflow, then add it to the organization inventory.</p></div><CreditCard className="heading-mark" /></div><div className="ops-two-column"><NfcCapture onUid={(value) => { setUid(value); setSuccess(''); }} disabled={saving} label="Capture card UID" /><section className="ops-panel form-panel"><span className="eyebrow-label">CONFIRM DETAILS</span><h3>Ready to register?</h3><p className="panel-help">Review the UID returned by the phone or external reader. The system stores the normalized UID only.</p><label className="ops-label" htmlFor="registration-uid">Card UID</label><input id="registration-uid" className="ops-input mono" value={uid} onChange={(e) => setUid(e.target.value)} placeholder="04:A3:FF:12:BC" disabled={saving} /><button type="button" className="ops-button primary full" disabled={saving || !uid.trim()} onClick={register}>{saving ? 'Registering…' : 'Register card'}</button>{success && <div className="success-message"><CheckCircle2 size={18} />{success}</div>}</section></div></div></div>;
+  const appendUid = (value: string) => {
+    const captured = value.trim();
+    if (!captured) return;
+    const existing = uid.split(',').map((item) => item.trim()).filter(Boolean);
+    if (existing.some((item) => item.toUpperCase() === captured.toUpperCase())) {
+      showToast(`Card ${captured} is already in the registration list.`, 'info');
+      return;
+    }
+    setUid([...existing, captured].join(', '));
+    setSuccess('');
+  };
+  const register = async () => {
+    const values = Array.from(new Set(uid.split(',').map((item) => item.trim()).filter(Boolean)));
+    if (values.length === 0) { showToast('Capture or enter at least one card UID before registering.', 'error'); return; }
+    setSaving(true); setSuccess('');
+    const results = await Promise.allSettled(values.map((value) => cardsApi.register(value)));
+    const failed = values.filter((_, index) => results[index].status === 'rejected');
+    const registered = values.length - failed.length;
+    setSaving(false);
+    if (failed.length === 0) {
+      setUid('');
+      setSuccess(`${registered} card${registered === 1 ? '' : 's'} registered and ready for assignment.`);
+      showToast(`${registered} NFC card${registered === 1 ? '' : 's'} registered successfully.`, 'success');
+      return;
+    }
+    setUid(failed.join(', '));
+    const message = registered > 0
+      ? `${registered} card${registered === 1 ? '' : 's'} registered. ${failed.length} failed and remain in the list for retry.`
+      : 'No cards were registered. The captured UIDs remain in the list for retry.';
+    setSuccess(message);
+    showToast(message, 'error');
+    results.forEach((result, index) => { if (result.status === 'rejected') console.error('[Cards] Registration failed', { uid: values[index], error: result.reason }); });
+  };
+  return <div className="ops-page"><EventTabs /><div className="ops-page-inner narrow"><Link to={`/events/${id}/cards`} className="back-link"><ArrowLeft size={16} /> Card inventory</Link><div className="ops-page-heading compact"><div><span className="eyebrow-label">CARD CONTROL / 01</span><h2>Register NFC cards</h2><p>Tap multiple cards or enter UIDs separated by commas, then register them together.</p></div><CreditCard className="heading-mark" /></div><div className="ops-two-column"><NfcCapture onUid={appendUid} disabled={saving} label="Capture card UIDs" /><section className="ops-panel form-panel"><span className="eyebrow-label">CONFIRM DETAILS</span><h3>Ready to register?</h3><p className="panel-help">Each captured UID is appended to the list. Review it before registering the batch.</p><label className="ops-label" htmlFor="registration-uid">Card UIDs</label><input id="registration-uid" className="ops-input mono" value={uid} onChange={(e) => setUid(e.target.value)} placeholder="04:A3:FF:12:BC, 04:B7:01:44:9A" disabled={saving} /><button type="button" className="ops-button primary full" disabled={saving || !uid.trim()} onClick={register}>{saving ? 'Registering cards…' : 'Register cards'}</button>{success && <div className="success-message"><CheckCircle2 size={18} />{success}</div>}</section></div></div></div>;
 }
