@@ -39,7 +39,8 @@ api.interceptors.response.use(
       await new Promise((resolve) => setTimeout(resolve, 700));
       return api(original);
     }
-    if (error.response?.status === 401 && !original._retry) {
+    const isLoginRequest = original?.url?.includes('/auth/login');
+    if (error.response?.status === 401 && !original._retry && !isLoginRequest) {
       original._retry = true;
       const refreshToken = useAuthStore.getState().refreshToken;
       if (refreshToken) {

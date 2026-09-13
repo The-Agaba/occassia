@@ -69,8 +69,10 @@ export default function LoginPage() {
       navigate('/dashboard', { replace: true });
     } catch (requestError: unknown) {
       const axiosError = requestError as any;
-      const message = axiosError?.response?.status === 401
+      const message = axiosError?.response?.data?.error === 'INVALID_CREDENTIALS'
         ? 'Email or password is incorrect.'
+        : axiosError?.response?.status === 401
+          ? 'The sign-in service rejected the request without confirming your credentials. Please try again.'
         : apiErrorMessage(requestError, 'Sign-in could not be completed. Please try again.');
       setError(message);
     }
