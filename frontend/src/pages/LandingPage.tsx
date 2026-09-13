@@ -1,6 +1,7 @@
 import { ArrowRight, CheckCircle2, CreditCard, Radio, QrCode, ShieldCheck, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ThemeToggle } from '../components/ThemeProvider';
+import SEO from '../components/SEO';
 
 const features = [
   { icon: Radio, title: 'Tap-first entry', text: 'Use Web NFC or a connected reader to move guests through the gate in seconds.' },
@@ -11,6 +12,7 @@ const features = [
 export default function LandingPage() {
   return (
     <main className="landing-shell">
+      <SEO title="Occassia | Event guest access, NFC check-in and live attendance" description="Occassia helps event teams welcome guests, manage NFC cards, use QR backups, and monitor attendance in real time." keywords="event guest access, NFC check-in, QR event check-in, guest management, Cotronix" />
       <nav className="landing-nav">
         <Link to="/" className="brand-lockup"><img src="/new-favicon.svg" alt="Occassia logo" /><span>Occassia</span></Link>
         <div className="landing-nav-links"><Link to="/about">About</Link><Link to="/terms">Terms</Link><ThemeToggle /><Link className="landing-login" to="/login">Sign in <ArrowRight size={16} /></Link></div>

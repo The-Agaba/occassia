@@ -51,6 +51,7 @@ export default function LoginPage() {
         title="Login - Occassia Event Management"
         description="Sign in to Occassia to manage your wedding and event guests, track attendance, and streamline event operations."
         keywords="login, sign in, event management login, wedding guest management access"
+        noIndex={true}
       />
       <div className="min-h-screen flex">
       {/* Left - full-bleed event media */}

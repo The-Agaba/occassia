@@ -6,9 +6,13 @@ Allow: /
 # Sitemap
 Sitemap: https://occassia.com/sitemap.xml
 
-# Disallow admin areas if needed
-# Disallow: /admin
-# Disallow: /api
+# Keep authenticated application data and API endpoints out of crawlers.
+Disallow: /dashboard
+Disallow: /events/
+Disallow: /settings/
+Disallow: /audit
+Disallow: /organizations
+Disallow: /api/
 
 # Crawl-delay (optional, adjust based on server capacity)
 # Crawl-delay: 1

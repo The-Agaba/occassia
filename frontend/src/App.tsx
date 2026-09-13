@@ -1,26 +1,33 @@
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthBootstrap } from './components/AuthBootstrap';
 import { ProtectedRoute, RoleGuard } from './components/ProtectedRoute';
 import LoginPage from './pages/LoginPage';
-import DashboardPage from './pages/DashboardPage';
-import NewEventPage from './pages/NewEventPage';
-import EventDetailPage from './pages/EventDetailPage';
-import GuestsPage from './pages/GuestsPage';
-import GuestImportPage from './pages/GuestImportPage';
-import CardsPage from './pages/CardsPage';
-import CheckInPage from './pages/CheckInPage';
-import LiveDashboardPage from './pages/LiveDashboardPage';
-import ReportsPage from './pages/ReportsPage';
-import UsersPage from './pages/UsersPage';
-import AuditPage from './pages/AuditPage';
-import OrganizationPage from './pages/OrganizationPage';
 import LandingPage from './pages/LandingPage';
 import MarkdownPage from './pages/MarkdownPage';
+
+const DashboardPage = lazy(() => import('./pages/DashboardPage'));
+const NewEventPage = lazy(() => import('./pages/NewEventPage'));
+const EventDetailPage = lazy(() => import('./pages/EventDetailPage'));
+const GuestsPage = lazy(() => import('./pages/GuestsPage'));
+const GuestImportPage = lazy(() => import('./pages/GuestImportPage'));
+const CardsPage = lazy(() => import('./pages/CardsPage'));
+const CheckInPage = lazy(() => import('./pages/CheckInPage'));
+const LiveDashboardPage = lazy(() => import('./pages/LiveDashboardPage'));
+const ReportsPage = lazy(() => import('./pages/ReportsPage'));
+const UsersPage = lazy(() => import('./pages/UsersPage'));
+const AuditPage = lazy(() => import('./pages/AuditPage'));
+const OrganizationPage = lazy(() => import('./pages/OrganizationPage'));
+
+function RouteLoading() {
+  return <div className="route-loading" role="status" aria-live="polite"><span className="route-loading-spinner" />Loading workspace…</div>;
+}
 
 export default function App() {
   return (
     <AuthBootstrap>
       <BrowserRouter>
+        <Suspense fallback={<RouteLoading />}>
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/about" element={<MarkdownPage kind="about" />} />
@@ -56,6 +63,7 @@ export default function App() {
           </Route>
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
+        </Suspense>
       </BrowserRouter>
     </AuthBootstrap>
   );

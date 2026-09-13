@@ -49,14 +49,18 @@ export default function SEO({
     // Update Open Graph tags
     updateMetaTag('og:title', title);
     updateMetaTag('og:description', description);
-    updateMetaTag('og:image', ogImage);
-    updateMetaTag('og:url', window.location.href);
+    const canonicalUrl = new URL(location.pathname, window.location.origin).toString();
+    const absoluteImage = new URL(ogImage, window.location.origin).toString();
+    updateMetaTag('og:type', 'website');
+    updateMetaTag('og:image', absoluteImage);
+    updateMetaTag('og:url', canonicalUrl);
     
     // Update Twitter tags
     updateMetaTag('twitter:title', title);
     updateMetaTag('twitter:description', description);
-    updateMetaTag('twitter:image', ogImage);
-    updateMetaTag('twitter:url', window.location.href);
+    updateMetaTag('twitter:card', 'summary_large_image');
+    updateMetaTag('twitter:image', absoluteImage);
+    updateMetaTag('twitter:url', canonicalUrl);
     
     // Handle noindex
     let robotsMeta = document.querySelector('meta[name="robots"]');
@@ -78,7 +82,7 @@ export default function SEO({
       canonicalLink.setAttribute('rel', 'canonical');
       document.head.appendChild(canonicalLink);
     }
-    canonicalLink.setAttribute('href', window.location.href);
+    canonicalLink.setAttribute('href', canonicalUrl);
     
   }, [title, description, keywords, ogImage, noIndex, location]);
 
