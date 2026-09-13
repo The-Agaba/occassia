@@ -327,7 +327,6 @@ button, a, input, select { -webkit-tap-highlight-color: transparent; }
 .login-particle-18 { --particle-x:4%; --particle-y:48%; --particle-size:29px; --particle-duration:23s; --particle-delay:-20s; }
 @keyframes particleTravel { 0% { opacity:0; transform:translate3d(-12vw,28vh,0) scale(.55) rotate(0deg); } 12% { opacity:.78; } 50% { opacity:.46; transform:translate3d(4vw,-3vh,0) scale(1.12) rotate(150deg); } 84% { opacity:.2; } 100% { opacity:0; transform:translate3d(17vw,-125vh,0) scale(.74) rotate(300deg); } }
 .login-form-controls { border:0; padding:0; margin:0; min-width:0; }
-.login-media-panel { min-width:0; min-height:560px; }
 .login-form-controls:disabled { opacity:.62; cursor:wait; }
 .login-request-status { display:flex; align-items:flex-start; gap:9px; padding:11px 12px; border:1px solid color-mix(in srgb,var(--violet) 24%,var(--line)); border-radius:11px; background:color-mix(in srgb,var(--violet) 8%,var(--color-surface-elevated)); color:var(--muted); font-size:11px; line-height:1.5; }
 .login-request-spinner { flex:none; width:14px; height:14px; margin-top:1px; border:2px solid color-mix(in srgb,var(--violet) 22%,transparent); border-top-color:var(--violet); border-radius:50%; animation:routeSpin .7s linear infinite; }

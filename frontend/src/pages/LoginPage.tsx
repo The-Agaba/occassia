@@ -88,7 +88,7 @@ export default function LoginPage() {
       />
       <div className="min-h-screen flex">
       {/* Left - full-bleed event media */}
-      <div className="hidden lg:block lg:w-[52%] xl:w-[55%] relative overflow-hidden login-brand-panel login-media-panel">
+      <div className="hidden lg:block lg:w-[52%] xl:w-[55%] relative overflow-hidden login-brand-panel">
         {!videoFailed ? (
           <>
             {!videoLoaded && (
