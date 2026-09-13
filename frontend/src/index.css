@@ -281,6 +281,8 @@ button, a, input, select { -webkit-tap-highlight-color: transparent; }
 .landing-shell .visual-card-top,.landing-shell .visual-card>span:last-child { color:var(--muted); }
 .landing-shell .visual-scan-ring { color:var(--violet); border-color:color-mix(in srgb, var(--violet) 50%, transparent); background:radial-gradient(circle,color-mix(in srgb, var(--violet) 18%, transparent),transparent 62%); }
 .landing-shell .visual-float { background:var(--color-surface-elevated); color:var(--ink); }
+.landing-shell .count-pulse { animation:countPulse .85s ease-out; }
+@keyframes countPulse { 0% { transform:scale(1); box-shadow:0 14px 30px rgba(0,0,0,.18); } 45% { transform:scale(1.08); box-shadow:0 0 0 10px color-mix(in srgb,var(--violet) 18%,transparent),0 18px 38px rgba(0,0,0,.24); } 100% { transform:scale(1); box-shadow:0 14px 30px rgba(0,0,0,.18); } }
 .landing-shell .feature-grid,.landing-shell .landing-footer { max-width:none; background:var(--cream); }
 .landing-shell .feature-grid { grid-template-columns:minmax(220px,1.15fr) repeat(3,minmax(220px,320px)); justify-content:center; }
 .landing-shell .section-intro h2 { color:var(--ink); }
