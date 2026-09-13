@@ -9,6 +9,7 @@ import { ArrowRight, Eye, EyeOff } from 'lucide-react';
 import SEO from '../components/SEO';
 import { ThemeToggle } from '../components/ThemeProvider';
 import { apiErrorMessage } from '../lib/errorMessages';
+import { useUiStore } from '../store/uiStore';
 
 const schema = z.object({
   email: z.string().email('Enter a valid email'),
@@ -25,6 +26,7 @@ export default function LoginPage() {
   const location = useLocation();
   const deactivationMsg = (location.state as any)?.message as string | undefined;
   const setAuth = useAuthStore((s) => s.setAuth);
+  const showToast = useUiStore((s) => s.showToast);
   const [error, setError] = useState('');
   const [videoFailed, setVideoFailed] = useState(false);
   const [videoLoaded, setVideoLoaded] = useState(false);
@@ -78,9 +80,16 @@ export default function LoginPage() {
           ? 'The sign-in service rejected the request without confirming your credentials. Please try again.'
         : apiErrorMessage(requestError, 'Sign-in could not be completed. Please try again.');
       setError(message);
+      showToast(message, 'error');
     } finally {
       loginInFlight.current = false;
     }
+  };
+
+  const onInvalid = (validationErrors: Record<string, { message?: string }>) => {
+    const message = validationErrors.email?.message || validationErrors.password?.message || 'Check your email and password, then try again.';
+    setError(message);
+    showToast(message, 'error');
   };
 
   return (
@@ -180,7 +189,7 @@ export default function LoginPage() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-8" aria-busy={isSubmitting}>
+          <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-8" aria-busy={isSubmitting}>
             {isSubmitting && (
               <div className="login-request-status" role="status" aria-live="polite">
                 <span className="login-request-spinner" />

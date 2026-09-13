@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useAuthStore } from '../store/authStore';
 import { authApi } from '../api';
 import { disconnectWebSocket } from '../lib/websocket';
-import Toaster from './Toaster';
 import LoadingOverlay from './LoadingOverlay';
 import ConfirmationModal from './ConfirmationModal';
 import { ThemeToggle } from './ThemeProvider';
@@ -29,6 +28,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <div className="sidebar-bottom"><Link className="help-link" to="/terms"><FileText size={16} /> Operating terms</Link><div className="sidebar-user"><div className="avatar">{user?.fullName?.charAt(0) || 'O'}</div><div className="user-details"><b>{user?.fullName}</b><span>{user?.role?.replace('_', ' ')}</span></div><button onClick={signOut} title="Sign out" aria-label="Sign out"><LogOut size={16} /></button></div></div>
     </aside>
     <section className="app-main"><header className="app-header"><button className="menu-button" onClick={() => setOpen(true)} aria-label="Open navigation"><Menu size={20} /></button><div><span className="header-kicker"><Activity size={13} /> OCCASSIA / LIVE OPERATIONS</span><h1>{location.pathname.includes('checkin') ? 'Gate check-in' : location.pathname.includes('cards') ? 'Card control' : 'Welcome back, ' + (user?.fullName?.split(' ')[0] || 'there')}</h1></div><div className="header-actions"><ThemeToggle /><span className="connection-badge"><i /> Connected</span><button className="header-avatar" onClick={() => navigate('/settings/users')} aria-label="Open account">{user?.fullName?.charAt(0) || 'O'}</button></div></header><main className="app-content">{children}</main></section>
-    <Toaster /><LoadingOverlay /><ConfirmationModal />
+    <LoadingOverlay /><ConfirmationModal />
   </div>;
 }
