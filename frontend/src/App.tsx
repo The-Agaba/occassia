@@ -6,6 +6,7 @@ import LoginPage from './pages/LoginPage';
 import LandingPage from './pages/LandingPage';
 import MarkdownPage from './pages/MarkdownPage';
 import NetworkStatus from './components/NetworkStatus';
+import InstallAppPrompt from './components/InstallAppPrompt';
 
 const DashboardPage = lazy(() => import('./pages/DashboardPage'));
 const NewEventPage = lazy(() => import('./pages/NewEventPage'));
@@ -30,6 +31,7 @@ export default function App() {
   return (
     <AuthBootstrap>
       <NetworkStatus />
+      <InstallAppPrompt />
       <BrowserRouter>
         <Suspense fallback={<RouteLoading />}>
         <Routes>
