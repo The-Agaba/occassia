@@ -41,9 +41,6 @@ export default function ReportsPage() {
 
   return (
     <div>
-      <div className="p-4 sm:p-8 pb-2">
-        {/* Consistent header area for positioning */}
-      </div>
       <EventTabs />
       <div className="p-4 sm:p-8">
         

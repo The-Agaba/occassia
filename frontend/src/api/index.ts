@@ -72,8 +72,6 @@ export const checkinApi = {
     api.post<CheckInResult>('/checkin/nfc', { nfcUid, gateId }),
   qr: (qrToken: string, gateId?: string) =>
     api.post<CheckInResult>('/checkin/qr', { qrToken, gateId }),
-  manual: (guestId: string, gateId?: string) =>
-    api.post<CheckInResult>('/checkin/manual', { guestId, gateId }),
   print: (checkInId: string) => api.patch(`/checkin/${checkInId}/print`),
   list: (eventId: string) => api.get<CheckInResult[]>(`/events/${eventId}/checkins`),
 };

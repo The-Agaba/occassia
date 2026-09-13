@@ -23,12 +23,10 @@ export default function CardsPage() {
   const uidInputRef = useRef<HTMLInputElement>(null);
   const user = useAuthStore((s) => s.user);
   const canManage = user?.role === 'ADMIN' || user?.role === 'EVENT_MANAGER';
-  const setLoading = useUiStore((s) => s.setLoading);
   const showToast = useUiStore((s) => s.showToast);
   const confirmAction = useUiStore((s) => s.confirmAction);
 
   const load = async () => {
-    setLoading(true);
     try {
       const cardRes = await cardsApi.list();
       setCards(cardRes.data);
@@ -38,8 +36,6 @@ export default function CardsPage() {
       }
     } catch (err: any) {
       showToast(err.response?.data?.message || 'Failed to load cards', 'error');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -57,7 +53,6 @@ export default function CardsPage() {
 
   const registerCard = async () => {
     if (!uid.trim()) return;
-    setLoading(true);
     try {
       await cardsApi.register(uid.trim());
       setUid('');
@@ -65,8 +60,6 @@ export default function CardsPage() {
       await load();
     } catch (err: any) {
       showToast(err.response?.data?.message || 'Failed to register card', 'error');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -74,7 +67,6 @@ export default function CardsPage() {
     const targetGuest = guestId || selectedGuestScanner;
     const targetCard = nfcUid || scanUid;
     if (!targetGuest || !targetCard) return;
-    setLoading(true);
     try {
       await cardsApi.assign(targetGuest, targetCard);
       setScanUid('');
@@ -87,8 +79,6 @@ export default function CardsPage() {
       await load();
     } catch (err: any) {
       showToast(err.response?.data?.message || 'Failed to assign card', 'error');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -134,9 +124,6 @@ export default function CardsPage() {
 
   return (
     <div>
-      <div className="p-4 sm:p-8 pb-2">
-        {/* Consistent header area for positioning */}
-      </div>
       <EventTabs />
       <div className="p-4 sm:p-8 grid md:grid-cols-2 gap-6 sm:gap-8">
         {canManage ? (

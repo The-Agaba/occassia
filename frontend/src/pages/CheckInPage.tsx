@@ -7,13 +7,14 @@ import { wsManager } from '../lib/websocket';
 import { formatDateTime } from '../lib/utils';
 import type { IMessage } from '@stomp/stompjs';
 import { useUiStore } from '../store/uiStore';
-import { Smartphone, Keyboard, AlertCircle, Scan, CheckCircle2 } from 'lucide-react';
+import { Smartphone, Radio, QrCode, AlertCircle, Scan, CheckCircle2 } from 'lucide-react';
 
 export default function CheckInPage() {
   const { id } = useParams<{ id: string }>();
   const [gates, setGates] = useState<Gate[]>([]);
   const [gateId, setGateId] = useState('');
   const [nfcUid, setNfcUid] = useState('');
+  const [qrToken, setQrToken] = useState('');
   const [lastCheckIn, setLastCheckIn] = useState<CheckInResult | null>(null);
   const [error, setError] = useState('');
   const showToast = useUiStore((s) => s.showToast);
@@ -23,8 +24,8 @@ export default function CheckInPage() {
   const [scanning, setScanning] = useState(false);
   const [nfcPermissionState, setNfcPermissionState] = useState<string>('prompt');
   
-  // Mode: 'nfc' | 'manual'
-  const [mode, setMode] = useState<'nfc' | 'manual'>('manual');
+  // Only NFC input methods are used for the primary flow; QR is the backup.
+  const [mode, setMode] = useState<'nfc' | 'reader' | 'qr'>('reader');
   
   const inputRef = useRef<HTMLInputElement>(null);
   const ndefRef = useRef<any>(null);
@@ -72,7 +73,7 @@ export default function CheckInPage() {
       const res = await checkinApi.nfc(uid.trim(), gateId || undefined);
       setLastCheckIn(res.data);
       setNfcUid('');
-      if (mode === 'manual') {
+      if (mode === 'reader') {
         inputRef.current?.focus();
       }
       showToast('Check-in completed', 'success');
@@ -82,6 +83,22 @@ export default function CheckInPage() {
       showToast(message, 'error');
     }
   }, [gateId, mode, showToast]);
+
+  const executeQrCheckIn = useCallback(async (token: string) => {
+    if (!token.trim()) return;
+    setError('');
+    try {
+      const res = await checkinApi.qr(token.trim(), gateId || undefined);
+      setLastCheckIn(res.data);
+      setQrToken('');
+      inputRef.current?.focus();
+      showToast('QR check-in completed', 'success');
+    } catch (err: any) {
+      const message = err.response?.data?.message || 'QR check-in failed';
+      setError(message);
+      showToast(message, 'error');
+    }
+  }, [gateId, showToast]);
 
   const handleManualKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -118,7 +135,7 @@ export default function CheckInPage() {
       setScanning(false);
       if (error.name === 'NotAllowedError') {
         setNfcPermissionState('denied');
-        setError('NFC permission denied. Please allow NFC access or use manual entry.');
+        setError('NFC permission denied. Use an external NFC reader or the QR backup.');
       } else {
         setError('Failed to start NFC scanner: ' + error.message);
       }
@@ -134,9 +151,6 @@ export default function CheckInPage() {
 
   return (
     <div>
-      <div className="p-4 sm:p-8 pb-2">
-        {/* Consistent header area for positioning */}
-      </div>
       <EventTabs />
       <div className="p-4 sm:p-8">
         <div className="max-w-2xl mx-auto">
@@ -170,12 +184,18 @@ export default function CheckInPage() {
                 </button>
               )}
               <button
-                onClick={() => { setMode('manual'); stopNfcScan(); }}
+                onClick={() => { setMode('reader'); stopNfcScan(); }}
                 className={`flex-1 py-3 text-sm font-medium flex items-center justify-center gap-2 ${
-                  mode === 'manual' ? 'bg-slate-50 text-indigo-700 border-b-2 border-indigo-600' : 'text-slate-500 hover:text-slate-700'
+                  mode === 'reader' ? 'bg-slate-50 text-indigo-700 border-b-2 border-indigo-600' : 'text-slate-500 hover:text-slate-700'
                 }`}
               >
-                <Keyboard size={16} /> Manual / External Scanner
+                <Radio size={16} /> External NFC Reader
+              </button>
+              <button
+                onClick={() => { setMode('qr'); stopNfcScan(); }}
+                className={`flex-1 py-3 text-sm font-medium flex items-center justify-center gap-2 ${mode === 'qr' ? 'bg-slate-50 text-indigo-700 border-b-2 border-indigo-600' : 'text-slate-500 hover:text-slate-700'}`}
+              >
+                <QrCode size={16} /> QR Backup
               </button>
             </div>
 
@@ -186,7 +206,7 @@ export default function CheckInPage() {
                     <div className="text-red-500 mb-4">
                       <AlertCircle size={40} className="mx-auto mb-2" />
                       <p>NFC permissions were denied.</p>
-                      <button onClick={() => setMode('manual')} className="mt-3 text-sm underline">Switch to Manual Mode</button>
+                      <button onClick={() => setMode('reader')} className="mt-3 text-sm underline">Use external NFC reader</button>
                     </div>
                   ) : scanning ? (
                     <div className="animate-pulse">
@@ -205,25 +225,35 @@ export default function CheckInPage() {
                     </div>
                   )}
                 </div>
-              ) : (
+              ) : mode === 'reader' ? (
                 <div>
                   <p className="text-sm text-slate-500 mb-4">
-                    Use this mode if you are using an external USB/Bluetooth scanner that acts as a keyboard, or if you need to manually type a UID.
+                    Connect a USB or Bluetooth NFC reader. When a card is tapped, the reader sends its UID and check-in starts automatically.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-2">
                     <input
                       ref={inputRef}
-                      placeholder="Scan or type UID..."
+                      placeholder="Waiting for NFC reader UID…"
                       value={nfcUid}
                       onChange={(e) => setNfcUid(e.target.value)}
                       onKeyDown={handleManualKeyDown}
                       className="flex-1 min-w-0 px-4 py-2.5 border rounded-lg font-mono text-lg shadow-inner bg-slate-50 focus:bg-white transition-colors"
                       autoFocus
                     />
-                    <button onClick={() => executeCheckIn(nfcUid)} className="px-6 py-2.5 bg-slate-800 text-white rounded-lg font-medium hover:bg-slate-900 transition-colors">
-                      Check In
-                    </button>
                   </div>
+                </div>
+              ) : (
+                <div>
+                  <p className="text-sm text-slate-500 mb-4">Use a QR scanner and scan the guest QR code. QR is the only backup method when NFC is unavailable.</p>
+                  <input
+                    ref={inputRef}
+                    placeholder="Scan guest QR code…"
+                    value={qrToken}
+                    onChange={(e) => setQrToken(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') executeQrCheckIn(qrToken); }}
+                    className="w-full px-4 py-2.5 border rounded-lg font-mono shadow-inner bg-slate-50 focus:bg-white transition-colors"
+                    autoFocus
+                  />
                 </div>
               )}
             </div>

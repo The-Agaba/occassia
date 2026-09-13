@@ -23,17 +23,16 @@ export default function UsersPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingUser, setEditingUser] = useState<UserRow | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({ fullName: '', email: '', password: '', role: 'EVENT_MANAGER' });
   const currentUser = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
   const navigate = useNavigate();
-  const setLoading = useUiStore((s) => s.setLoading);
   const showToast = useUiStore((s) => s.showToast);
   const confirmAction = useUiStore((s) => s.confirmAction);
   const [roleCounts, setRoleCounts] = useState<Record<string, number>>({});
 
   const load = async () => {
-    setLoading(true);
     try {
       const usersRes = await usersApi.list();
       const userRows = usersRes.data as UserRow[];
@@ -54,7 +53,7 @@ export default function UsersPage() {
     }
     } catch (err: any) {
       showToast(err.response?.data?.message || 'Failed to load users', 'error');
-    } finally { setLoading(false); }
+    }
   };
 
   useEffect(() => { load(); }, [currentUser?.role]);
@@ -237,8 +236,8 @@ export default function UsersPage() {
             <button type="button" onClick={handleCancel} className="px-4 py-2 border rounded-lg text-sm hover:bg-slate-50">
               Cancel
             </button>
-            <button type="submit" className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium">
-              {editingUser ? 'Save Changes' : 'Create User'}
+            <button type="submit" disabled={loading} className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium disabled:opacity-50">
+              {loading ? 'Saving…' : editingUser ? 'Save Changes' : 'Create User'}
             </button>
           </div>
         </form>
@@ -280,7 +279,7 @@ export default function UsersPage() {
                       </button>
                     )}
                     {canDeleteUser(u) && u.active && (
-                      <button onClick={() => handleDelete(u)} className="text-red-500 hover:text-red-700 font-medium text-xs">
+                      <button onClick={() => handleDelete(u)} disabled={loading} className="text-red-500 hover:text-red-700 font-medium text-xs disabled:opacity-50">
                         {u.id === currentUser?.id ? 'Deactivate Me' : 'Deactivate'}
                       </button>
                     )}

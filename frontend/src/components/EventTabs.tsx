@@ -19,7 +19,7 @@ export default function EventTabs() {
   const visibleTabs = tabs.filter((tab) => !tab.roles || (user && tab.roles.includes(user.role)));
 
   return (
-    <div className="border-b border-[#e8e4de] bg-white px-4 sm:px-6">
+    <div className="sticky top-0 z-10 border-b border-[#e8e4de] bg-white px-4 sm:px-6">
       <div className="flex gap-1 overflow-x-auto scrollbar-hide">
         {visibleTabs.map((tab) => {
           const to = base + tab.path;

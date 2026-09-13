@@ -1,6 +1,8 @@
 package com.occassia.checkin;
 
 import com.occassia.checkin.dto.CheckInResponse;
+import com.occassia.checkin.dto.NfcCheckInRequest;
+import com.occassia.checkin.dto.QrCheckInRequest;
 import com.occassia.dashboard.StatsService;
 import com.occassia.dashboard.dto.EventStatsResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -8,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.charset.StandardCharsets;
@@ -17,7 +20,7 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "Check-in", description = "NFC, QR, and manual check-in - IoT gate device contract")
+@Tag(name = "Check-in", description = "NFC check-in with QR backup - IoT gate device contract")
 public class CheckInController {
 
     private final CheckInService checkInService;
@@ -25,24 +28,13 @@ public class CheckInController {
     private final ReportService reportService;
 
     @PostMapping("/api/v1/checkin/nfc")
-    public CheckInResponse nfc(@RequestBody Map<String, Object> body) {
-        String nfcUid = (String) body.get("nfcUid");
-        UUID gateId = body.get("gateId") != null ? UUID.fromString(body.get("gateId").toString()) : null;
-        return checkInService.checkInByNfc(nfcUid, gateId);
+    public CheckInResponse nfc(@Valid @RequestBody NfcCheckInRequest request) {
+        return checkInService.checkInByNfc(request.getNfcUid(), request.getGateId());
     }
 
     @PostMapping("/api/v1/checkin/qr")
-    public CheckInResponse qr(@RequestBody Map<String, Object> body) {
-        String qrToken = (String) body.get("qrToken");
-        UUID gateId = body.get("gateId") != null ? UUID.fromString(body.get("gateId").toString()) : null;
-        return checkInService.checkInByQr(qrToken, gateId);
-    }
-
-    @PostMapping("/api/v1/checkin/manual")
-    public CheckInResponse manual(@RequestBody Map<String, Object> body) {
-        UUID guestId = UUID.fromString(body.get("guestId").toString());
-        UUID gateId = body.get("gateId") != null ? UUID.fromString(body.get("gateId").toString()) : null;
-        return checkInService.checkInManual(guestId, gateId);
+    public CheckInResponse qr(@Valid @RequestBody QrCheckInRequest request) {
+        return checkInService.checkInByQr(request.getQrToken(), request.getGateId());
     }
 
     @PatchMapping("/api/v1/checkin/{id}/print")

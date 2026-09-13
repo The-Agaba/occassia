@@ -11,6 +11,7 @@ import com.occassia.shared.enums.UserRole;
 import com.occassia.shared.exception.ApiException;
 import com.occassia.shared.security.SecurityUtils;
 import com.occassia.shared.security.UserPrincipal;
+import com.occassia.shared.nfc.NfcUid;
 import com.occassia.card.dto.CardRegisterRequest;
 import com.occassia.card.dto.CardResponse;
 import com.occassia.websocket.CheckInEventPublisher;
@@ -43,12 +44,13 @@ public class CardService {
         UserPrincipal current = SecurityUtils.currentUser();
         Organization org = organizationService.findOrThrow(current.getOrganizationId());
 
-        if (cardRepository.existsByUid(request.getUid())) {
+        String uid = NfcUid.normalize(request.getUid());
+        if (cardRepository.existsByUid(uid)) {
             throw new ApiException(HttpStatus.CONFLICT, "CARD_EXISTS", "Card already registered");
         }
 
         NfcCard card = NfcCard.builder()
-            .uid(request.getUid())
+            .uid(uid)
             .organization(org)
             .status(CardStatus.AVAILABLE)
             .build();
@@ -70,8 +72,8 @@ public class CardService {
             for (int i = 1; i < rows.size(); i++) {
                 String[] row = rows.get(i);
                 if (row.length == 0 || row[0].isBlank()) continue;
-                String uid = row[0].trim();
                 try {
+                    String uid = NfcUid.normalize(row[0]);
                     if (cardRepository.existsByUid(uid)) {
                         errors.add(Map.of("row", i + 1, "reason", "Card already exists: " + uid));
                         continue;
@@ -141,13 +143,14 @@ public class CardService {
             throw new ApiException(HttpStatus.CONFLICT, "ALREADY_ASSIGNED", "Guest already has a card");
         }
 
-        NfcCard card = findOrThrow(nfcUid);
+        String canonicalUid = NfcUid.normalize(nfcUid);
+        NfcCard card = findOrThrow(canonicalUid);
         SecurityUtils.requireOrgAccess(card.getOrganization().getId());
         if (card.getStatus() != CardStatus.AVAILABLE) {
             throw new ApiException(HttpStatus.CONFLICT, "CARD_NOT_AVAILABLE", "Card is not available");
         }
 
-        guest.setNfcCardUid(nfcUid);
+        guest.setNfcCardUid(canonicalUid);
         guestRepository.save(guest);
 
         card.setStatus(CardStatus.ASSIGNED);
@@ -156,7 +159,7 @@ public class CardService {
         cardRepository.save(card);
 
         eventPublisher.publishCardUpdate(card);
-        auditService.log(card.getOrganization(), "CARD_ASSIGNED", "CARD", nfcUid,
+        auditService.log(card.getOrganization(), "CARD_ASSIGNED", "CARD", canonicalUid,
                 Map.of("guestId", guestId.toString()));
     }
 
@@ -182,7 +185,7 @@ public class CardService {
     }
 
     public NfcCard findOrThrow(String uid) {
-        return cardRepository.findById(uid)
+        return cardRepository.findById(NfcUid.normalize(uid))
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "CARD_NOT_FOUND", "Card not registered in system"));
     }
 

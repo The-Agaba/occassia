@@ -18,6 +18,7 @@ import com.occassia.shared.enums.EventStatus;
 import com.occassia.shared.enums.UserRole;
 import com.occassia.shared.exception.ApiException;
 import com.occassia.shared.security.SecurityUtils;
+import com.occassia.shared.nfc.NfcUid;
 import com.occassia.websocket.CheckInEventPublisher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -46,7 +47,7 @@ public class CheckInService {
     @Transactional
     public CheckInResponse checkInByNfc(String nfcUid, UUID gateId) {
         SecurityUtils.requireRole(UserRole.CHECKIN_STAFF, UserRole.ADMIN, UserRole.EVENT_MANAGER);
-        NfcCard card = cardRepository.findById(nfcUid)
+        NfcCard card = cardRepository.findById(NfcUid.normalize(nfcUid))
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "CARD_NOT_FOUND", "Card not registered in system"));
 
         if (card.getStatus() == CardStatus.LOST) {
@@ -70,14 +71,6 @@ public class CheckInService {
         Guest guest = guestRepository.findByQrToken(qrToken)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "GUEST_NOT_FOUND", "Invalid QR code"));
         return performCheckIn(guest, gateId, CheckInMethod.QR);
-    }
-
-    @Transactional
-    public CheckInResponse checkInManual(UUID guestId, UUID gateId) {
-        SecurityUtils.requireRole(UserRole.ADMIN, UserRole.EVENT_MANAGER);
-        Guest guest = guestRepository.findById(guestId)
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "GUEST_NOT_FOUND", "Guest not found"));
-        return performCheckIn(guest, gateId, CheckInMethod.MANUAL);
     }
 
     private CheckInResponse performCheckIn(Guest guest, UUID gateId, CheckInMethod method) {

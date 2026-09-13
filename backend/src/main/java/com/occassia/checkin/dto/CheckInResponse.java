@@ -26,21 +26,3 @@ public class CheckInResponse {
         private Integer tableNumber;
     }
 }
-
-@Data
-class NfcCheckInRequest {
-    private String nfcUid;
-    private UUID gateId;
-}
-
-@Data
-class QrCheckInRequest {
-    private String qrToken;
-    private UUID gateId;
-}
-
-@Data
-class ManualCheckInRequest {
-    private UUID guestId;
-    private UUID gateId;
-}

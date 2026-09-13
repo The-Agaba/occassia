@@ -489,7 +489,7 @@ Card registration accepts one UID at a time:
 - `POST /api/v1/cards` with `{ "uid": "04:A3:FF:12:BC" }`
 - `batch_code` is not part of the entity, request, response, or frontend model.
 - CSV card import is available at `POST /api/v1/cards/batch`; its first column is `uid` and additional columns are ignored.
-- Custom readers can register cards through HID/keyboard mode, Web NFC where supported, or `tools/serial-bridge.js`.
+- Cards and check-ins accept canonical NFC UIDs from Web NFC, HID/keyboard readers, or `tools/serial-bridge.js`.
 
 See [CONFIGURE.md](./CONFIGURE.md) for reader compatibility, UID formatting, serial-port settings, authentication, and hardware verification.
 
@@ -499,7 +499,7 @@ Entry points:
 
 - `POST /api/v1/checkin/nfc` - `{ nfcUid, gateId? }`
 - `POST /api/v1/checkin/qr` - `{ qrToken, gateId? }`
-- `POST /api/v1/checkin/manual` - `{ guestId, gateId? }`
+- Gate check-in accepts NFC UID input or QR token input only. There is no manual/type-in gate check-in endpoint.
 
 ---
 

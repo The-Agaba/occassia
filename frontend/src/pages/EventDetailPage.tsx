@@ -117,7 +117,7 @@ export default function EventDetailPage() {
         keywords="event details, event management, wedding event operations, guest categories, event gates"
       />
       <div>
-      <div className="p-4 sm:p-8 pb-2">
+      <div className="p-4 sm:p-8 pb-4">
         <div className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-0 justify-between">
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
