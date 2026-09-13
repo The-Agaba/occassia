@@ -28,10 +28,9 @@ export default function EventTabs() {
       <div className="event-workspace-nav-inner"><Link to="/dashboard" className="event-back-link"><ArrowLeft size={15} /> All events</Link><div className="event-tab-strip">
         {visibleTabs.map((tab) => {
           const to = base + tab.path;
-          const active =
-            tab.path === ''
-              ? location.pathname === base
-              : location.pathname.startsWith(base + tab.path);
+          // Keep the active marker exclusive: /cards/register and /cards/assign
+          // are separate workflows and must not also highlight Card inventory.
+          const active = location.pathname === to;
           return (
             <Link
               key={tab.path}
