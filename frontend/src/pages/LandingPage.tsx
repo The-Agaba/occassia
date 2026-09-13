@@ -1,7 +1,9 @@
 import { ArrowRight, CheckCircle2, CreditCard, Radio, QrCode, ShieldCheck, Sparkles } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ThemeToggle } from '../components/ThemeProvider';
 import SEO from '../components/SEO';
+import { publicApi } from '../api';
 
 const features = [
   { icon: Radio, title: 'Tap-first entry', text: 'Use Web NFC or a connected reader to move guests through the gate in seconds.' },
@@ -10,6 +12,20 @@ const features = [
 ];
 
 export default function LandingPage() {
+  const [totalCheckIns, setTotalCheckIns] = useState<number | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    publicApi.metrics()
+      .then(({ data }) => {
+        if (active) setTotalCheckIns(data.totalCheckIns);
+      })
+      .catch((error) => {
+        console.error('[LANDING_METRICS]', error);
+      });
+    return () => { active = false; };
+  }, []);
+
   return (
     <main className="landing-shell">
       <SEO title="Occassia | Event guest access, NFC check-in and live attendance" description="Occassia helps event teams welcome guests, manage NFC cards, use QR backups, and monitor attendance in real time." keywords="event guest access, NFC check-in, QR event check-in, guest management, Cotronix" />
@@ -28,7 +44,7 @@ export default function LandingPage() {
         <div className="hero-visual" aria-label="Abstract event access illustration">
           <div className="visual-orbit orbit-one" /><div className="visual-orbit orbit-two" /><div className="visual-orbit orbit-three" />
           <div className="visual-card"><div className="visual-card-top"><span className="status-dot" /> LIVE GATE</div><div className="visual-scan-ring"><Radio size={64} strokeWidth={1.2} /></div><strong>Tap to welcome</strong><span>Secure · instant · human</span></div>
-          <div className="visual-float float-top"><ShieldCheck size={16} /><span>Verified guest</span></div><div className="visual-float float-bottom"><span className="mini-avatar">A</span><span>+ 248 checked in</span></div>
+          <div className="visual-float float-top"><ShieldCheck size={16} /><span>Verified guest</span></div><div className="visual-float float-bottom"><span className="mini-avatar">A</span><span>{totalCheckIns === null ? 'Loading live count…' : `+ ${totalCheckIns.toLocaleString()} checked in`}</span></div>
         </div>
       </section>
       <section id="how-it-works" className="feature-grid"><div className="section-intro"><span>01 / OPERATIONS</span><h2>One clear view<br />of the whole welcome.</h2></div>{features.map(({ icon: Icon, title, text }) => <article className="feature-card" key={title}><div className="feature-icon"><Icon size={20} /></div><h3>{title}</h3><p>{text}</p></article>)}</section>

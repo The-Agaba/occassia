@@ -71,7 +71,7 @@ export default function App() {
               <RoleGuard roles={['SUPER_ADMIN']}><OrganizationPage /></RoleGuard>
             } />
           </Route>
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         </Suspense>
       </BrowserRouter>

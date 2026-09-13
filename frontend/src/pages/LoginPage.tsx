@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -34,12 +34,22 @@ export default function LoginPage() {
     formState: { errors, isSubmitting },
   } = useForm<FormData>({ resolver: zodResolver(schema) });
 
+  useEffect(() => {
+    // A direct /login visit should still have the public landing page behind it,
+    // so the browser back gesture never strands the user outside the app flow.
+    const historyIndex = window.history.state?.idx;
+    if (historyIndex === 0 || (historyIndex == null && window.history.length <= 1)) {
+      navigate('/', { replace: true });
+      navigate('/login');
+    }
+  }, [navigate]);
+
   const onSubmit = async (data: FormData) => {
     setError('');
     try {
       const res = await authApi.login(data.email, data.password);
       setAuth(res.data.token, res.data.refreshToken, res.data.user);
-      navigate('/dashboard');
+      navigate('/dashboard', { replace: true });
     } catch {
       setError('Invalid email or password');
     }

@@ -88,16 +88,29 @@ export default function GuestsPage() {
         <head>
           <title>Guest QR - ${qrModalGuest.fullName}</title>
           <style>
-            body { font-family: sans-serif; text-align: center; margin-top: 50px; }
-            img { max-width: 300px; }
-            h2 { margin-bottom: 5px; }
-            p { color: #555; }
+            @page { size: 80mm 50mm; margin: 0; }
+            * { box-sizing: border-box; }
+            html, body { width: 80mm; height: 50mm; margin: 0; }
+            body { font-family: Arial, sans-serif; display: grid; place-items: center; padding: 4mm; color: #10182d; }
+            .ticket { width: 72mm; min-height: 42mm; display: grid; grid-template-columns: 1fr 25mm; gap: 3mm; align-items: center; border: .35mm solid #d8ddec; border-radius: 2mm; padding: 3mm; }
+            .details { min-width: 0; text-align: left; }
+            .event { color: #66708a; font-size: 7pt; margin-bottom: 2mm; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            h2 { font-size: 13pt; line-height: 1.08; margin: 0 0 2mm; overflow-wrap: anywhere; }
+            .category { display: inline-block; color: #fff; background: ${qrModalGuest.category.colorHex}; border-radius: 999px; padding: 1.2mm 2mm; font-size: 7pt; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
+            .type { color: #66708a; font-size: 7pt; margin-top: 2mm; }
+            img { width: 23mm; height: 23mm; display: block; }
           </style>
         </head>
         <body>
-          <h2>${qrModalGuest.fullName}</h2>
-          <p>${event?.name || 'Event'}</p>
-          <img src="${qrModalUrl}" onload="window.print();window.close()" />
+          <main class="ticket">
+            <section class="details">
+              <div class="event">${event?.name || 'Event'}</div>
+              <h2>${qrModalGuest.fullName}</h2>
+              <div class="category">${qrModalGuest.category.name}</div>
+              <div class="type">${qrModalGuest.attendanceType}</div>
+            </section>
+            <img src="${qrModalUrl}" alt="Guest QR code" onload="window.print();window.close()" />
+          </main>
         </body>
       </html>
     `);

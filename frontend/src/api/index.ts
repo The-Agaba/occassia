@@ -11,6 +11,10 @@ export const authApi = {
   logout: () => api.post('/auth/logout'),
 };
 
+export const publicApi = {
+  metrics: () => api.get<{ totalCheckIns: number }>('/public/metrics'),
+};
+
 export const eventsApi = {
   list: () => api.get<Event[]>('/events'),
   get: (id: string) => api.get<Event>(`/events/${id}`),

@@ -19,6 +19,7 @@ import com.occassia.shared.enums.UserRole;
 import com.occassia.shared.exception.ApiException;
 import com.occassia.shared.security.SecurityUtils;
 import com.occassia.shared.nfc.NfcUid;
+import com.occassia.metrics.PlatformMetricService;
 import com.occassia.websocket.CheckInEventPublisher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -43,6 +44,7 @@ public class CheckInService {
     private final AuditService auditService;
     private final CheckInEventPublisher eventPublisher;
     private final StatsService statsService;
+    private final PlatformMetricService platformMetricService;
 
     @Transactional
     public CheckInResponse checkInByNfc(String nfcUid, UUID gateId) {
@@ -106,6 +108,9 @@ public class CheckInService {
                 .ticketPrinted(false)
                 .build();
         checkIn = checkInRepository.save(checkIn);
+        // Keep the product-wide counter independent from mutable event records.
+        // It is incremented only for a new check-in, never for a duplicate scan.
+        platformMetricService.recordCheckIn();
 
         auditService.log(event.getOrganization(), "CHECKIN_PERFORMED", "CHECKIN", checkIn.getId().toString(),
                 Map.of("guestId", guest.getId().toString(), "method", method.name()));

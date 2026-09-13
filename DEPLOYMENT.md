@@ -63,6 +63,12 @@ VITE_WS_URL=https://your-backend-host/ws
 7. Deploy the frontend.
 8. Copy the final Vercel origin into the backend's `CORS_ALLOWED_ORIGINS` environment variable and redeploy/restart the backend.
 
+### Public attendance metric and compact tickets
+
+The landing page reads `GET /api/v1/public/metrics` and displays the durable `totalCheckIns` value. Flyway migration `V6__add_permanent_attendance_counter.sql` initializes that value from all existing check-ins and increments it atomically only after a new NFC or QR check-in succeeds. It is deliberately separate from event records, so normal event/guest cleanup cannot reset the historical total. A full database restore or replacement still requires restoring the database backup containing `platform_metrics`.
+
+Guest QR printing uses an 80mm × 50mm compact event-ticket layout. Check-in confirmation printing uses the same physical size; configure the browser/printer to use the ticket roll or custom 80mm × 50mm paper setting and disable automatic scaling.
+
 `frontend/vercel.json` keeps client-side routes working when a user refreshes a page such as `/events/{id}/dashboard`.
 
 ## Verify the live deployment

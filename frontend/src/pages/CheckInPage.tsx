@@ -106,6 +106,39 @@ export default function CheckInPage() {
     }
   };
 
+  const printCompactTicket = async () => {
+    if (!lastCheckIn?.checkInId) return;
+    const printWindow = window.open('', '_blank', 'width=420,height=280');
+    if (!printWindow) {
+      showToast('Printing was blocked. Allow pop-ups for this site and try again.', 'error');
+      return;
+    }
+    const guest = lastCheckIn.guest;
+    const escapeHtml = (value: string) => value.replace(/[&<>'"]/g, (character) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;',
+    }[character] || character));
+    printWindow.document.write(`
+      <html><head><title>Entry ticket - ${escapeHtml(guest.fullName)}</title><style>
+        @page{size:80mm 50mm;margin:0}*{box-sizing:border-box}html,body{width:80mm;height:50mm;margin:0}
+        body{font-family:Arial,sans-serif;display:grid;place-items:center;padding:4mm;color:#10182d}
+        .ticket{width:72mm;min-height:42mm;border:.35mm solid #d8ddec;border-radius:2mm;padding:3mm;display:flex;flex-direction:column;justify-content:center;gap:2mm}
+        .event{font-size:7pt;color:#66708a}.name{font-size:14pt;font-weight:800;line-height:1.08;overflow-wrap:anywhere}
+        .category{font-size:10pt;font-weight:900;letter-spacing:.05em;text-transform:uppercase;color:${escapeHtml(guest.category.colorHex)};}
+        .meta{font-size:7pt;color:#66708a}
+      </style></head><body><main class="ticket">
+        <div class="event">Occassia · Verified entry</div><div class="name">${escapeHtml(guest.fullName)}</div>
+        <div class="category">${escapeHtml(guest.category.name)}</div><div class="meta">${escapeHtml(guest.attendanceType)}${guest.tableNumber ? ` · Table ${guest.tableNumber}` : ''}</div>
+      </main><script>window.onload=function(){window.print();window.onafterprint=function(){window.close()}}</script></body></html>`);
+    printWindow.document.close();
+    try {
+      await checkinApi.print(lastCheckIn.checkInId);
+      showToast('Compact ticket sent to the printer.', 'success');
+    } catch (error) {
+      console.error('[TICKET_PRINT]', error);
+      showToast('Ticket printed locally, but the server could not record the print status.', 'error');
+    }
+  };
+
   const startNfcScan = async () => {
     if (!('NDEFReader' in window)) return;
     
@@ -307,10 +340,10 @@ export default function CheckInPage() {
               
               {!lastCheckIn.alreadyCheckedIn && lastCheckIn.checkInId && (
                 <button
-                  onClick={() => checkinApi.print(lastCheckIn.checkInId)}
+                  onClick={printCompactTicket}
                   className="mt-6 px-6 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-lg transition-colors text-sm"
                 >
-                  Mark Ticket Printed
+                  Print Compact Ticket
                 </button>
               )}
             </div>
