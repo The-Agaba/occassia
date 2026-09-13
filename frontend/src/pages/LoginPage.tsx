@@ -8,6 +8,7 @@ import { useAuthStore } from '../store/authStore';
 import { ArrowRight, Eye, EyeOff } from 'lucide-react';
 import SEO from '../components/SEO';
 import { ThemeToggle } from '../components/ThemeProvider';
+import { apiErrorMessage } from '../lib/errorMessages';
 
 const schema = z.object({
   email: z.string().email('Enter a valid email'),
@@ -28,11 +29,21 @@ export default function LoginPage() {
   const [videoFailed, setVideoFailed] = useState(false);
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [slowRequest, setSlowRequest] = useState(false);
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({ resolver: zodResolver(schema) });
+
+  useEffect(() => {
+    if (!isSubmitting) {
+      setSlowRequest(false);
+      return;
+    }
+    const timer = window.setTimeout(() => setSlowRequest(true), 15000);
+    return () => window.clearTimeout(timer);
+  }, [isSubmitting]);
 
   useEffect(() => {
     // A direct /login visit should still have the public landing page behind it,
@@ -50,8 +61,12 @@ export default function LoginPage() {
       const res = await authApi.login(data.email, data.password);
       setAuth(res.data.token, res.data.refreshToken, res.data.user);
       navigate('/dashboard', { replace: true });
-    } catch {
-      setError('Invalid email or password');
+    } catch (requestError: unknown) {
+      const axiosError = requestError as any;
+      const message = axiosError?.response?.status === 401
+        ? 'Email or password is incorrect.'
+        : apiErrorMessage(requestError, 'Sign-in could not be completed. Please try again.');
+      setError(message);
     }
   };
 
@@ -102,6 +117,9 @@ export default function LoginPage() {
             <rect x="260" y="40" width="160" height="160" rx="32" fill="rgba(255,255,255,0.08)" className="hero-shape hero-shape-2" />
             <ellipse cx="420" cy="210" rx="100" ry="60" fill="rgba(255,255,255,0.06)" className="hero-shape hero-shape-3" />
           </svg>
+          <div className="login-particle-field" aria-hidden="true">
+            {Array.from({ length: 18 }, (_, index) => <span key={index} className={`login-particle login-particle-${index + 1}`} />)}
+          </div>
         </div>
 
         <div className="relative z-10 h-full flex flex-col justify-between p-12 xl:p-16">
@@ -198,12 +216,12 @@ export default function LoginPage() {
             </div>
 
             {error && (
-              <p className="text-red-600 text-sm">{error}</p>
+            <p className="text-red-600 text-sm" role="alert">{error}</p>
             )}
 
             <button type="submit" disabled={isSubmitting} className="btn-primary group">
               {isSubmitting ? (
-                'Signing in…'
+                slowRequest ? 'Waking the server… still waiting' : 'Signing in…'
               ) : (
                 <span className="flex items-center gap-2">
                   Continue

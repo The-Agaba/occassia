@@ -299,6 +299,30 @@ button, a, input, select { -webkit-tap-highlight-color: transparent; }
 /* Login uses the preserved composition, with calmer, theme-aware motion. */
 .form-shape { border-color:color-mix(in srgb, var(--violet) 30%, transparent)!important; background:color-mix(in srgb, var(--violet) 12%, transparent)!important; animation:loginBubble 8s ease-in-out infinite; }.form-shape-1 { animation-delay:-1s; }.form-shape-2 { animation-delay:-3s; }.form-shape-3 { animation-delay:-5s; }
 @keyframes loginBubble { 0%,100% { transform:translate3d(0,0,0) scale(1); } 35% { transform:translate3d(8px,-13px,0) scale(1.04); } 70% { transform:translate3d(-6px,7px,0) scale(.97); } }
+.login-particle-field { position:absolute; inset:0; overflow:hidden; }
+.login-particle { position:absolute; left:var(--particle-x); top:var(--particle-y); width:var(--particle-size); height:var(--particle-size); border:1px solid color-mix(in srgb,var(--cyan) 45%,transparent); border-radius:50%; background:radial-gradient(circle at 35% 30%,color-mix(in srgb,var(--cyan) 28%,transparent),transparent 68%); box-shadow:0 0 28px color-mix(in srgb,var(--cyan) 16%,transparent); animation:particleTravel var(--particle-duration) linear infinite; animation-delay:var(--particle-delay); opacity:0; }
+.login-particle:nth-child(3n) { border-color:color-mix(in srgb,var(--violet) 55%,transparent); background:color-mix(in srgb,var(--violet) 11%,transparent); }
+.login-particle:nth-child(4n) { border-radius:24%; transform:rotate(45deg); }
+.login-particle:nth-child(5n) { border-radius:4px; background:color-mix(in srgb,var(--cyan) 10%,transparent); }
+.login-particle-1 { --particle-x:8%; --particle-y:78%; --particle-size:22px; --particle-duration:19s; --particle-delay:-2s; }
+.login-particle-2 { --particle-x:19%; --particle-y:35%; --particle-size:9px; --particle-duration:15s; --particle-delay:-8s; }
+.login-particle-3 { --particle-x:30%; --particle-y:66%; --particle-size:38px; --particle-duration:23s; --particle-delay:-14s; }
+.login-particle-4 { --particle-x:42%; --particle-y:18%; --particle-size:15px; --particle-duration:17s; --particle-delay:-5s; }
+.login-particle-5 { --particle-x:53%; --particle-y:72%; --particle-size:28px; --particle-duration:21s; --particle-delay:-17s; }
+.login-particle-6 { --particle-x:64%; --particle-y:42%; --particle-size:11px; --particle-duration:14s; --particle-delay:-3s; }
+.login-particle-7 { --particle-x:75%; --particle-y:84%; --particle-size:18px; --particle-duration:18s; --particle-delay:-11s; }
+.login-particle-8 { --particle-x:87%; --particle-y:28%; --particle-size:31px; --particle-duration:25s; --particle-delay:-21s; }
+.login-particle-9 { --particle-x:95%; --particle-y:61%; --particle-size:8px; --particle-duration:16s; --particle-delay:-7s; }
+.login-particle-10 { --particle-x:12%; --particle-y:12%; --particle-size:14px; --particle-duration:20s; --particle-delay:-18s; }
+.login-particle-11 { --particle-x:24%; --particle-y:89%; --particle-size:26px; --particle-duration:22s; --particle-delay:-10s; }
+.login-particle-12 { --particle-x:36%; --particle-y:51%; --particle-size:7px; --particle-duration:13s; --particle-delay:-4s; }
+.login-particle-13 { --particle-x:48%; --particle-y:91%; --particle-size:19px; --particle-duration:24s; --particle-delay:-15s; }
+.login-particle-14 { --particle-x:59%; --particle-y:8%; --particle-size:34px; --particle-duration:26s; --particle-delay:-24s; }
+.login-particle-15 { --particle-x:70%; --particle-y:57%; --particle-size:12px; --particle-duration:16s; --particle-delay:-9s; }
+.login-particle-16 { --particle-x:81%; --particle-y:16%; --particle-size:21px; --particle-duration:19s; --particle-delay:-13s; }
+.login-particle-17 { --particle-x:91%; --particle-y:76%; --particle-size:10px; --particle-duration:15s; --particle-delay:-6s; }
+.login-particle-18 { --particle-x:4%; --particle-y:48%; --particle-size:29px; --particle-duration:23s; --particle-delay:-20s; }
+@keyframes particleTravel { 0% { opacity:0; transform:translate3d(-12vw,28vh,0) scale(.55) rotate(0deg); } 12% { opacity:.78; } 50% { opacity:.46; transform:translate3d(4vw,-3vh,0) scale(1.12) rotate(150deg); } 84% { opacity:.2; } 100% { opacity:0; transform:translate3d(17vw,-125vh,0) scale(.74) rotate(300deg); } }
 @media (max-width: 800px) { .app-sidebar { position:fixed; left:0; top:0; transform:translateX(-100%); transition:transform .25s ease; box-shadow:20px 0 60px rgba(0,0,0,.2); }.app-sidebar.is-open { transform:none; }.sidebar-close { display:block; }.mobile-scrim { display:block; position:fixed; inset:0; z-index:19; background:rgba(12,20,40,.35); border:0; opacity:0; pointer-events:none; transition:.2s; }.mobile-scrim.is-open { opacity:1; pointer-events:auto; }.menu-button { display:block; }.app-header { min-height:78px; padding:14px 18px; }.header-kicker { font-size:8px; }.app-header h1 { font-size:18px; }.connection-badge { display:none; }.app-content { padding:18px; }.landing-hero { grid-template-columns:1fr; padding-top:48px; }.hero-visual { min-height:380px; }.feature-grid { grid-template-columns:1fr; padding-top:50px; }.section-intro { margin-bottom:15px; }.landing-footer { flex-wrap:wrap; }.landing-footer div { width:100%; }.landing-nav-links a:not(.landing-login) { display:none; } }
 @media (prefers-reduced-motion: reduce) { *,*::before,*::after { animation-duration:.001ms!important; transition-duration:.001ms!important; } }
 @media (max-width: 800px) { .event-workspace-nav-inner { display:block; }.event-back-link { padding:11px 0 4px; }.event-tab-strip { margin:0 -2px; }.event-tab-link { padding:12px 9px 11px; font-size:10px; }.ops-page-heading { display:block; }.ops-heading-actions { margin-top:18px; }.ops-heading-actions .ops-button { flex:1; }.ops-stat-grid { grid-template-columns:repeat(2,1fr); }.ops-two-column { grid-template-columns:1fr; }.ops-panel,.nfc-capture { padding:18px; }.ops-page-heading h2 { font-size:30px; } }

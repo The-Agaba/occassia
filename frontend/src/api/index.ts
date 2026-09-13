@@ -3,7 +3,9 @@ import type { User, Event, Category, Guest, NfcCard, Gate, CheckInResult, EventS
 
 export const authApi = {
   login: (email: string, password: string) =>
-    api.post<{ token: string; refreshToken: string; user: User }>('/auth/login', { email, password }),
+    // Free-tier hosts can take several minutes to wake. Login gets a generous
+    // timeout without slowing down normal API requests elsewhere in the app.
+    api.post<{ token: string; refreshToken: string; user: User }>('/auth/login', { email, password }, { timeout: 300000 }),
   me: () => api.get<User>('/auth/me'),
   /** Update own profile (name, email, password). Cannot change role. */
   updateMe: (data: { fullName?: string; email?: string; password?: string }) =>
