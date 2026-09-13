@@ -54,7 +54,7 @@ export default function LoginPage() {
       />
       <div className="min-h-screen flex">
       {/* Left - full-bleed event media */}
-      <div className="hidden lg:block lg:w-[52%] xl:w-[55%] relative overflow-hidden bg-[#0c0f14]">
+      <div className="hidden lg:block lg:w-[52%] xl:w-[55%] relative overflow-hidden login-brand-panel">
         {!videoFailed ? (
           <>
             {!videoLoaded && (
@@ -83,7 +83,7 @@ export default function LoginPage() {
           <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${EVENT_POSTER})` }} />
         )}
 
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0c0f14]/95 via-[#0c0f14]/60 to-transparent" />
+        <div className="absolute inset-0 login-hero-overlay" />
 
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <svg viewBox="0 0 560 320" className="absolute -left-24 top-12 h-72 w-[34rem] opacity-70">
@@ -95,7 +95,7 @@ export default function LoginPage() {
 
         <div className="relative z-10 h-full flex flex-col justify-between p-12 xl:p-16">
           <div>
-            <span className="text-[#d4b896] text-xs font-medium tracking-[0.3em] uppercase">
+            <span className="login-accent text-xs font-medium tracking-[0.3em] uppercase">
               Occassia Event Access Platform
             </span>
           </div>
@@ -103,7 +103,7 @@ export default function LoginPage() {
           <div className="max-w-md">
             <h2 className="font-display text-4xl xl:text-5xl text-white font-medium leading-tight">
               Every guest.<br />
-              <em className="text-[#d4b896] not-italic">Every moment.</em>
+              <em className="login-accent not-italic">Every moment.</em>
             </h2>
             <p className="mt-4 text-white/70 text-sm leading-relaxed max-w-sm">
               Seamless check-in, live attendance, and guest management for weddings and events of every scale.
@@ -117,23 +117,23 @@ export default function LoginPage() {
       </div>
 
       {/* Right - clean open form */}
-      <div className="flex-1 flex flex-col justify-center px-8 sm:px-16 xl:px-24 py-12 bg-[#faf8f5] relative overflow-hidden">
+      <div className="flex-1 flex flex-col justify-center px-8 sm:px-16 xl:px-24 py-12 login-surface relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute right-[-2rem] top-10 h-32 w-32 rounded-full border border-[#0c0f14]/10 bg-[#0c0f14]/5 form-shape form-shape-1" />
-          <div className="absolute left-8 bottom-16 h-20 w-20 rounded-3xl border border-[#b8956a]/20 bg-[#b8956a]/10 form-shape form-shape-2" />
-          <div className="absolute right-16 bottom-8 h-16 w-24 rounded-full border border-[#0c0f14]/10 bg-[#0c0f14]/5 form-shape form-shape-3" />
+          <div className="absolute right-[-2rem] top-10 h-32 w-32 rounded-full login-bubble login-bubble-1 form-shape form-shape-1" />
+          <div className="absolute left-8 bottom-16 h-20 w-20 rounded-3xl login-bubble login-bubble-2 form-shape form-shape-2" />
+          <div className="absolute right-16 bottom-8 h-16 w-24 rounded-full login-bubble login-bubble-3 form-shape form-shape-3" />
         </div>
 
         <div className="login-theme-control"><ThemeToggle /></div>
         <div className="w-full max-w-sm mx-auto relative z-10">
           <div className="mb-12">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-[#0c0f14]/10 bg-white shadow-sm">
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl login-logo-frame shadow-sm">
               <img src="/new-favicon.svg" alt="Occassia logo" className="h-7 w-7" />
             </div>
-            <h1 className="font-display text-4xl text-[#0c0f14] font-semibold tracking-tight">
+            <h1 className="font-display text-4xl login-heading font-semibold tracking-tight">
               Occassia
             </h1>
-            <p className="mt-2 text-[#6b7280] text-sm">
+            <p className="mt-2 login-muted text-sm">
               Cotronix · Weddings & Events
             </p>
           </div>
@@ -145,7 +145,7 @@ export default function LoginPage() {
               </div>
             )}
             <div>
-              <label className="block text-xs font-medium text-[#9ca3af] uppercase tracking-widest mb-2">
+              <label className="block text-xs font-medium login-label uppercase tracking-widest mb-2">
                 Email
               </label>
               <input
@@ -161,7 +161,7 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-[#9ca3af] uppercase tracking-widest mb-2">
+              <label className="block text-xs font-medium login-label uppercase tracking-widest mb-2">
                 Password
               </label>
               <div className="relative">
