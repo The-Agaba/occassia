@@ -5,6 +5,7 @@ import { ProtectedRoute, RoleGuard } from './components/ProtectedRoute';
 import LoginPage from './pages/LoginPage';
 import LandingPage from './pages/LandingPage';
 import MarkdownPage from './pages/MarkdownPage';
+import NetworkStatus from './components/NetworkStatus';
 
 const DashboardPage = lazy(() => import('./pages/DashboardPage'));
 const NewEventPage = lazy(() => import('./pages/NewEventPage'));
@@ -12,6 +13,8 @@ const EventDetailPage = lazy(() => import('./pages/EventDetailPage'));
 const GuestsPage = lazy(() => import('./pages/GuestsPage'));
 const GuestImportPage = lazy(() => import('./pages/GuestImportPage'));
 const CardsPage = lazy(() => import('./pages/CardsPage'));
+const CardRegistrationPage = lazy(() => import('./pages/CardRegistrationPage'));
+const CardAssignmentPage = lazy(() => import('./pages/CardAssignmentPage'));
 const CheckInPage = lazy(() => import('./pages/CheckInPage'));
 const LiveDashboardPage = lazy(() => import('./pages/LiveDashboardPage'));
 const ReportsPage = lazy(() => import('./pages/ReportsPage'));
@@ -26,6 +29,7 @@ function RouteLoading() {
 export default function App() {
   return (
     <AuthBootstrap>
+      <NetworkStatus />
       <BrowserRouter>
         <Suspense fallback={<RouteLoading />}>
         <Routes>
@@ -45,6 +49,12 @@ export default function App() {
             } />
             <Route path="/events/:id/cards" element={
               <RoleGuard roles={['ADMIN', 'SUPER_ADMIN', 'EVENT_MANAGER']}><CardsPage /></RoleGuard>
+            } />
+            <Route path="/events/:id/cards/register" element={
+              <RoleGuard roles={['ADMIN', 'EVENT_MANAGER']}><CardRegistrationPage /></RoleGuard>
+            } />
+            <Route path="/events/:id/cards/assign" element={
+              <RoleGuard roles={['ADMIN', 'EVENT_MANAGER']}><CardAssignmentPage /></RoleGuard>
             } />
             <Route path="/events/:id/checkin" element={
               <RoleGuard roles={['ADMIN', 'EVENT_MANAGER', 'CHECKIN_STAFF']}><CheckInPage /></RoleGuard>

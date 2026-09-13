@@ -1,14 +1,17 @@
 import { Link, useParams, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { cn } from '../lib/utils';
+import { ArrowLeft, BarChart3, ClipboardList, CreditCard, Gauge, Radio, UsersRound } from 'lucide-react';
 
 const tabs = [
-  { path: '', label: 'Overview' },
-  { path: '/guests', label: 'Guests' },
-  { path: '/cards', label: 'Cards', roles: ['ADMIN', 'SUPER_ADMIN', 'EVENT_MANAGER'] },
-  { path: '/checkin', label: 'Check-in', roles: ['ADMIN', 'EVENT_MANAGER', 'CHECKIN_STAFF'] },
-  { path: '/dashboard', label: 'Live Dashboard' },
-  { path: '/reports', label: 'Reports' },
+  { path: '', label: 'Overview', icon: Gauge },
+  { path: '/guests', label: 'Guest list', icon: UsersRound },
+  { path: '/cards', label: 'Card inventory', icon: CreditCard, roles: ['ADMIN', 'SUPER_ADMIN', 'EVENT_MANAGER'] },
+  { path: '/cards/register', label: 'Register card', icon: Radio, roles: ['ADMIN', 'EVENT_MANAGER'] },
+  { path: '/cards/assign', label: 'Assign card', icon: ClipboardList, roles: ['ADMIN', 'EVENT_MANAGER'] },
+  { path: '/checkin', label: 'Gate check-in', icon: Radio, roles: ['ADMIN', 'EVENT_MANAGER', 'CHECKIN_STAFF'] },
+  { path: '/dashboard', label: 'Live view', icon: BarChart3 },
+  { path: '/reports', label: 'Reports', icon: ClipboardList },
 ];
 
 export default function EventTabs() {
@@ -19,8 +22,8 @@ export default function EventTabs() {
   const visibleTabs = tabs.filter((tab) => !tab.roles || (user && tab.roles.includes(user.role)));
 
   return (
-    <div className="sticky top-0 z-10 border-b border-[#e8e4de] bg-white px-4 sm:px-6">
-      <div className="flex gap-1 overflow-x-auto scrollbar-hide">
+    <div className="event-workspace-nav">
+      <div className="event-workspace-nav-inner"><Link to="/dashboard" className="event-back-link"><ArrowLeft size={15} /> All events</Link><div className="event-tab-strip">
         {visibleTabs.map((tab) => {
           const to = base + tab.path;
           const active =
@@ -31,18 +34,13 @@ export default function EventTabs() {
             <Link
               key={tab.path}
               to={to}
-              className={cn(
-                'px-4 py-3.5 text-sm font-medium border-b-2 whitespace-nowrap transition-colors -mb-px',
-                active
-                  ? 'border-[#b8956a] text-[#0c0f14]'
-                  : 'border-transparent text-[#9ca3af] hover:text-[#6b7280]'
-              )}
+              className={cn('event-tab-link', active && 'active')}
             >
-              {tab.label}
+              <tab.icon size={15} /> {tab.label}
             </Link>
           );
         })}
-      </div>
+      </div></div>
     </div>
   );
 }

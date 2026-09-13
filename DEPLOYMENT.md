@@ -6,6 +6,12 @@ The recommended hosting arrangement is:
 - **Backend:** Render, Railway, Fly.io, or another Docker host using `backend/Dockerfile`.
 - **Database:** Managed PostgreSQL supplied by the backend host.
 
+### Render Free-tier availability
+
+The API exposes a lightweight `GET /health` endpoint and Render uses it for health checks. This improves deploy/restart detection and avoids loading Swagger for every health probe. It does not remove Render Free-tier suspension: Free web services sleep after 15 minutes without inbound traffic and can take about a minute to wake. Free Postgres can also restart, has no backups or managed connection pooling, and expires after 30 days. For an always-responsive production API, upgrade both the web service and database to paid plans. If you remain on Free, an external monitor can request `/health` every 5–10 minutes as a warm-up mitigation, but that is not a reliability guarantee.
+
+An optional GitHub Actions workflow is included at `.github/workflows/render-warmup.yml`. Add a repository secret named `RENDER_HEALTH_URL` containing the full `/health` URL to run a scheduled warm-up every 10 minutes. Scheduled workflows may be delayed and cannot prevent Render maintenance, database restarts, or Free Postgres expiry.
+
 Spring Boot is not a good fit for a Vercel serverless function without a separate adaptation. Keep the Java API on a long-running container service.
 
 ## Before deploying
@@ -26,7 +32,7 @@ This repository includes [`render.yaml`](./render.yaml).
 4. When prompted for `CORS_ALLOWED_ORIGINS`, enter the final Vercel origin, for example `https://occassia.vercel.app`. For multiple frontend origins, separate them with commas.
 5. Deploy and wait for the service health check to pass.
 6. Copy the backend URL, for example `https://occassia-api.onrender.com`.
-7. Verify `https://your-backend-host/api/v1/docs` loads before deploying the frontend.
+7. Verify `https://your-backend-host/health` returns `{"status":"ok","service":"occassia-api"}` before deploying the frontend.
 
 Required backend environment variables:
 
