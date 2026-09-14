@@ -1,5 +1,6 @@
 import { Link, useParams, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
+import { useLayoutEffect, useRef } from 'react';
 import { cn } from '../lib/utils';
 import { ArrowLeft, BarChart3, ClipboardList, CreditCard, Gauge, Radio, UsersRound } from 'lucide-react';
 
@@ -20,12 +21,23 @@ export default function EventTabs() {
   const user = useAuthStore((s) => s.user);
   const base = `/events/${id}`;
   const visibleTabs = tabs.filter((tab) => !tab.roles || (user && tab.roles.includes(user.role)));
+  const stripRef = useRef<HTMLDivElement>(null);
+  const storageKey = `event-tabs-scroll:${id}`;
+
+  useLayoutEffect(() => {
+    const strip = stripRef.current;
+    if (!strip) return;
+    const saved = Number(sessionStorage.getItem(storageKey));
+    if (Number.isFinite(saved)) strip.scrollLeft = saved;
+    const active = strip.querySelector<HTMLElement>('.event-tab-link.active');
+    active?.scrollIntoView({ behavior: 'auto', block: 'nearest', inline: 'nearest' });
+  }, [location.pathname, storageKey]);
 
   return (
     <>
     <div className="event-workspace-nav-spacer" aria-hidden="true" />
     <div className="event-workspace-nav">
-      <div className="event-workspace-nav-inner"><Link to="/dashboard" className="event-back-link"><ArrowLeft size={15} /> All events</Link><div className="event-tab-strip">
+      <div className="event-workspace-nav-inner"><Link to="/dashboard" className="event-back-link"><ArrowLeft size={15} /> All events</Link><div ref={stripRef} className="event-tab-strip" onScroll={(event) => sessionStorage.setItem(storageKey, String(event.currentTarget.scrollLeft))}>
         {visibleTabs.map((tab) => {
           const to = base + tab.path;
           // Keep the active marker exclusive: /cards/register and /cards/assign

@@ -29,6 +29,10 @@ export default function CheckInPage() {
   
   const inputRef = useRef<HTMLInputElement>(null);
   const ndefRef = useRef<any>(null);
+  const qrVideoRef = useRef<HTMLVideoElement>(null);
+  const qrStreamRef = useRef<MediaStream | null>(null);
+  const qrFrameRef = useRef<number | null>(null);
+  const [qrCameraReady, setQrCameraReady] = useState(false);
 
   useEffect(() => {
     if (id) gatesApi.list(id).then((r) => {
@@ -100,6 +104,46 @@ export default function CheckInPage() {
     }
   }, [gateId, showToast]);
 
+  useEffect(() => {
+    if (mode !== 'qr') return;
+    let active = true;
+    const startCamera = async () => {
+      if (!navigator.mediaDevices?.getUserMedia || !(window as any).BarcodeDetector) {
+        setError('Camera QR scanning is not available in this browser. Use the scanner input below.');
+        return;
+      }
+      try {
+        setError('');
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false });
+        if (!active) { stream.getTracks().forEach((track) => track.stop()); return; }
+        qrStreamRef.current = stream;
+        if (qrVideoRef.current) { qrVideoRef.current.srcObject = stream; await qrVideoRef.current.play(); }
+        setQrCameraReady(true);
+        const detector = new (window as any).BarcodeDetector({ formats: ['qr_code'] });
+        const scan = async () => {
+          if (!active || !qrVideoRef.current || qrVideoRef.current.readyState < 2) { if (active) qrFrameRef.current = requestAnimationFrame(scan); return; }
+          try {
+            const codes = await detector.detect(qrVideoRef.current);
+            const value = codes?.[0]?.rawValue;
+            if (value) { await executeQrCheckIn(value); return; }
+          } catch { /* camera frames can be unavailable while the stream warms up */ }
+          if (active) qrFrameRef.current = requestAnimationFrame(scan);
+        };
+        qrFrameRef.current = requestAnimationFrame(scan);
+      } catch (err: any) {
+        setError(err?.name === 'NotAllowedError' ? 'Camera permission is required for QR backup. Allow access or use the scanner input below.' : 'Could not start the QR camera. Use the scanner input below.');
+      }
+    };
+    void startCamera();
+    return () => {
+      active = false;
+      if (qrFrameRef.current) cancelAnimationFrame(qrFrameRef.current);
+      qrStreamRef.current?.getTracks().forEach((track) => track.stop());
+      qrStreamRef.current = null;
+      setQrCameraReady(false);
+    };
+  }, [mode, executeQrCheckIn]);
+
   const handleManualKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       executeCheckIn(nfcUid);
@@ -114,6 +158,9 @@ export default function CheckInPage() {
       return;
     }
     const guest = lastCheckIn.guest;
+    const categoryCode = guest.category.priorityLevel > 0 && guest.category.priorityLevel < 27
+      ? String.fromCharCode(64 + guest.category.priorityLevel) : guest.category.name.trim().charAt(0).toUpperCase();
+    const statusLabel = lastCheckIn.alreadyCheckedIn ? 'ALREADY ARRIVED' : 'ARRIVED';
     const escapeHtml = (value: string) => value.replace(/[&<>'"]/g, (character) => ({
       '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;',
     }[character] || character));
@@ -122,12 +169,12 @@ export default function CheckInPage() {
         @page{size:80mm 50mm;margin:0}*{box-sizing:border-box}html,body{width:80mm;height:50mm;margin:0}
         body{font-family:Arial,sans-serif;display:grid;place-items:center;padding:4mm;color:#10182d}
         .ticket{width:72mm;min-height:42mm;border:.35mm solid #d8ddec;border-radius:2mm;padding:3mm;display:flex;flex-direction:column;justify-content:center;gap:2mm}
-        .event{font-size:7pt;color:#66708a}.name{font-size:14pt;font-weight:800;line-height:1.08;overflow-wrap:anywhere}
-        .category{font-size:10pt;font-weight:900;letter-spacing:.05em;text-transform:uppercase;color:${escapeHtml(guest.category.colorHex)};}
+        .event{font-size:7pt;color:#66708a}.status{font-size:17pt;font-weight:950;letter-spacing:.08em;color:${lastCheckIn.alreadyCheckedIn ? '#b33c50' : '#16734b'}}.code{font-size:24pt;font-weight:950;line-height:.9;color:${escapeHtml(guest.category.colorHex)}}.name{font-size:13pt;font-weight:800;line-height:1.08;overflow-wrap:anywhere}
+        .category{font-size:9pt;font-weight:900;letter-spacing:.05em;text-transform:uppercase;color:${escapeHtml(guest.category.colorHex)};}
         .meta{font-size:7pt;color:#66708a}
       </style></head><body><main class="ticket">
-        <div class="event">Occassia · Verified entry</div><div class="name">${escapeHtml(guest.fullName)}</div>
-        <div class="category">${escapeHtml(guest.category.name)}</div><div class="meta">${escapeHtml(guest.attendanceType)}${guest.tableNumber ? ` · Table ${guest.tableNumber}` : ''}</div>
+        <div class="event">Occassia · Verified entry</div><div class="status">${statusLabel}</div><div class="code">${categoryCode}</div><div class="category">${escapeHtml(guest.category.name)}</div><div class="name">${escapeHtml(guest.fullName)}</div>
+        <div class="meta">${escapeHtml(guest.attendanceType)}${guest.tableNumber ? ` · Table ${guest.tableNumber}` : ''}</div>
       </main><script>window.onload=function(){window.print();window.onafterprint=function(){window.close()}}</script></body></html>`);
     printWindow.document.close();
     try {
@@ -242,8 +289,8 @@ export default function CheckInPage() {
                       <button onClick={() => setMode('reader')} className="mt-3 text-sm underline">Use external NFC reader</button>
                     </div>
                   ) : scanning ? (
-                    <div className="animate-pulse">
-                      <Scan size={60} className="mx-auto text-indigo-500 mb-4" />
+                    <div className="nfc-tap-zone scanning">
+                      <div className="nfc-wave"><Scan size={34} /></div>
                       <p className="text-lg font-medium text-slate-700">Ready to Scan</p>
                       <p className="text-sm text-slate-500 mt-1">Hold an NFC card to the back of your device</p>
                       <button onClick={stopNfcScan} className="mt-6 px-4 py-2 border rounded-lg text-sm font-medium">Cancel</button>
@@ -277,7 +324,11 @@ export default function CheckInPage() {
                 </div>
               ) : (
                 <div>
-                  <p className="text-sm text-slate-500 mb-4">Use a QR scanner and scan the guest QR code. QR is the only backup method when NFC is unavailable.</p>
+                  <p className="text-sm text-slate-500 mb-4">Camera permission is requested here when needed. Scan a guest-specific QR code without leaving check-in.</p>
+                  <div className={`qr-camera-frame ${qrCameraReady ? 'ready' : ''}`}>
+                    <video ref={qrVideoRef} muted playsInline aria-label="QR camera preview" />
+                    <span>{qrCameraReady ? 'Point the camera at a guest QR code' : 'Starting camera…'}</span>
+                  </div>
                   <input
                     ref={inputRef}
                     placeholder="Scan guest QR code…"
@@ -312,6 +363,7 @@ export default function CheckInPage() {
                   <CheckCircle2 size={16} /> SUCCESS
                 </div>
               )}
+              <div className="checkin-category-code" style={{ color: lastCheckIn.guest.category.colorHex }}>{lastCheckIn.guest.category.priorityLevel > 0 && lastCheckIn.guest.category.priorityLevel < 27 ? String.fromCharCode(64 + lastCheckIn.guest.category.priorityLevel) : lastCheckIn.guest.category.name.charAt(0).toUpperCase()}</div>
               
               <p className="text-2xl sm:text-4xl font-bold text-slate-900 tracking-tight break-words">{lastCheckIn.guest.fullName}</p>
               
