@@ -1,4 +1,4 @@
-import { Link, useParams, useLocation } from 'react-router-dom';
+import { Link, NavLink, useParams, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { useLayoutEffect, useRef } from 'react';
 import { cn } from '../lib/utils';
@@ -44,13 +44,14 @@ export default function EventTabs() {
           // are separate workflows and must not also highlight Card inventory.
           const active = location.pathname === to;
           return (
-            <Link
+            <NavLink
               key={tab.path}
               to={to}
-              className={cn('event-tab-link', active && 'active')}
+              end
+              className={({ isActive }) => cn('event-tab-link', (isActive || active) && 'active')}
             >
               <tab.icon size={15} /> {tab.label}
-            </Link>
+            </NavLink>
           );
         })}
       </div></div>

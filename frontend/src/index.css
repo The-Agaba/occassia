@@ -452,6 +452,8 @@ button, a, input, select { -webkit-tap-highlight-color: transparent; }
 @keyframes installPromptIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
 @media (max-width: 800px) { .app-content { padding:0; }.ops-page-inner { padding:18px 14px; }.install-prompt { right:14px; bottom:max(14px,env(safe-area-inset-bottom)); } }
 .event-tab-strip { overscroll-behavior-inline: contain; }
+.event-tab-strip { flex:1 1 auto; min-width:0; }
+.event-tab-link { flex:none; }
 .ops-table-wrap { max-width:100%; overscroll-behavior:contain; scrollbar-width:thin; scrollbar-color:color-mix(in srgb,var(--violet) 45%,var(--line)) transparent; }
 .ops-table-wrap::-webkit-scrollbar { width:7px; height:7px; }
 .ops-table-wrap::-webkit-scrollbar-track { background:transparent; }
@@ -463,3 +465,7 @@ button, a, input, select { -webkit-tap-highlight-color: transparent; }
 .event-card-new.is-opening { border-color:color-mix(in srgb,var(--violet) 55%,var(--line)); cursor:wait; }
 .event-opening-spinner { animation:eventOpeningSpin .8s linear infinite; color:var(--violet); }
 @keyframes eventOpeningSpin { to { transform:rotate(360deg); } }
+@media (max-width: 800px) {
+  .event-workspace-nav-inner { width:100%; min-width:0; }
+  .event-tab-strip { width:100%; max-width:100%; min-width:0; }
+}
