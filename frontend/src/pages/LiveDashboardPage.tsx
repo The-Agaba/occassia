@@ -114,7 +114,7 @@ export default function LiveDashboardPage() {
         <ConnectionStatusBanner />
 
         {stats && (
-          <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-8">
             <div className="bg-white border rounded-xl p-6 text-center shadow-sm">
               <p className="text-3xl font-bold text-slate-900">{stats.totalGuests}</p>
               <p className="text-slate-500 text-sm mt-1">Total Invited</p>

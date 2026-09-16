@@ -33,6 +33,11 @@ export default function CheckInPage() {
   const qrStreamRef = useRef<MediaStream | null>(null);
   const qrFrameRef = useRef<number | null>(null);
   const [qrCameraReady, setQrCameraReady] = useState(false);
+  const [autoPrint, setAutoPrint] = useState(() => localStorage.getItem('occassia-auto-print-ticket') === 'true');
+
+  useEffect(() => {
+    localStorage.setItem('occassia-auto-print-ticket', String(autoPrint));
+  }, [autoPrint]);
 
   useEffect(() => {
     if (id) gatesApi.list(id).then((r) => {
@@ -170,11 +175,11 @@ export default function CheckInPage() {
         body{font-family:Arial,sans-serif;display:grid;place-items:center;padding:4mm;color:#10182d}
         .ticket{width:72mm;min-height:42mm;border:.35mm solid #d8ddec;border-radius:2mm;padding:3mm;display:flex;flex-direction:column;justify-content:center;gap:2mm}
         .event{font-size:7pt;color:#66708a}.status{font-size:17pt;font-weight:950;letter-spacing:.08em;color:${lastCheckIn.alreadyCheckedIn ? '#b33c50' : '#16734b'}}.code{font-size:24pt;font-weight:950;line-height:.9;color:${escapeHtml(guest.category.colorHex)}}.name{font-size:13pt;font-weight:800;line-height:1.08;overflow-wrap:anywhere}
-        .category{font-size:9pt;font-weight:900;letter-spacing:.05em;text-transform:uppercase;color:${escapeHtml(guest.category.colorHex)};}
+        .category{font-size:9pt;font-weight:900;letter-spacing:.05em;text-transform:uppercase;color:${escapeHtml(guest.category.colorHex)};}.plus-one{font-size:28pt;font-weight:950;line-height:.85;letter-spacing:-.08em;color:#10182d}
         .meta{font-size:7pt;color:#66708a}
       </style></head><body><main class="ticket">
-        <div class="event">Occassia · Verified entry</div><div class="status">${statusLabel}</div><div class="code">${categoryCode}</div><div class="category">${escapeHtml(guest.category.name)}</div><div class="name">${escapeHtml(guest.fullName)}</div>
-        <div class="meta">${escapeHtml(guest.attendanceType)}${guest.tableNumber ? ` · Table ${guest.tableNumber}` : ''}</div>
+        <div class="event">Occassia · Verified entry</div><div class="status">${statusLabel}</div>${guest.attendanceType === 'PLUS_ONE' ? '<div class="plus-one">+O</div>' : `<div class="code">${categoryCode}</div>`}<div class="category">${escapeHtml(guest.category.name)}</div><div class="name">${escapeHtml(guest.fullName)}</div>
+        <div class="meta">${guest.attendanceType === 'PLUS_ONE' ? 'Plus one' : 'Single'}${guest.tableNumber ? ` · Table ${guest.tableNumber}` : ''}</div>
       </main><script>window.onload=function(){window.print();window.onafterprint=function(){window.close()}}</script></body></html>`);
     printWindow.document.close();
     try {
@@ -185,6 +190,12 @@ export default function CheckInPage() {
       showToast('Ticket printed locally, but the server could not record the print status.', 'error');
     }
   };
+
+  useEffect(() => {
+    if (autoPrint && lastCheckIn && !lastCheckIn.alreadyCheckedIn && lastCheckIn.checkInId) {
+      void printCompactTicket();
+    }
+  }, [lastCheckIn?.checkInId, autoPrint]);
 
   const startNfcScan = async () => {
     if (!('NDEFReader' in window)) return;
@@ -249,6 +260,7 @@ export default function CheckInPage() {
                 ))}
               </select>
             </div>
+            <label className="flex items-center gap-2 self-end rounded-lg border bg-white px-3 py-2.5 text-xs font-medium text-slate-600 shadow-sm"><input type="checkbox" checked={autoPrint} onChange={(e) => setAutoPrint(e.target.checked)} /> Auto-print ticket</label>
           </div>
 
           <div className="bg-white border rounded-xl overflow-hidden shadow-sm mb-8">
@@ -375,7 +387,7 @@ export default function CheckInPage() {
                   {lastCheckIn.guest.category.name}
                 </span>
                 <span className="text-slate-400 text-sm font-medium px-3 py-1 bg-slate-100 rounded-full">
-                  {lastCheckIn.guest.attendanceType}
+                  {lastCheckIn.guest.attendanceType === 'PLUS_ONE' ? 'Plus one' : 'Single'}
                 </span>
               </div>
 

@@ -5,15 +5,16 @@ import com.occassia.event.Event;
 import com.occassia.event.EventService;
 import com.occassia.guest.dto.GuestRequest;
 import com.occassia.shared.enums.AttendanceType;
-import com.opencsv.CSVReader;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.InputStreamReader;
+import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.*;
 
 @Service
@@ -36,7 +37,7 @@ public class GuestImportService {
             if (filename.endsWith(".xlsx") || filename.endsWith(".xls")) {
                 rows = parseExcel(file);
             } else {
-                rows = parseCsv(file);
+                throw new IllegalArgumentException("Only Excel workbooks (.xlsx or .xls) are supported");
             }
         } catch (Exception e) {
             throw new com.occassia.shared.exception.ApiException(
@@ -103,6 +104,7 @@ public class GuestImportService {
                         .event(event)
                         .category(category)
                         .fullName(fullName.trim())
+                        .phoneNumber(getCol(row, colIndex, "phone_number"))
                         .attendanceType(attendanceType)
                         .tableNumber(tableNumber)
                         .mealPreference(getCol(row, colIndex, "meal_preference"))
@@ -126,15 +128,18 @@ public class GuestImportService {
         );
     }
 
-    private List<String[]> parseCsv(MultipartFile file) throws Exception {
-        try (CSVReader reader = new CSVReader(new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
-            return reader.readAll();
+    private List<String[]> parseExcel(MultipartFile file) throws Exception {
+        byte[] bytes = file.getBytes();
+        try {
+            return parseWorkbook(bytes);
+        } catch (Exception workbookError) {
+            return parseHtmlWorkbook(new String(bytes, StandardCharsets.UTF_8));
         }
     }
 
-    private List<String[]> parseExcel(MultipartFile file) throws Exception {
+    private List<String[]> parseWorkbook(byte[] bytes) throws Exception {
         List<String[]> rows = new ArrayList<>();
-        try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
+        try (Workbook workbook = WorkbookFactory.create(new ByteArrayInputStream(bytes))) {
             Sheet sheet = workbook.getSheetAt(0);
             for (Row row : sheet) {
                 List<String> cells = new ArrayList<>();
@@ -144,6 +149,21 @@ public class GuestImportService {
                 rows.add(cells.toArray(new String[0]));
             }
         }
+        return rows;
+    }
+
+    private List<String[]> parseHtmlWorkbook(String html) {
+        List<String[]> rows = new ArrayList<>();
+        Matcher rowMatcher = Pattern.compile("(?is)<tr[^>]*>(.*?)</tr>").matcher(html);
+        while (rowMatcher.find()) {
+            List<String> cells = new ArrayList<>();
+            Matcher cellMatcher = Pattern.compile("(?is)<t[dh][^>]*>(.*?)</t[dh]>").matcher(rowMatcher.group(1));
+            while (cellMatcher.find()) {
+                cells.add(cellMatcher.group(1).replaceAll("(?is)<[^>]+>", "").replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">").trim());
+            }
+            if (!cells.isEmpty()) rows.add(cells.toArray(new String[0]));
+        }
+        if (rows.isEmpty()) throw new IllegalArgumentException("The Excel workbook could not be read");
         return rows;
     }
 

@@ -4,7 +4,8 @@ import { organizationsApi, usersApi } from '../api';
 import { useAuthStore } from '../store/authStore';
 import { useUiStore } from '../store/uiStore';
 import { disconnectWebSocket } from '../lib/websocket';
-import { Eye, EyeOff } from 'lucide-react';
+import { AlertCircle, Eye, EyeOff, RefreshCcw } from 'lucide-react';
+import Spinner from '../components/Spinner';
 
 interface UserRow {
   id: string;
@@ -24,6 +25,8 @@ export default function UsersPage() {
   const [editingUser, setEditingUser] = useState<UserRow | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [usersLoading, setUsersLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
   const [form, setForm] = useState({ fullName: '', email: '', password: '', role: 'EVENT_MANAGER' });
   const currentUser = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
@@ -33,6 +36,8 @@ export default function UsersPage() {
   const [roleCounts, setRoleCounts] = useState<Record<string, number>>({});
 
   const load = async () => {
+    setUsersLoading(true);
+    setLoadError('');
     try {
       const usersRes = await usersApi.list();
       const userRows = usersRes.data as UserRow[];
@@ -52,7 +57,11 @@ export default function UsersPage() {
       setRoleCounts(counts);
     }
     } catch (err: any) {
-      showToast(err.response?.data?.message || 'Failed to load users', 'error');
+      const message = err.response?.data?.message || 'Failed to load users';
+      setLoadError(message);
+      showToast(message, 'error');
+    } finally {
+      setUsersLoading(false);
     }
   };
 
@@ -243,6 +252,15 @@ export default function UsersPage() {
         </form>
       )}
 
+      {usersLoading ? (
+        <div className="bg-white border rounded-xl p-10"><Spinner text="Loading team access…" useLogo size="lg" /></div>
+      ) : loadError ? (
+        <div className="bg-white border rounded-xl p-8 text-center text-slate-500">
+          <AlertCircle size={26} className="mx-auto mb-3 text-red-500" />
+          <p className="text-sm mb-4">{loadError}</p>
+          <button type="button" onClick={load} className="inline-flex items-center gap-2 px-4 py-2 border rounded-lg text-sm hover:bg-slate-50"><RefreshCcw size={15} /> Retry</button>
+        </div>
+      ) : (
       <div className="bg-white border rounded-xl overflow-hidden overflow-x-auto">
         <table className="w-full text-sm min-w-[600px]">
           <thead className="bg-slate-50">
@@ -290,6 +308,7 @@ export default function UsersPage() {
           </tbody>
         </table>
       </div>
+      )}
     </div>
   );
 }

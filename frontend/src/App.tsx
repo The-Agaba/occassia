@@ -8,6 +8,8 @@ import MarkdownPage from './pages/MarkdownPage';
 import NetworkStatus from './components/NetworkStatus';
 import InstallAppPrompt from './components/InstallAppPrompt';
 import Toaster from './components/Toaster';
+import LiveDashboardPage from './pages/LiveDashboardPage';
+import ReportsPage from './pages/ReportsPage';
 
 const DashboardPage = lazy(() => import('./pages/DashboardPage'));
 const NewEventPage = lazy(() => import('./pages/NewEventPage'));
@@ -18,8 +20,6 @@ const CardsPage = lazy(() => import('./pages/CardsPage'));
 const CardRegistrationPage = lazy(() => import('./pages/CardRegistrationPage'));
 const CardAssignmentPage = lazy(() => import('./pages/CardAssignmentPage'));
 const CheckInPage = lazy(() => import('./pages/CheckInPage'));
-const LiveDashboardPage = lazy(() => import('./pages/LiveDashboardPage'));
-const ReportsPage = lazy(() => import('./pages/ReportsPage'));
 const UsersPage = lazy(() => import('./pages/UsersPage'));
 const AuditPage = lazy(() => import('./pages/AuditPage'));
 const OrganizationPage = lazy(() => import('./pages/OrganizationPage'));

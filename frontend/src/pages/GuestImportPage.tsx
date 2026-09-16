@@ -66,8 +66,7 @@ export default function GuestImportPage() {
       'table_number',
       'meal_preference',
       'notes',
-      'email',
-      'phone',
+      'phone_number',
     ];
     const sample = [
       'Jane Doe',
@@ -76,15 +75,15 @@ export default function GuestImportPage() {
       '12',
       'Vegetarian',
       'Allergic to nuts',
-      'jane.doe@example.com',
       '+1234567890',
     ];
-    const csvContent = `${headers.join(',')}\n${sample.map((value) => `"${String(value).replace(/"/g, '""')}"`).join(',')}\n`;
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const cells = (values: string[]) => values.map((value) => `<td>${String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td>`).join('');
+    const workbook = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"><style>th{background:#e8eaf6;font-weight:bold}td,th{border:1px solid #c5cae9;padding:6px}</style></head><body><table><tr>${cells(headers)}</tr><tr>${cells(sample)}</tr></table></body></html>`;
+    const blob = new Blob([workbook], { type: 'application/vnd.ms-excel' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', 'guest-import-template.csv');
+    link.setAttribute('download', 'guest-import-template.xls');
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -98,7 +97,7 @@ export default function GuestImportPage() {
         <div className="mb-6">
           <h2 className="text-2xl font-bold text-[#0c0f14]">Import Guests</h2>
           <p className="text-sm text-slate-500 mt-1">
-            Bulk upload guests via CSV. Ensure your columns match the required format.
+            Bulk upload guests from an Excel workbook. Download the template, fill it in, then upload it here.
           </p>
         </div>
 
@@ -116,7 +115,7 @@ export default function GuestImportPage() {
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept=".csv"
+                  accept=".xlsx,.xls"
                   onChange={(e) => setFile(e.target.files?.[0] || null)}
                   className="hidden"
                 />
@@ -136,7 +135,7 @@ export default function GuestImportPage() {
                 ) : (
                   <div className="flex flex-col items-center">
                     <UploadCloud size={48} className="text-slate-300 mb-4" />
-                    <p className="font-medium text-slate-700">Click or drag CSV file to upload</p>
+                    <p className="font-medium text-slate-700">Click or drag an Excel file to upload</p>
                     <p className="text-xs text-slate-500 mt-2">Maximum file size 5MB</p>
                   </div>
                 )}
@@ -172,10 +171,10 @@ export default function GuestImportPage() {
               </h3>
               <div className="space-y-3 text-xs text-slate-600">
                 <p><strong>Required columns:</strong><br/>`full_name`, `category_name`</p>
-                <p><strong>Optional columns:</strong><br/>`attendance_type`, `table_number`, `meal_preference`, `notes`</p>
+                <p><strong>Optional columns:</strong><br/>`attendance_type`, `table_number`, `meal_preference`, `notes`, `phone_number`</p>
                 <div className="bg-slate-200 h-px my-2" />
                 <ul className="list-disc pl-4 space-y-1">
-                  <li>`attendance_type` must be SINGLE or DOUBLE</li>
+                  <li>`attendance_type` must be SINGLE or PLUS_ONE</li>
                   <li>`category_name` must match an existing category exactly (case-sensitive)</li>
                   <li>`table_number` must be a valid integer</li>
                 </ul>
@@ -223,7 +222,7 @@ export default function GuestImportPage() {
                     onClick={downloadErrorReport}
                     className="flex items-center gap-1.5 text-xs font-medium text-red-700 bg-red-100 px-3 py-1.5 rounded-lg hover:bg-red-200 transition-colors"
                   >
-                    <Download size={14} /> Download CSV Report
+                    <Download size={14} /> Download error report
                   </button>
                 </div>
                 <div className="overflow-x-auto max-h-[400px] overflow-y-auto">

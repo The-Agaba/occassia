@@ -1,0 +1,1 @@
+ALTER TABLE guests ADD COLUMN IF NOT EXISTS phone_number VARCHAR(40);

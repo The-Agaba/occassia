@@ -33,6 +33,9 @@ public class Guest {
     @Column(name = "full_name", nullable = false, length = 200)
     private String fullName;
 
+    @Column(name = "phone_number", length = 40)
+    private String phoneNumber;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "attendance_type", nullable = false, columnDefinition = "attendance_type")
     @org.hibernate.annotations.JdbcTypeCode(org.hibernate.type.SqlTypes.NAMED_ENUM)

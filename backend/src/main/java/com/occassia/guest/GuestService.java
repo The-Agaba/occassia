@@ -47,6 +47,7 @@ public class GuestService {
                 .event(event)
                 .category(category)
                 .fullName(request.getFullName())
+                .phoneNumber(request.getPhoneNumber())
                 .attendanceType(request.getAttendanceType())
                 .tableNumber(request.getTableNumber())
                 .mealPreference(request.getMealPreference())
@@ -89,6 +90,7 @@ public class GuestService {
         Guest guest = findGuestInEvent(eventId, guestId);
         GuestCategory category = categoryService.findOrThrow(request.getCategoryId());
         guest.setFullName(request.getFullName());
+        guest.setPhoneNumber(request.getPhoneNumber());
         guest.setAttendanceType(request.getAttendanceType());
         guest.setCategory(category);
         guest.setTableNumber(request.getTableNumber());
@@ -163,6 +165,10 @@ public class GuestService {
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Guest not found"));
     }
 
+    public Event getEvent(UUID eventId) {
+        return eventService.findOrThrow(eventId);
+    }
+
     private Guest findGuestInEvent(UUID eventId, UUID guestId) {
         Guest guest = findOrThrow(guestId);
         eventService.verifyEventAccess(guest.getEvent());
@@ -179,6 +185,7 @@ public class GuestService {
                 .id(guest.getId())
                 .eventId(guest.getEvent().getId())
                 .fullName(guest.getFullName())
+                .phoneNumber(guest.getPhoneNumber())
                 .attendanceType(guest.getAttendanceType())
                 .category(CategoryResponse.builder()
                         .id(cat.getId())

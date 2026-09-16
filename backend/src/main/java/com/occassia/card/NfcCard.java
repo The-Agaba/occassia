@@ -2,6 +2,7 @@ package com.occassia.card;
 
 import com.occassia.guest.Guest;
 import com.occassia.organization.Organization;
+import com.occassia.event.Event;
 import com.occassia.shared.enums.CardStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -25,6 +26,10 @@ public class NfcCard {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "organization_id", nullable = false)
     private Organization organization;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "event_id")
+    private Event event;
 
 
     @Enumerated(EnumType.STRING)

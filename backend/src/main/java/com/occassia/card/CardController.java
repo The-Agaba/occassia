@@ -27,13 +27,13 @@ public class CardController {
     }
 
     @PostMapping("/cards/batch")
-    public Map<String, Object> batchRegister(@RequestParam("file") MultipartFile file) {
-        return cardService.batchRegister(file);
+    public Map<String, Object> batchRegister(@RequestParam("file") MultipartFile file, @RequestParam UUID eventId) {
+        return cardService.batchRegister(file, eventId);
     }
 
-    @GetMapping("/cards")
-    public List<CardResponse> list(@RequestParam(required = false) CardStatus status) {
-        return cardService.list(status);
+    @GetMapping("/events/{eventId}/cards")
+    public List<CardResponse> listForEvent(@PathVariable UUID eventId, @RequestParam(required = false) CardStatus status) {
+        return cardService.listForEvent(eventId, status);
     }
 
     @GetMapping("/cards/{uid}")
@@ -44,6 +44,12 @@ public class CardController {
     @PatchMapping("/cards/{uid}/status")
     public CardResponse updateStatus(@PathVariable String uid, @RequestBody Map<String, CardStatus> body) {
         return cardService.updateStatus(uid, body.get("status"));
+    }
+
+    @DeleteMapping("/cards/{uid}")
+    public Map<String, String> delete(@PathVariable String uid) {
+        cardService.delete(uid);
+        return Map.of("message", "Card deleted");
     }
 
     @PatchMapping("/guests/{guestId}/assign-card")

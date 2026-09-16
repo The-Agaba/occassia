@@ -1,5 +1,5 @@
 package com.occassia.shared.enums;
 
 public enum CardStatus {
-    AVAILABLE, ASSIGNED, LOST, DAMAGED
+    AVAILABLE, ASSIGNED, CHECKED_IN, LOST, DAMAGED
 }

@@ -1,8 +1,8 @@
 export type UserRole = 'SUPER_ADMIN' | 'ADMIN' | 'EVENT_MANAGER' | 'CHECKIN_STAFF' | 'VIEWER';
 export type EventStatus = 'DRAFT' | 'ACTIVE' | 'CLOSED' | 'ARCHIVED';
 export type EventType = 'WEDDING' | 'CONFERENCE' | 'BIRTHDAY' | 'OTHER';
-export type AttendanceType = 'SINGLE' | 'DOUBLE';
-export type CardStatus = 'AVAILABLE' | 'ASSIGNED' | 'LOST' | 'DAMAGED';
+export type AttendanceType = 'SINGLE' | 'PLUS_ONE';
+export type CardStatus = 'AVAILABLE' | 'ASSIGNED' | 'CHECKED_IN' | 'LOST' | 'DAMAGED';
 export type OrgStatus = 'ACTIVE' | 'INACTIVE';
 
 export interface User {
@@ -52,6 +52,7 @@ export interface Guest {
   id: string;
   eventId: string;
   fullName: string;
+  phoneNumber: string | null;
   attendanceType: AttendanceType;
   category: Category;
   nfcCardUid: string | null;
@@ -68,6 +69,7 @@ export interface Guest {
 export interface NfcCard {
   uid: string;
   organizationId: string;
+  eventId: string | null;
   status: CardStatus;
   assignedGuestId: string | null;
   assignedGuestName: string | null;

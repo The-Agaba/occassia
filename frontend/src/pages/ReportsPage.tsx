@@ -89,8 +89,8 @@ export default function ReportsPage() {
               </div>
             </div>
 
-            <div className="bg-white border rounded-xl overflow-hidden">
-              <table className="w-full text-sm">
+            <div className="bg-white border rounded-xl overflow-hidden overflow-x-auto">
+              <table className="w-full min-w-[520px] text-sm">
                 <thead className="bg-slate-50">
                   <tr>
                     <th className="text-left p-3">Category</th>

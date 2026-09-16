@@ -451,6 +451,11 @@ button, a, input, select { -webkit-tap-highlight-color: transparent; }
 .install-prompt-action { flex:none; min-height:34px; padding:0 12px; border:0; border-radius:9px; background:var(--violet); color:#fff; font:700 11px var(--font-sans); cursor:pointer; }.install-prompt-action:disabled { opacity:.6; cursor:wait; }.install-prompt-close { display:grid; place-items:center; flex:none; width:27px; height:27px; padding:0; border:0; border-radius:50%; background:transparent; color:var(--muted); cursor:pointer; }.install-prompt-close:hover { background:color-mix(in srgb,var(--line) 55%,transparent); color:var(--ink); }
 @keyframes installPromptIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
 @media (max-width: 800px) { .app-content { padding:0; }.ops-page-inner { padding:18px 14px; }.install-prompt { right:14px; bottom:max(14px,env(safe-area-inset-bottom)); } }
+
+/* Keep workspace chrome outside the scrolling content viewport. */
+.app-header { position:relative; z-index:35; }
+.event-workspace-nav { z-index:30; }
+.ops-pill.checked_in { background:#e2e8f0; color:#334155; }
 .event-tab-strip { overscroll-behavior-inline: contain; }
 .event-tab-strip { flex:1 1 auto; min-width:0; }
 .event-tab-link { flex:none; }
@@ -469,3 +474,9 @@ button, a, input, select { -webkit-tap-highlight-color: transparent; }
   .event-workspace-nav-inner { width:100%; min-width:0; }
   .event-tab-strip { width:100%; max-width:100%; min-width:0; }
 }
+.app-shell { height:100vh; min-height:0; overflow:hidden; }
+.app-main { height:100vh; display:flex; flex-direction:column; overflow:hidden; }
+.app-header { flex:0 0 auto; }
+.app-content { flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; scrollbar-width:thin; scrollbar-color:color-mix(in srgb,var(--violet) 45%,var(--line)) transparent; }
+.app-content::-webkit-scrollbar { width:7px; }
+.app-content::-webkit-scrollbar-thumb { background:color-mix(in srgb,var(--violet) 45%,var(--line)); border-radius:99px; }

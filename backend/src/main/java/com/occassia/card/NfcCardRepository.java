@@ -12,6 +12,14 @@ public interface NfcCardRepository extends JpaRepository<NfcCard, String> {
 
     List<NfcCard> findByOrganizationIdAndStatusOrderByRegisteredAtDesc(UUID organizationId, CardStatus status);
 
+    List<NfcCard> findByOrganizationIdAndEventIdOrderByRegisteredAtDesc(UUID organizationId, UUID eventId);
+
+    List<NfcCard> findByOrganizationIdAndEventIdAndStatusOrderByRegisteredAtDesc(UUID organizationId, UUID eventId, CardStatus status);
+
+    List<NfcCard> findByEventIdOrderByRegisteredAtDesc(UUID eventId);
+
+    List<NfcCard> findByEventIdAndStatusOrderByRegisteredAtDesc(UUID eventId, CardStatus status);
+
     List<NfcCard> findAllByOrderByRegisteredAtDesc();
 
     List<NfcCard> findAllByStatusOrderByRegisteredAtDesc(CardStatus status);

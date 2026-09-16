@@ -13,6 +13,8 @@ public class GuestRequest {
     @NotBlank
     private String fullName;
 
+    private String phoneNumber;
+
     @NotNull
     private AttendanceType attendanceType;
 

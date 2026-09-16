@@ -3,6 +3,7 @@ package com.occassia.checkin;
 import com.occassia.audit.AuditService;
 import com.occassia.card.NfcCard;
 import com.occassia.card.NfcCardRepository;
+import com.occassia.card.CardService;
 import com.occassia.category.dto.CategoryResponse;
 import com.occassia.checkin.dto.CheckInResponse;
 import com.occassia.dashboard.StatsService;
@@ -39,6 +40,7 @@ public class CheckInService {
     private final CheckInRepository checkInRepository;
     private final GuestRepository guestRepository;
     private final NfcCardRepository cardRepository;
+    private final CardService cardService;
     private final EventService eventService;
     private final GateService gateService;
     private final AuditService auditService;
@@ -58,10 +60,16 @@ public class CheckInService {
         if (card.getStatus() == CardStatus.DAMAGED) {
             throw new ApiException(HttpStatus.FORBIDDEN, "CARD_DAMAGED", "This card is damaged. Contact admin.");
         }
+        if (card.getStatus() == CardStatus.CHECKED_IN) {
+            throw new ApiException(HttpStatus.CONFLICT, "CARD_ALREADY_CHECKED_IN", "This card has already checked in for this event and cannot be used again.");
+        }
 
         Guest guest = card.getAssignedGuest();
         if (guest == null) {
             throw new ApiException(HttpStatus.NOT_FOUND, "CARD_NOT_FOUND", "Card not assigned to any guest");
+        }
+        if (card.getEvent() == null || !card.getEvent().getId().equals(guest.getEvent().getId())) {
+            throw new ApiException(HttpStatus.FORBIDDEN, "CARD_WRONG_EVENT", "This card is not registered for the guest's event.");
         }
 
         return performCheckIn(guest, gateId, CheckInMethod.NFC);
@@ -108,6 +116,11 @@ public class CheckInService {
                 .ticketPrinted(false)
                 .build();
         checkIn = checkInRepository.save(checkIn);
+        if (method == CheckInMethod.NFC) {
+            if (guest.getNfcCardUid() != null) {
+                cardService.markCheckedIn(guest.getNfcCardUid());
+            }
+        }
         // Keep the product-wide counter independent from mutable event records.
         // It is incremented only for a new check-in, never for a duplicate scan.
         platformMetricService.recordCheckIn();

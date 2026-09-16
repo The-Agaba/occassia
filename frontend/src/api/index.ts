@@ -60,17 +60,18 @@ export const guestsApi = {
 };
 
 export const cardsApi = {
-  list: (status?: string) => api.get<NfcCard[]>('/cards', { params: status ? { status } : {} }),
-  register: (uid: string) => api.post<NfcCard>('/cards', { uid }),
-  batch: (file: File) => {
+  list: (eventId: string, status?: string) => api.get<NfcCard[]>(`/events/${eventId}/cards`, { params: status ? { status } : {} }),
+  register: (eventId: string, uid: string) => api.post<NfcCard>('/cards', { uid, eventId }),
+  batch: (eventId: string, file: File) => {
     const form = new FormData();
     form.append('file', file);
-    return api.post('/cards/batch', form, { headers: { 'Content-Type': 'multipart/form-data' } });
+    return api.post('/cards/batch', form, { params: { eventId }, headers: { 'Content-Type': 'multipart/form-data' } });
   },
   assign: (guestId: string, nfcUid: string) =>
     api.patch(`/guests/${guestId}/assign-card`, { nfcUid }),
   unassign: (guestId: string) => api.patch(`/guests/${guestId}/unassign-card`),
   updateStatus: (uid: string, status: string) => api.patch(`/cards/${uid}/status`, { status }),
+  delete: (uid: string) => api.delete(`/cards/${uid}`),
 };
 
 export const checkinApi = {

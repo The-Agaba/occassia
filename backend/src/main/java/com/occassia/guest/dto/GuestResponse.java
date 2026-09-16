@@ -14,6 +14,7 @@ public class GuestResponse {
     private UUID id;
     private UUID eventId;
     private String fullName;
+    private String phoneNumber;
     private AttendanceType attendanceType;
     private CategoryResponse category;
     private String nfcCardUid;

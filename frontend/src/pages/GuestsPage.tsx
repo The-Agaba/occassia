@@ -5,7 +5,7 @@ import type { Guest, Event, Category } from '../types';
 import EventTabs from '../components/EventTabs';
 import { useAuthStore } from '../store/authStore';
 import { useUiStore } from '../store/uiStore';
-import { Upload, Check, DollarSign, QrCode, X, Download, Printer } from 'lucide-react';
+import { Upload, Check, DollarSign, QrCode, X, Download, Printer, Info } from 'lucide-react';
 
 export default function GuestsPage() {
   const { id } = useParams<{ id: string }>();
@@ -15,7 +15,7 @@ export default function GuestsPage() {
   const [filterCategory, setFilterCategory] = useState('');
   const [categories, setCategories] = useState<Category[]>([]);
   const [showAdd, setShowAdd] = useState(false);
-  const [newGuest, setNewGuest] = useState({ fullName: '', attendanceType: 'SINGLE', categoryId: '' });
+  const [newGuest, setNewGuest] = useState({ fullName: '', phoneNumber: '', attendanceType: 'SINGLE', categoryId: '' });
 
   // QR Modal State
   const [qrModalUrl, setQrModalUrl] = useState<string | null>(null);
@@ -98,6 +98,7 @@ export default function GuestsPage() {
             h2 { font-size: 13pt; line-height: 1.08; margin: 0 0 2mm; overflow-wrap: anywhere; }
             .category { display: inline-block; color: #fff; background: ${qrModalGuest.category.colorHex}; border-radius: 999px; padding: 1.2mm 2mm; font-size: 7pt; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
             .type { color: #66708a; font-size: 7pt; margin-top: 2mm; }
+            .plus-one { color: #10182d; font-size: 28pt; line-height: .85; font-weight: 950; letter-spacing: -.08em; margin: 1mm 0 2mm; }
             img { width: 23mm; height: 23mm; display: block; }
           </style>
         </head>
@@ -106,8 +107,9 @@ export default function GuestsPage() {
             <section class="details">
               <div class="event">${event?.name || 'Event'}</div>
               <h2>${qrModalGuest.fullName}</h2>
+              ${qrModalGuest.attendanceType === 'PLUS_ONE' ? '<div class="plus-one">+O</div>' : ''}
               <div class="category">${qrModalGuest.category.name}</div>
-              <div class="type">${qrModalGuest.attendanceType}</div>
+              <div class="type">${qrModalGuest.attendanceType === 'PLUS_ONE' ? 'Plus one' : 'Single'}</div>
             </section>
             <img src="${qrModalUrl}" alt="Guest QR code" onload="window.print();window.close()" />
           </main>
@@ -120,10 +122,15 @@ export default function GuestsPage() {
   const handleAddGuest = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!id || !newGuest.categoryId) return;
-    await guestsApi.create(id, newGuest);
-    setShowAdd(false);
-    setNewGuest({ fullName: '', attendanceType: 'SINGLE', categoryId: '' });
-    load();
+    try {
+      await guestsApi.create(id, newGuest);
+      setShowAdd(false);
+      setNewGuest({ fullName: '', phoneNumber: '', attendanceType: 'SINGLE', categoryId: '' });
+      showToast('Guest added successfully', 'success');
+      load();
+    } catch (err: any) {
+      showToast(err.response?.data?.message || 'Guest could not be added. Please try again.', 'error');
+    }
   };
 
   return (
@@ -192,7 +199,7 @@ export default function GuestsPage() {
           <div className="flex gap-2 flex-wrap">
             <select
               value={filterCategory}
-              onChange={(e) => setFilterCategory(e.target.value)}
+              onChange={(e) => { const categoryId = e.target.value; setFilterCategory(categoryId); if (showAdd) setNewGuest((current) => ({ ...current, categoryId })); }}
               className="flex-1 sm:flex-none px-3 py-2 border rounded-lg"
             >
               <option value="">All categories</option>
@@ -202,7 +209,11 @@ export default function GuestsPage() {
             </select>
             {canManage && (
               <button
-                onClick={() => setShowAdd(!showAdd)}
+                onClick={() => {
+                  if (!showAdd && !filterCategory) { showToast('Select a category before adding a guest.', 'error'); return; }
+                  setNewGuest((current) => ({ ...current, categoryId: filterCategory }));
+                  setShowAdd(!showAdd);
+                }}
                 className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
               >
                 Add Guest
@@ -213,7 +224,7 @@ export default function GuestsPage() {
                 to={`/events/${id}/guests/import`}
                 className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-slate-50"
               >
-                <Upload size={16} /> Import CSV
+                <Upload size={16} /> Import Excel
               </Link>
             )}
           </div>
@@ -222,25 +233,36 @@ export default function GuestsPage() {
         {showAdd && canManage && (
           <form onSubmit={handleAddGuest} className="bg-white border rounded-xl p-4 mb-4 flex flex-col gap-3">
             <input placeholder="Full name" value={newGuest.fullName} onChange={(e) => setNewGuest({ ...newGuest, fullName: e.target.value })} className="w-full px-3 py-2 border rounded-lg" required />
+            <input placeholder="Phone number (optional)" type="tel" value={newGuest.phoneNumber} onChange={(e) => setNewGuest({ ...newGuest, phoneNumber: e.target.value })} className="w-full px-3 py-2 border rounded-lg" />
             <div className="flex flex-col sm:flex-row gap-3">
               <select value={newGuest.attendanceType} onChange={(e) => setNewGuest({ ...newGuest, attendanceType: e.target.value })} className="flex-1 px-3 py-2 border rounded-lg">
                 <option value="SINGLE">Single</option>
-                <option value="DOUBLE">Double</option>
+                <option value="PLUS_ONE">Plus one</option>
               </select>
-              <select value={newGuest.categoryId} onChange={(e) => setNewGuest({ ...newGuest, categoryId: e.target.value })} className="flex-1 px-3 py-2 border rounded-lg" required>
-                <option value="">Category</option>
-                {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-              </select>
+              <div className="flex-1 px-3 py-2 border rounded-lg bg-slate-50 text-slate-600" aria-label="Selected guest category">
+                {categories.find((category) => category.id === newGuest.categoryId)?.name || 'Select a category above'}
+              </div>
               <button type="submit" className="px-6 py-2 bg-emerald-600 text-white rounded-lg shrink-0">Save</button>
             </div>
           </form>
         )}
+
+        <div className="mb-5 rounded-2xl border border-indigo-100 bg-gradient-to-r from-indigo-50 via-white to-emerald-50 p-4 shadow-sm">
+          <div className="flex items-start gap-3">
+            <div className="mt-0.5 rounded-full bg-white p-2 text-indigo-600 shadow-sm"><Info size={16} /></div>
+            <div>
+              <p className="text-sm font-semibold text-slate-800">Guest list key</p>
+              <p className="mt-1 text-xs leading-5 text-slate-600"><span className="inline-flex items-center gap-1 font-semibold text-blue-700"><Check size={13} /> Tick</span> means confirmed. <span className="ml-2 inline-flex items-center gap-1 font-semibold text-emerald-700"><DollarSign size={13} /> Dollar sign</span> means paid.</p>
+            </div>
+          </div>
+        </div>
 
         <div className="bg-white rounded-xl border overflow-hidden overflow-x-auto">
           <table className="w-full text-sm min-w-[700px]">
             <thead className="bg-slate-50 border-b">
               <tr>
                 <th className="text-left p-3 font-medium">Name</th>
+                <th className="text-left p-3 font-medium">Phone</th>
                 <th className="text-left p-3 font-medium">Category</th>
                 <th className="text-left p-3 font-medium">Type</th>
                 <th className="text-left p-3 font-medium">Status</th>
@@ -252,6 +274,7 @@ export default function GuestsPage() {
               {filtered.map((g) => (
                 <tr key={g.id} className="border-b last:border-0 hover:bg-slate-50">
                   <td className="p-3 font-medium">{g.fullName}</td>
+                  <td className="p-3 text-slate-600">{g.phoneNumber || '—'}</td>
                   <td className="p-3">
                     <span
                       className="px-2 py-0.5 rounded-full text-xs font-medium text-white"
@@ -260,7 +283,7 @@ export default function GuestsPage() {
                       {g.category.name}
                     </span>
                   </td>
-                  <td className="p-3">{g.attendanceType}</td>
+                  <td className="p-3">{g.attendanceType === 'PLUS_ONE' ? 'Plus one' : 'Single'}</td>
                   <td className="p-3">
                     <div className="flex flex-wrap gap-1">
                       {g.confirmed && <span className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">Confirmed</span>}
