@@ -34,7 +34,7 @@ Before connecting hardware, confirm the following with the reader manufacturer:
 - The reader exposes the card's hardware UID, not a block of card memory, NDEF text, card number, or a vendor-specific alias.
 - The reader can return the UID as text in a stable format.
 - The reader does not rewrite, randomize, or rotate the UID. Some phones and secure cards may use privacy/randomized identifiers and are not suitable for permanent card registration.
-- Each physical card has a unique UID. Occassia rejects a second registration of an already registered UID.
+- Each physical card has a unique UID. A card is registered for one event at a time; it can move to another event only when the event windows do not overlap. Overlapping reuse returns a specific conflict.
 - The reader's communication settings are known: USB mode, serial port name, baud rate, data bits, parity, stop bits, and line terminator.
 
 Recommended UID output is uppercase hexadecimal with optional colon separators, for example:
@@ -89,16 +89,16 @@ If a reader adds a label such as `UID:`, configure the reader to remove it. The 
 
 ## Register a card in Occassia
 
-Card registration is single-UID only:
+Card registration is single-UID only and event-specific:
 
 1. Sign in with an Admin or Event Manager account.
 2. Open the event and select **Cards**.
 3. Choose **Manual entry** to type one UID, or **External scanner** for a HID reader.
 4. Enter or scan one UID.
 5. Select **Register**.
-6. Confirm that the card appears with status `AVAILABLE`.
+6. Confirm that the card appears with status `AVAILABLE` in that event's inventory.
 
-There is no batch-code field and no comma-separated manual registration field. CSV card import remains available for administrators who need to load many UIDs; the first CSV column must be `uid`, and other columns are ignored.
+There is no batch-code field. Card batch import remains available to administrators at `POST /api/v1/cards/batch?eventId=<event-uuid>`; the first column must be `uid`, and other columns are ignored.
 
 Example CSV:
 
@@ -241,7 +241,8 @@ The current serial bridge posts `{ "uid": ... }` to card registration. It does n
 - [ ] A HID scan enters one UID into the **External scanner** field.
 - [ ] Manual registration accepts one UID only.
 - [ ] The card is visible with status `AVAILABLE` after registration.
-- [ ] Re-registering the same UID returns a duplicate-card error.
+- [ ] Re-registering the same UID for the same event returns a duplicate-card error.
+- [ ] Registering the UID for an overlapping event returns `CARD_EVENT_OVERLAP`.
 
 ### Assignment and check-in
 
@@ -249,7 +250,15 @@ The current serial bridge posts `{ "uid": ... }` to card registration. It does n
 - [ ] The card is assigned to that guest.
 - [ ] The card status changes to `ASSIGNED`.
 - [ ] A check-in scan uses the exact stored UID.
+- [ ] A successful NFC check-in changes the card status to `CHECKED_IN`.
+- [ ] A repeat NFC scan returns `CARD_ALREADY_CHECKED_IN`.
 - [ ] The check-in result and event statistics update correctly.
+
+### Lost, deleted, and auto-printed cards
+
+Admins can mark a card **Lost** from the event card inventory. This detaches it from the guest and deactivates it; the gate returns `CARD_LOST`. Admins can also permanently delete the card record. Deletion is irreversible.
+
+On the gate check-in screen, enable **Auto-print ticket** after configuring the connected printer/browser. Successful check-ins then open the compact ticket print workflow automatically. For unattended printing, use a managed browser or kiosk print policy that suppresses the system print dialog.
 
 ## Troubleshooting
 

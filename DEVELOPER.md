@@ -21,7 +21,7 @@
 12. [Multi-Tenancy & RBAC](#12-multi-tenancy--rbac)
 13. [Module Deep Dive](#13-module-deep-dive)
 14. [IoT / Gate Device Integration](#14-iot--gate-device-integration)
-15. [CSV Import Formats](#15-csv-import-formats)
+15. [Excel Import Formats](#15-excel-import-formats)
 16. [Frontend Architecture](#16-frontend-architecture)
 17. [Build, Test & Run](#17-build-test--run)
 18. [Docker Deployment](#18-docker-deployment)
@@ -46,10 +46,10 @@ NFC Gate Devices ──REST/JWT──►  Spring Boot API (check-in endpoints on
 ### Design principles
 
 - **Backend is the single source of truth.** All business logic lives in Spring services.
-- **Cards are org-level assets**, not tied to events. They survive event lifecycle.
+- **Cards are event-scoped assets** within an organization. They are visible only through the current event inventory and can be reused only when event times do not overlap.
 - **Categories are per-event and dynamic.** Never hardcode VIP/Family/etc. in code.
 - **One guest = one check-in.** Enforced by DB `UNIQUE` on `check_ins.guest_id`.
-- **Duplicate NFC taps never error.** Always HTTP 200 with `alreadyCheckedIn: true`.
+- **NFC cards are single-use per event.** A successful NFC scan changes the card to `CHECKED_IN`; another scan returns `CARD_ALREADY_CHECKED_IN`. QR duplicate scans return `alreadyCheckedIn: true`.
 - **Event status is one-way:** `DRAFT → ACTIVE → CLOSED → ARCHIVED`.
 - **Audit log is append-only.** No deletes.
 
@@ -141,6 +141,9 @@ Flyway runs automatically on backend startup. Migrations:
 |------|---------|
 | `V1__init.sql` | All tables, enums, indexes |
 | `V2__seed_data.sql` | Demo orgs, users, sample event |
+| `V7__add_guest_phone_number.sql` | Optional guest phone number |
+| `V8__rename_double_to_plus_one.sql` | Renames attendance type `DOUBLE` to `PLUS_ONE` |
+| `V9__make_cards_event_specific.sql` | Adds event ownership and `CHECKED_IN` card status |
 
 ### Step 2 - Backend
 
@@ -224,7 +227,7 @@ organizations
         └── guests
         └── gates
         └── check_ins (1:1 with guests)
-  └── nfc_cards (org-level, reusable)
+  └── nfc_cards (organization + event scoped)
   └── audit_logs
 ```
 
@@ -415,9 +418,9 @@ These are **contractual** - especially for the IoT team.
 
 | # | Rule | Enforcement |
 |---|------|-------------|
-| 1 | Cards belong to org, not event | `nfc_cards.organization_id` FK |
+| 1 | Cards belong to one organization and one event | `nfc_cards.organization_id` + `event_id` FKs |
 | 2 | One guest = one check-in | DB unique on `check_ins.guest_id` |
-| 3 | Duplicate NFC tap → 200 + `alreadyCheckedIn: true` | `CheckInService.performCheckIn()` |
+| 3 | Successful NFC check-in marks card `CHECKED_IN`; repeat NFC tap is rejected | `CheckInService` + `CardService.markCheckedIn()` |
 | 4 | QR token auto-generated on guest create | `Guest.@PrePersist` |
 | 5 | Event status one-way only | `EventService.validateStatusTransition()` |
 | 6 | Card assign updates guest + card atomically | `CardService.assignToGuest()` @Transactional |
@@ -471,24 +474,28 @@ DRAFT ──► ACTIVE ──► CLOSED ──► ARCHIVED
 ### Guests (`guest/`)
 
 - `GuestService` - CRUD, confirm, paid, QR generation (ZXing)
-- `GuestImportService` - CSV + Excel parsing (OpenCSV + POI)
+- `GuestImportService` - Excel `.xlsx`/`.xls` parsing with Apache POI, including the downloadable Excel template
 
 ### Cards (`card/`)
 
 Assignment flow:
 
 ```
-1. Validate guest: confirmed=true, paid=true, nfc_card_uid=null
-2. Validate card: status=AVAILABLE, same org
-3. Set guest.nfc_card_uid, card.status=ASSIGNED, card.assigned_guest_id
-4. Publish WebSocket card update + audit log
+1. Validate guest: confirmed=true, paid=true, nfc_card_uid=null.
+2. Validate card: status=AVAILABLE, same organization, and same event.
+3. Set guest.nfc_card_uid, card.status=ASSIGNED, card.assigned_guest_id.
+4. Publish WebSocket card update + audit log.
 ```
 
 Card registration accepts one UID at a time:
 
-- `POST /api/v1/cards` with `{ "uid": "04:A3:FF:12:BC" }`
+- `POST /api/v1/cards` with `{ "uid": "04:A3:FF:12:BC", "eventId": "<event-uuid>" }`
+- `GET /api/v1/events/{eventId}/cards` returns only cards for that event and organization.
+- `PATCH /api/v1/cards/{uid}/status` is Admin-only. `LOST` detaches the card from its guest and deactivates it.
+- `DELETE /api/v1/cards/{uid}` permanently removes the card database record.
+- Registering a card for an overlapping event returns `CARD_EVENT_OVERLAP`.
 - `batch_code` is not part of the entity, request, response, or frontend model.
-- CSV card import is available at `POST /api/v1/cards/batch`; its first column is `uid` and additional columns are ignored.
+- Card batch import is available at `POST /api/v1/cards/batch?eventId=<event-uuid>`; its first column is `uid` and additional columns are ignored.
 - Cards and check-ins accept canonical NFC UIDs from Web NFC, HID/keyboard readers, or `tools/serial-bridge.js`.
 
 See [CONFIGURE.md](./CONFIGURE.md) for reader compatibility, UID formatting, serial-port settings, authentication, and hardware verification.
@@ -537,7 +544,7 @@ POST /api/v1/checkin/nfc
   "guest": {
     "id": "uuid",
     "fullName": "James Kiprotich",
-    "attendanceType": "DOUBLE",
+  "attendanceType": "PLUS_ONE",
     "category": { "name": "VIP", "colorHex": "#FFD700" },
     "tableNumber": 5
   },
@@ -546,7 +553,7 @@ POST /api/v1/checkin/nfc
 }
 ```
 
-### Already checked in - HTTP 200 (NOT an error)
+### QR duplicate check-in - HTTP 200
 
 ```json
 {
@@ -562,6 +569,8 @@ POST /api/v1/checkin/nfc
 | 404 | `CARD_NOT_FOUND` | UID not in system or not assigned |
 | 403 | `EVENT_CLOSED` | Event not ACTIVE |
 | 403 | `CARD_LOST` | Card status is LOST |
+| 403 | `CARD_WRONG_EVENT` | Card and guest belong to different events |
+| 409 | `CARD_ALREADY_CHECKED_IN` | NFC card has already been used for this event |
 | 403 | `GUEST_NOT_CONFIRMED` | Guest `confirmed=false` |
 
 ### Mark ticket printed
@@ -572,18 +581,21 @@ PATCH /api/v1/checkin/{checkInId}/print
 
 ---
 
-## 15. CSV Import Formats
+## 15. Excel Import Formats
 
 ### Guest import (`POST /api/v1/events/{id}/guests/batch`)
+
+The UI accepts Excel workbooks with `.xlsx` or `.xls` extensions and provides a downloadable template. CSV guest files are no longer the documented import format.
 
 | Column | Required | Values |
 |--------|----------|--------|
 | `full_name` | Yes | string |
-| `attendance_type` | Yes | `SINGLE` or `DOUBLE` |
+| `attendance_type` | Yes | `SINGLE` or `PLUS_ONE` |
 | `category_name` | Yes | Must match existing category for event |
 | `table_number` | No | integer |
 | `meal_preference` | No | string |
 | `notes` | No | string |
+| `phone_number` | No | string |
 
 Response:
 
@@ -596,13 +608,17 @@ Response:
 }
 ```
 
-### Card batch import (`POST /api/v1/cards/batch`)
+### Card batch import (`POST /api/v1/cards/batch?eventId=<event-uuid>`)
 
 | Column | Required |
 |--------|----------|
 | `uid` (col 1) | Yes |
 
-Additional columns are ignored. This is a CSV import mechanism only; it does not create or restore batch-code metadata.
+Additional columns are ignored. The imported cards are assigned to the supplied event.
+
+### Tickets and printing
+
+Check-in tickets use an 80mm × 50mm compact layout. Normal guests display a category-specific letter derived from the category priority/name; Plus one guests display `+O`. The Check-in screen has an **Auto-print ticket** option persisted per browser. When enabled, a successful check-in opens the browser print workflow automatically. Silent printing still requires a kiosk or managed-browser printer policy because ordinary browsers may show a print dialog.
 
 ---
 

@@ -67,7 +67,7 @@ VITE_WS_URL=https://your-backend-host/ws
 
 The landing page reads `GET /api/v1/public/metrics` and displays the durable `totalCheckIns` value. Flyway migration `V6__add_permanent_attendance_counter.sql` initializes that value from all existing check-ins and increments it atomically only after a new NFC or QR check-in succeeds. It is deliberately separate from event records, so normal event/guest cleanup cannot reset the historical total. A full database restore or replacement still requires restoring the database backup containing `platform_metrics`.
 
-Guest QR printing uses an 80mm × 50mm compact event-ticket layout. Check-in confirmation printing uses the same physical size; configure the browser/printer to use the ticket roll or custom 80mm × 50mm paper setting and disable automatic scaling.
+Guest QR printing uses an 80mm × 50mm compact event-ticket layout. Check-in confirmation printing uses the same physical size and displays a category-specific letter, or `+O` for Plus one guests. Configure the browser/printer to use the ticket roll or custom 80mm × 50mm paper setting and disable automatic scaling. The Check-in screen's **Auto-print ticket** option starts printing after a successful check-in; truly unattended output requires kiosk or managed-browser silent-print configuration.
 
 `frontend/vercel.json` keeps client-side routes working when a user refreshes a page such as `/events/{id}/dashboard`.
 
@@ -78,7 +78,7 @@ Guest QR printing uses an 80mm × 50mm compact event-ticket layout. Check-in con
 3. In the browser Network tab, confirm API requests go to `https://your-backend-host/api/v1`.
 4. Create or open an event and verify guest, card, and check-in pages load.
 5. Confirm the live dashboard connects without repeated WebSocket failures.
-6. Register one test NFC UID, assign it to a confirmed and paid test guest, and check it in.
+6. Register one test NFC UID for an event, assign it to a confirmed and paid test guest, and check it in. Confirm the card becomes `CHECKED_IN` and a second NFC scan is rejected.
 7. Remove test data before opening the system to real guests.
 8. Confirm CORS rejects an unrelated origin and that Swagger is not exposing secrets.
 

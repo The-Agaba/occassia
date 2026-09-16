@@ -70,7 +70,7 @@ NFC hardware can integrate through HID/keyboard mode, browser Web NFC, or the lo
 <td width="50%">
 
 ### 🎫 Guest Management
-- Single add & CSV/Excel batch import
+- Single add & Excel (`.xlsx`/`.xls`) batch import with downloadable template
 - Dynamic per-event categories (VIP, Family, etc.)
 - Confirmed / paid status tracking
 - Auto-generated QR tokens per guest
@@ -79,11 +79,11 @@ NFC hardware can integrate through HID/keyboard mode, browser Web NFC, or the lo
 <td width="50%">
 
 ### 💳 NFC Card System
-- Org-level card assets (reusable across events)
+- Event-scoped card assets with organization isolation
 - Single UID registration (no batch-code field)
 - HID, Web NFC, and serial/SDK reader support
 - Fast scan-and-assign workflow
-- LOST / DAMAGED status handling
+- LOST / DAMAGED status handling, admin deletion, and checked-in lockout
 
 </td>
 </tr>
@@ -92,9 +92,9 @@ NFC hardware can integrate through HID/keyboard mode, browser Web NFC, or the lo
 
 ### 🚪 Check-in
 - NFC tap, external NFC reader, or QR scan backup
-- Duplicate taps return success with warning flag
+- Lost, wrong-event, and already-checked-in cards are rejected with clear errors
 - Gate assignment per check-in
-- Ticket printed tracking
+- Category-coded compact tickets with optional auto-print
 
 </td>
 <td>
