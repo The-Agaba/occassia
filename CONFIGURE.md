@@ -34,7 +34,7 @@ Before connecting hardware, confirm the following with the reader manufacturer:
 - The reader exposes the card's hardware UID, not a block of card memory, NDEF text, card number, or a vendor-specific alias.
 - The reader can return the UID as text in a stable format.
 - The reader does not rewrite, randomize, or rotate the UID. Some phones and secure cards may use privacy/randomized identifiers and are not suitable for permanent card registration.
-- Each physical card has a unique UID. A card is registered for one event at a time; it can move to another event only when the event windows do not overlap. Overlapping reuse returns a specific conflict.
+- Each physical card has a unique UID and is registered once for its organization. An `AVAILABLE` card can be allocated to another event without re-registering it. Cards in use by an active event are hidden from other event inventories and are released automatically when that event ends.
 - The reader's communication settings are known: USB mode, serial port name, baud rate, data bits, parity, stop bits, and line terminator.
 
 Recommended UID output is uppercase hexadecimal with optional colon separators, for example:
@@ -89,14 +89,14 @@ If a reader adds a label such as `UID:`, configure the reader to remove it. The 
 
 ## Register a card in Occassia
 
-Card registration is single-UID only and event-specific:
+Card registration/allocation is single-UID only:
 
 1. Sign in with an Admin or Event Manager account.
 2. Open the event and select **Cards**.
 3. Choose **Manual entry** to type one UID, or **External scanner** for a HID reader.
 4. Enter or scan one UID.
 5. Select **Register**.
-6. Confirm that the card appears with status `AVAILABLE` in that event's inventory.
+6. Confirm that the card appears with status `AVAILABLE` in that event's inventory. If it was already registered and available, this step allocates it to the event instead of creating a duplicate record.
 
 There is no batch-code field. Card batch import remains available to administrators at `POST /api/v1/cards/batch?eventId=<event-uuid>`; the first column must be `uid`, and other columns are ignored.
 
@@ -242,7 +242,8 @@ The current serial bridge posts `{ "uid": ... }` to card registration. It does n
 - [ ] Manual registration accepts one UID only.
 - [ ] The card is visible with status `AVAILABLE` after registration.
 - [ ] Re-registering the same UID for the same event returns a duplicate-card error.
-- [ ] Registering the UID for an overlapping event returns `CARD_EVENT_OVERLAP`.
+- [ ] Allocating a UID already in use by an overlapping event returns `CARD_EVENT_OVERLAP`.
+- [ ] Closing the event releases its cards as `AVAILABLE` for future allocation.
 
 ### Assignment and check-in
 

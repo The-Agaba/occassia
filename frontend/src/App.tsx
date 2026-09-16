@@ -43,6 +43,7 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/card-control" element={<RoleGuard roles={['ADMIN']}><CardsPage /></RoleGuard>} />
             <Route path="/events/new" element={
               <RoleGuard roles={['ADMIN']}><NewEventPage /></RoleGuard>
             } />

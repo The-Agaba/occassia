@@ -78,7 +78,7 @@ Guest QR printing uses an 80mm × 50mm compact event-ticket layout. Check-in con
 3. In the browser Network tab, confirm API requests go to `https://your-backend-host/api/v1`.
 4. Create or open an event and verify guest, card, and check-in pages load.
 5. Confirm the live dashboard connects without repeated WebSocket failures.
-6. Register one test NFC UID for an event, assign it to a confirmed and paid test guest, and check it in. Confirm the card becomes `CHECKED_IN` and a second NFC scan is rejected.
+6. Register one test NFC UID, allocate it to an event, assign it to a confirmed and paid test guest, and check it in. Confirm the card becomes `CHECKED_IN`, a second NFC scan is rejected, and closing the event releases the card as `AVAILABLE`.
 7. Remove test data before opening the system to real guests.
 8. Confirm CORS rejects an unrelated origin and that Swagger is not exposing secrets.
 

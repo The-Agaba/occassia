@@ -36,6 +36,11 @@ public class CardController {
         return cardService.listForEvent(eventId, status);
     }
 
+    @GetMapping("/cards/organization/inventory")
+    public List<CardResponse> organizationInventory() {
+        return cardService.listOrganizationInventory();
+    }
+
     @GetMapping("/cards/{uid}")
     public CardResponse get(@PathVariable String uid) {
         return cardService.get(uid);

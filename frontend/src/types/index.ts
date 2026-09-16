@@ -70,6 +70,8 @@ export interface NfcCard {
   uid: string;
   organizationId: string;
   eventId: string | null;
+  eventName?: string | null;
+  organizationName?: string | null;
   status: CardStatus;
   assignedGuestId: string | null;
   assignedGuestName: string | null;

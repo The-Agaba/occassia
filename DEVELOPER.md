@@ -46,7 +46,7 @@ NFC Gate Devices ──REST/JWT──►  Spring Boot API (check-in endpoints on
 ### Design principles
 
 - **Backend is the single source of truth.** All business logic lives in Spring services.
-- **Cards are event-scoped assets** within an organization. They are visible only through the current event inventory and can be reused only when event times do not overlap.
+- **Cards are organization-owned assets allocated to events.** An available card can appear in other event inventories; a card allocated to an active event is hidden from other events and is released automatically when the event closes or is deleted.
 - **Categories are per-event and dynamic.** Never hardcode VIP/Family/etc. in code.
 - **One guest = one check-in.** Enforced by DB `UNIQUE` on `check_ins.guest_id`.
 - **NFC cards are single-use per event.** A successful NFC scan changes the card to `CHECKED_IN`; another scan returns `CARD_ALREADY_CHECKED_IN`. QR duplicate scans return `alreadyCheckedIn: true`.
@@ -491,9 +491,11 @@ Card registration accepts one UID at a time:
 
 - `POST /api/v1/cards` with `{ "uid": "04:A3:FF:12:BC", "eventId": "<event-uuid>" }`
 - `GET /api/v1/events/{eventId}/cards` returns only cards for that event and organization.
+- The event inventory also includes organization cards with no current event allocation and `AVAILABLE` status, so they can be allocated without registering a second time.
+- `GET /api/v1/cards/organization/inventory` is Admin-only and returns the organization-wide view, including current event, organization, registration, assignment, and lifecycle details.
 - `PATCH /api/v1/cards/{uid}/status` is Admin-only. `LOST` detaches the card from its guest and deactivates it.
 - `DELETE /api/v1/cards/{uid}` permanently removes the card database record.
-- Registering a card for an overlapping event returns `CARD_EVENT_OVERLAP`.
+- Allocating a card already in use by another event returns `CARD_EVENT_OVERLAP` for overlapping windows or `CARD_IN_USE` otherwise. Closing an event releases its cards to `AVAILABLE`.
 - `batch_code` is not part of the entity, request, response, or frontend model.
 - Card batch import is available at `POST /api/v1/cards/batch?eventId=<event-uuid>`; its first column is `uid` and additional columns are ignored.
 - Cards and check-ins accept canonical NFC UIDs from Web NFC, HID/keyboard readers, or `tools/serial-bridge.js`.

@@ -79,11 +79,11 @@ NFC hardware can integrate through HID/keyboard mode, browser Web NFC, or the lo
 <td width="50%">
 
 ### 💳 NFC Card System
-- Event-scoped card assets with organization isolation
+- Organization-owned cards allocated to events with organization isolation
 - Single UID registration (no batch-code field)
 - HID, Web NFC, and serial/SDK reader support
 - Fast scan-and-assign workflow
-- LOST / DAMAGED status handling, admin deletion, and checked-in lockout
+- LOST / DAMAGED status handling, admin deletion, checked-in lockout, and automatic release after events end
 
 </td>
 </tr>

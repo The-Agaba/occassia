@@ -56,9 +56,8 @@ public class CardService {
             if (existing.getEvent() != null && existing.getEvent().getId().equals(event.getId())) {
                 throw new ApiException(HttpStatus.CONFLICT, "CARD_EXISTS", "Card is already registered for this event");
             }
-            if (existing.getEvent() != null && eventsOverlap(existing.getEvent(), event)) {
-                throw new ApiException(HttpStatus.CONFLICT, "CARD_EVENT_OVERLAP", "This card is already registered for an overlapping event (" + existing.getEvent().getName() + ")");
-            }
+            if (existing.getEvent() != null && eventsOverlap(existing.getEvent(), event)) throw new ApiException(HttpStatus.CONFLICT, "CARD_EVENT_OVERLAP", "This card is already in use for an overlapping event (" + existing.getEvent().getName() + ")");
+            if (existing.getEvent() != null) throw new ApiException(HttpStatus.CONFLICT, "CARD_IN_USE", "This card is currently in use by another event");
             if (existing.getAssignedGuest() != null) {
                 throw new ApiException(HttpStatus.CONFLICT, "CARD_IN_USE", "This card is still assigned to a guest and cannot be reused");
             }
@@ -147,7 +146,38 @@ public class CardService {
         List<NfcCard> cards = status == null
                 ? (superAdmin ? cardRepository.findByEventIdOrderByRegisteredAtDesc(eventId) : cardRepository.findByOrganizationIdAndEventIdOrderByRegisteredAtDesc(current.getOrganizationId(), eventId))
                 : (superAdmin ? cardRepository.findByEventIdAndStatusOrderByRegisteredAtDesc(eventId, status) : cardRepository.findByOrganizationIdAndEventIdAndStatusOrderByRegisteredAtDesc(current.getOrganizationId(), eventId, status));
-        return cards.stream().map(this::toResponse).toList();
+        UUID eventOrganizationId = event.getOrganization().getId();
+        List<NfcCard> available = status == null
+                ? cardRepository.findByOrganizationIdAndEventIdIsNullAndStatusOrderByRegisteredAtDesc(eventOrganizationId, CardStatus.AVAILABLE)
+                : (status == CardStatus.AVAILABLE ? cardRepository.findByOrganizationIdAndEventIdIsNullAndStatusOrderByRegisteredAtDesc(eventOrganizationId, CardStatus.AVAILABLE) : List.of());
+        List<NfcCard> combined = new ArrayList<>(cards);
+        available.stream().filter(card -> combined.stream().noneMatch(currentCard -> currentCard.getUid().equals(card.getUid()))).forEach(combined::add);
+        return combined.stream().map(this::toResponse).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<CardResponse> listOrganizationInventory() {
+        SecurityUtils.requireRole(UserRole.ADMIN);
+        UserPrincipal current = SecurityUtils.currentUser();
+        return cardRepository.findByOrganizationIdOrderByRegisteredAtDesc(current.getOrganizationId()).stream().map(this::toResponse).toList();
+    }
+
+    @Transactional
+    public void releaseCardsForEvent(Event event) {
+        List<NfcCard> cards = cardRepository.findByEventIdOrderByRegisteredAtDesc(event.getId());
+        for (NfcCard card : cards) {
+            if (card.getAssignedGuest() != null) {
+                Guest guest = card.getAssignedGuest();
+                guest.setNfcCardUid(null);
+                guestRepository.save(guest);
+            }
+            card.setAssignedGuest(null);
+            card.setAssignedAt(null);
+            card.setEvent(null);
+            card.setStatus(CardStatus.AVAILABLE);
+            cardRepository.save(card);
+            eventPublisher.publishCardUpdate(card);
+        }
     }
 
     @Transactional(readOnly = true)
@@ -285,6 +315,8 @@ public class CardService {
                 .uid(card.getUid())
                 .organizationId(card.getOrganization().getId())
                 .eventId(card.getEvent() != null ? card.getEvent().getId() : null)
+                .eventName(card.getEvent() != null ? card.getEvent().getName() : null)
+                .organizationName(card.getOrganization().getName())
                 .status(card.getStatus())
                 .assignedGuestId(card.getAssignedGuest() != null ? card.getAssignedGuest().getId() : null)
                 .assignedGuestName(card.getAssignedGuest() != null ? card.getAssignedGuest().getFullName() : null)

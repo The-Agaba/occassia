@@ -2,6 +2,7 @@ package com.occassia.event;
 
 import com.occassia.audit.AuditService;
 import com.occassia.guest.GuestRepository;
+import com.occassia.card.NfcCardRepository;
 import com.occassia.organization.Organization;
 import com.occassia.organization.OrganizationService;
 import com.occassia.shared.enums.EventStatus;
@@ -31,6 +32,7 @@ public class EventService {
     private final OrganizationService organizationService;
     private final UserService userService;
     private final GuestRepository guestRepository;
+    private final NfcCardRepository nfcCardRepository;
     private final AuditService auditService;
 
     @Transactional
@@ -118,11 +120,28 @@ public class EventService {
         event = eventRepository.save(event);
         auditService.log(event.getOrganization(), "EVENT_STATUS_CHANGED", "EVENT", event.getId().toString(),
                 Map.of("status", newStatus.name()));
+        if (newStatus == EventStatus.CLOSED) {
+            releaseEventCards(event);
+        }
         if (newStatus == EventStatus.CLOSED && event.getCreatedBy() != null && event.getCreatedBy().getRole() != UserRole.SUPER_ADMIN) {
             guestRepository.deleteByEventId(event.getId());
             auditService.log(event.getOrganization(), "GUESTS_CLEANED_UP", "EVENT", event.getId().toString(), null);
         }
         return toResponse(event);
+    }
+
+    private void releaseEventCards(Event event) {
+        nfcCardRepository.findByEventIdOrderByRegisteredAtDesc(event.getId()).forEach(card -> {
+            if (card.getAssignedGuest() != null) {
+                card.getAssignedGuest().setNfcCardUid(null);
+                guestRepository.save(card.getAssignedGuest());
+            }
+            card.setAssignedGuest(null);
+            card.setAssignedAt(null);
+            card.setEvent(null);
+            card.setStatus(com.occassia.shared.enums.CardStatus.AVAILABLE);
+            nfcCardRepository.save(card);
+        });
     }
 
     @Transactional
@@ -133,6 +152,7 @@ public class EventService {
         if (event.getStatus() != EventStatus.DRAFT) {
             throw new ApiException(HttpStatus.FORBIDDEN, "NOT_DRAFT", "Only DRAFT events can be deleted");
         }
+        releaseEventCards(event);
         eventRepository.delete(event);
         auditService.log(event.getOrganization(), "EVENT_DELETED", "EVENT", id.toString(), null);
     }

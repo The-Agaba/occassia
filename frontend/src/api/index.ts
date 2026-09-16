@@ -61,6 +61,7 @@ export const guestsApi = {
 
 export const cardsApi = {
   list: (eventId: string, status?: string) => api.get<NfcCard[]>(`/events/${eventId}/cards`, { params: status ? { status } : {} }),
+  organizationInventory: () => api.get<NfcCard[]>('/cards/organization/inventory'),
   register: (eventId: string, uid: string) => api.post<NfcCard>('/cards', { uid, eventId }),
   batch: (eventId: string, file: File) => {
     const form = new FormData();
