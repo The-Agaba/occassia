@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Activity, CalendarDays, CreditCard, FileText, LogOut, Menu, Settings2, ShieldCheck, UserRound, X } from 'lucide-react';
+import { Activity, BookOpen, CalendarDays, CreditCard, FileText, LogOut, Menu, Settings2, ShieldCheck, UserRound, X } from 'lucide-react';
 import { useState } from 'react';
 import { useAuthStore } from '../store/authStore';
 import { authApi } from '../api';
@@ -9,6 +9,7 @@ import ConfirmationModal from './ConfirmationModal';
 import { ThemeToggle } from './ThemeProvider';
 
 const nav = [
+  { to: '/guide', label: 'How it works', note: 'Quick start guide', icon: BookOpen },
   { to: '/dashboard', label: 'Events', note: 'Your event spaces', icon: CalendarDays },
   { to: '/settings/users', label: 'Team access', note: 'Roles & permissions', icon: UserRound, roles: ['ADMIN', 'SUPER_ADMIN'] },
   { to: '/audit', label: 'Audit trail', note: 'Operational history', icon: ShieldCheck, roles: ['ADMIN', 'SUPER_ADMIN'] },

@@ -10,6 +10,7 @@ import InstallAppPrompt from './components/InstallAppPrompt';
 import Toaster from './components/Toaster';
 import LiveDashboardPage from './pages/LiveDashboardPage';
 import ReportsPage from './pages/ReportsPage';
+import GuidePage from './pages/GuidePage';
 
 const DashboardPage = lazy(() => import('./pages/DashboardPage'));
 const NewEventPage = lazy(() => import('./pages/NewEventPage'));
@@ -42,6 +43,7 @@ export default function App() {
           <Route path="/terms" element={<MarkdownPage kind="terms" />} />
           <Route path="/login" element={<LoginPage />} />
           <Route element={<ProtectedRoute />}>
+            <Route path="/guide" element={<GuidePage />} />
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/card-control" element={<RoleGuard roles={['ADMIN']}><CardsPage /></RoleGuard>} />
             <Route path="/events/new" element={
