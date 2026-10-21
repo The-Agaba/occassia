@@ -15,6 +15,9 @@ export const authApi = {
 
 export const publicApi = {
   metrics: () => api.get<{ totalCheckIns: number }>('/public/metrics'),
+  getInvitation: (token: string) => api.get<any>(`/public/invitations/${token}`),
+  submitRsvp: (token: string, data: { status: string; headcount?: number; dietary?: string; message?: string; phoneConfirm?: string }) =>
+    api.post<any>(`/public/invitations/${token}/rsvp`, data),
 };
 
 export const eventsApi = {
@@ -110,4 +113,10 @@ export const organizationsApi = {
     api.put<Organization>(`/organizations/${id}`, data),
   deactivate: (id: string) => api.patch<Organization>(`/organizations/${id}/status`, { status: 'INACTIVE' }),
   activate: (id: string) => api.patch<Organization>(`/organizations/${id}/status`, { status: 'ACTIVE' }),
+};
+
+export const invitationsApi = {
+  list: (eventId: string) => api.get<any[]>(`/events/${eventId}/invitations`),
+  batchInvite: (eventId: string, data: { guestIds?: string[]; channel: string; templateId?: string; imageUrl?: string; letterDetails?: Record<string, unknown> }) =>
+    api.post<any[]>(`/events/${eventId}/invitations/batch`, data),
 };
