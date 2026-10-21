@@ -11,7 +11,14 @@ self.addEventListener('activate', (event) => event.waitUntil(
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET' || !event.request.url.startsWith(self.location.origin)) return;
   const requestUrl = new URL(event.request.url);
-  if (requestUrl.pathname.startsWith('/api/') || requestUrl.pathname.startsWith('/ws/')) return;
+  if (
+    requestUrl.pathname.startsWith('/api/') || 
+    requestUrl.pathname.startsWith('/ws/') ||
+    requestUrl.hostname === 'localhost' ||
+    requestUrl.hostname === '127.0.0.1' ||
+    requestUrl.pathname.includes('/node_modules/') ||
+    requestUrl.pathname.includes('/@')
+  ) return;
   const isNavigation = event.request.mode === 'navigate' || requestUrl.pathname === '/';
   if (isNavigation) {
     // Always prefer the deployed HTML so a new Vite build can reach its new
