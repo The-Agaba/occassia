@@ -50,12 +50,12 @@ export default function App() {
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/card-control" element={<RoleGuard roles={['ADMIN']}><CardsPage /></RoleGuard>} />
             <Route path="/events/new" element={
-              <RoleGuard roles={['ADMIN']}><NewEventPage /></RoleGuard>
+              <RoleGuard roles={['ADMIN', 'SUPER_ADMIN']}><NewEventPage /></RoleGuard>
             } />
             <Route path="/events/:id" element={<EventDetailPage />} />
             <Route path="/events/:id/guests" element={<GuestsPage />} />
             <Route path="/events/:id/invitations" element={
-              <RoleGuard roles={['ADMIN', 'SUPER_ADMIN', 'EVENT_MANAGER']}><InvitationsPage /></RoleGuard>
+              <RoleGuard roles={['ADMIN', 'SUPER_ADMIN']}><InvitationsPage /></RoleGuard>
             } />
             <Route path="/events/:id/guests/import" element={
               <RoleGuard roles={['ADMIN', 'EVENT_MANAGER']}><GuestImportPage /></RoleGuard>

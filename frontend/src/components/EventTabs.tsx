@@ -7,7 +7,7 @@ import { ArrowLeft, BarChart3, ClipboardList, CreditCard, Gauge, Mail, Radio, Us
 const tabs = [
   { path: '', label: 'Overview', icon: Gauge },
   { path: '/guests', label: 'Guest list', icon: UsersRound },
-  { path: '/invitations', label: 'Invitations', icon: Mail, roles: ['ADMIN', 'SUPER_ADMIN', 'EVENT_MANAGER'] },
+  { path: '/invitations', label: 'Invitations', icon: Mail, roles: ['ADMIN', 'SUPER_ADMIN'] },
   { path: '/cards', label: 'Card inventory', icon: CreditCard, roles: ['ADMIN', 'SUPER_ADMIN', 'EVENT_MANAGER'] },
   { path: '/cards/register', label: 'Register card', icon: Radio, roles: ['ADMIN', 'EVENT_MANAGER'] },
   { path: '/cards/assign', label: 'Assign card', icon: ClipboardList, roles: ['ADMIN', 'EVENT_MANAGER'] },

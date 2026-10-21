@@ -26,6 +26,7 @@ import Spinner from '../components/Spinner';
 import { eventsApi, guestsApi } from '../api';
 import type { Event, InvitationRecord } from '../types';
 import { useInvitationStore } from '../store/invitationStore';
+import { useAuthStore } from '../store/authStore';
 import { useUiStore } from '../store/uiStore';
 import {
   downloadInvitationTemplate,
@@ -37,6 +38,8 @@ import InvitationWizardModal from '../components/InvitationWizardModal';
 
 export default function InvitationsPage() {
   const { id } = useParams<{ id: string }>();
+  const user = useAuthStore((s) => s.user);
+  const canManageInvitations = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const [viewAllMode, setViewAllMode] = useState(false);
@@ -161,6 +164,29 @@ export default function InvitationsPage() {
   };
 
   if (loading) return <Spinner />;
+
+  if (!canManageInvitations) {
+    return (
+      <div className="ops-page">
+        <SEO
+          title={`Invitations - ${event?.name || 'Event'} | Occassia`}
+          description="Digital invitation management restricted to event creators."
+          noIndex
+        />
+        <EventTabs />
+        <div className="ops-page-inner">
+          <div className="ops-panel ops-empty">
+            <Mail size={32} />
+            <strong>Restricted Access</strong>
+            <span>Only event creators and administrators have permission to access digital invitations.</span>
+            <Link to={`/events/${id}`} className="ops-button primary">
+              Return to Event Overview
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="ops-page">
