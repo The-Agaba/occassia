@@ -19,7 +19,7 @@
 <p>
   <img src="https://img.shields.io/badge/version-1.0.0-blue?style=flat-square" alt="Version" />
   <img src="https://img.shields.io/badge/Java-21-orange?style=flat-square&logo=openjdk" alt="Java 21" />
-  <img src="https://img.shields.io/badge/license-Proprietary-lightgrey?style=flat-square" alt="License" />
+  <a href="./LICENSE"><img src="https://img.shields.io/badge/license-PolyForm%20Noncommercial%201.0.0-orange?style=flat-square" alt="License: PolyForm Noncommercial 1.0.0" /></a>
   <img src="https://img.shields.io/badge/API-Swagger%20OpenAPI-85EA2D?style=flat-square&logo=swagger&logoColor=black" alt="Swagger" />
 </p>
 
@@ -395,11 +395,20 @@ curl -X POST http://localhost:8080/api/v1/auth/login \
 3. Ensure `mvn package` and `npm run build` pass
 4. Open a pull request with a clear description
 
+By contributing you agree to the contribution terms in [CONTRIBUTING.md](./CONTRIBUTING.md).
+
 ---
 
 ## 📄 License
 
-Proprietary - Occassia v1.0. All rights reserved.
+Copyright © 2026 CO-TRONICS TECHNOLOGY (Cotronix).
+
+Occassia is **source-available** under the [PolyForm Noncommercial License 1.0.0](./LICENSE).
+
+- ✅ Free for personal, educational, research, charitable, and other noncommercial use.
+- ❌ **Commercial use requires a separate license.** This includes running paid events, hosting it as a service, or selling or bundling it.
+
+See [COMMERCIAL-LICENSE.md](./COMMERCIAL-LICENSE.md) for details and contact information. The Occassia and Cotronix names and logos are not covered by the license.
 
 ---
 

@@ -14,7 +14,11 @@ Occassia is provided as an operational tool. Event owners remain responsible for
 
 ## License
 
-Copyright © 2026 Cotronix. All rights reserved. The software, branding, documentation, and visual design may not be copied, resold, or redistributed without written permission. See the repository LICENSE file for the full license notice.
+Copyright © 2026 CO-TRONICS TECHNOLOGY (Cotronix).
+
+The Occassia source code is available under the **PolyForm Noncommercial License 1.0.0**. You may use, study, and modify it for noncommercial purposes only. Any commercial use, including running paid events, offering it as a hosted service, or reselling or bundling it, requires a separate written license from Cotronix.
+
+The Occassia and Cotronix names, logos, and branding are not licensed for reuse. See the repository LICENSE and COMMERCIAL-LICENSE.md files for full details.
 
 ## Changes
 

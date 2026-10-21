@@ -6,12 +6,16 @@ import terms from '../content/terms.md?raw';
 import about from '../content/about.md?raw';
 
 function renderMarkdown(source: string) {
+  const renderBold = (text: string) =>
+    text.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
+      part.startsWith('**') && part.endsWith('**') && part.length > 4 ? <strong key={i}>{part.slice(2, -2)}</strong> : part
+    );
   const renderInline = (text: string) => {
     const match = text.match(/^\[([^\]]+)\]\(([^)]+)\)(.*)$/);
-    if (!match) return text;
+    if (!match) return renderBold(text);
     const [, label, href, suffix] = match;
     const Icon = label.toLowerCase().includes('github') ? Code2 : label.toLowerCase().includes('whatsapp') ? MessageCircle : label.toLowerCase().includes('email') ? Mail : ExternalLink;
-    return <><a className="markdown-link" href={href} target={href.startsWith('http') ? '_blank' : undefined} rel={href.startsWith('http') ? 'noreferrer' : undefined}><Icon size={15} />{label}</a>{suffix}</>;
+    return <><a className="markdown-link" href={href} target={href.startsWith('http') ? '_blank' : undefined} rel={href.startsWith('http') ? 'noreferrer' : undefined}><Icon size={15} />{label}</a>{renderBold(suffix)}</>;
   };
   return source.split('\n').map((line, index) => {
     if (line.startsWith('# ')) return <h1 key={index}>{line.slice(2)}</h1>;

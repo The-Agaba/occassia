@@ -48,8 +48,8 @@ public class OpenApiConfig {
                                 .name("Occassia Engineering")
                                 .email("admin@occassia.com"))
                         .license(new License()
-                                .name("Proprietary")
-                                .url("https://occassia.com")))
+                                .name("PolyForm Noncommercial 1.0.0")
+                                .url("https://polyformproject.org/licenses/noncommercial/1.0.0")))
                 .servers(List.of(
                         new Server().url("http://localhost:" + serverPort).description("Local development"),
                         new Server().url("https://api.occassia.com").description("Production")))
