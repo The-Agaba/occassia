@@ -99,6 +99,38 @@ export default function InvitationCardPreview({
           </div>
         )}
 
+        {/* Featured Photo Frame (For Wedding & Photo Templates) */}
+        {(template.supportsImage || details.imageUrl) && (details.imageUrl || template.defaultImage) && (
+          <div className={`relative w-full ${compact ? 'max-w-[200px] mb-2.5' : 'max-w-xs sm:max-w-sm mb-4'} mx-auto`}>
+            {theme.decorStyle === 'photo-arch' ? (
+              <div className="rounded-t-full overflow-hidden shadow-2xl border-2 border-amber-400/60 p-1 bg-white/10">
+                <img
+                  src={details.imageUrl || template.defaultImage}
+                  alt={hostNames}
+                  className={`w-full ${compact ? 'h-28' : 'h-48 sm:h-64'} object-cover rounded-t-full`}
+                />
+              </div>
+            ) : (
+              <div className="relative p-1">
+                {/* 4 Gilded Corner Frame Brackets (Inspired by Jessica Williams screenshot) */}
+                <div className="absolute top-0 left-0 w-4 sm:w-6 h-4 sm:h-6 border-t-2 border-l-2 border-[#d4af37] z-20 pointer-events-none" />
+                <div className="absolute top-0 right-0 w-4 sm:w-6 h-4 sm:h-6 border-t-2 border-r-2 border-[#d4af37] z-20 pointer-events-none" />
+                <div className="absolute bottom-0 left-0 w-4 sm:w-6 h-4 sm:h-6 border-b-2 border-l-2 border-[#d4af37] z-20 pointer-events-none" />
+                <div className="absolute bottom-0 right-0 w-4 sm:w-6 h-4 sm:h-6 border-b-2 border-r-2 border-[#d4af37] z-20 pointer-events-none" />
+
+                <div className="relative rounded-lg overflow-hidden shadow-xl border border-white/20">
+                  <img
+                    src={details.imageUrl || template.defaultImage}
+                    alt={hostNames}
+                    className={`w-full ${compact ? 'h-28' : 'h-44 sm:h-60'} object-cover`}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Headline */}
         <div
           className={`font-semibold uppercase tracking-[0.2em] ${

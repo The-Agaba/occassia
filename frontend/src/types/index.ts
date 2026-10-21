@@ -150,6 +150,7 @@ export interface InvitationLetterDetails {
   rsvpDeadline?: string;
   personalMessage?: string;
   additionalNotes?: string;
+  imageUrl?: string;
   templateId: string;
   collectionType: string;
 }

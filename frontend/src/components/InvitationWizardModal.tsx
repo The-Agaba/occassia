@@ -11,6 +11,9 @@ import {
   Lock,
   Eye,
   Info,
+  Camera,
+  UploadCloud,
+  Sparkles,
 } from 'lucide-react';
 import {
   INVITATION_COLLECTIONS,
@@ -67,6 +70,18 @@ export default function InvitationWizardModal({
   const [previewingTemplate, setPreviewingTemplate] = useState<CardTemplate | null>(null);
   const [channel, setChannel] = useState<InvitationChannel>('WHATSAPP');
 
+  // Photo template prompt state
+  const [photoModalOpen, setPhotoModalOpen] = useState(false);
+  const [photoPendingTemplate, setPhotoPendingTemplate] = useState<CardTemplate | null>(null);
+  const [tempPhotoUrl, setTempPhotoUrl] = useState<string>(details.imageUrl || '');
+
+  const PHOTO_PRESETS = [
+    { label: 'Golden Hour Couple', url: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80' },
+    { label: 'Modern Arch Romance', url: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=800&q=80' },
+    { label: 'Celebration Send-Off', url: 'https://images.unsplash.com/photo-1532712938310-34cb3982ef74?auto=format&fit=crop&w=800&q=80' },
+    { label: 'Minimalist Studio', url: 'https://images.unsplash.com/photo-1606800052052-a08af7148866?auto=format&fit=crop&w=800&q=80' },
+  ];
+
   if (!isOpen) return null;
 
   const isWeddingEvent = event.type === 'WEDDING';
@@ -74,13 +89,11 @@ export default function InvitationWizardModal({
 
   const recipientCount = selectedGuestIds.length > 0 ? selectedGuestIds.length : totalGuestsCount;
 
-  // Filter templates by selected collection
-  const availableTemplates = CARD_TEMPLATES.filter((t) => {
-    if (selectedCollection === 'wedding-related') {
-      return t.collectionId === 'wedding-related';
-    }
-    return t.collectionId === 'wedding-invitations';
-  });
+  // Filter templates by selected collection with fallback
+  const collectionTemplates = CARD_TEMPLATES.filter((t) => t.collectionId === selectedCollection);
+  const availableTemplates = collectionTemplates.length > 0
+    ? collectionTemplates
+    : CARD_TEMPLATES.filter((t) => t.collectionId === 'wedding-invitations');
 
   const handleNextFromCategory = (colId: string, comingSoon?: boolean) => {
     if (comingSoon) {
@@ -95,7 +108,42 @@ export default function InvitationWizardModal({
   const handleChooseTemplateAndPreview = (tmpl: CardTemplate) => {
     setChosenTemplate(tmpl);
     setDetails((prev) => ({ ...prev, templateId: tmpl.id }));
-    setPreviewingTemplate(tmpl);
+
+    // If template holds images and user has not added one yet, prompt them to add image
+    if (tmpl.supportsImage && !details.imageUrl) {
+      setPhotoPendingTemplate(tmpl);
+      setTempPhotoUrl(tmpl.defaultImage || '');
+      setPhotoModalOpen(true);
+    } else {
+      setPreviewingTemplate(tmpl);
+    }
+  };
+
+  const handlePhotoFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 8 * 1024 * 1024) {
+      showToast('Photo exceeds 8MB limit. Please upload a smaller file.', 'error');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        setTempPhotoUrl(reader.result);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleConfirmPhoto = () => {
+    const finalUrl = tempPhotoUrl || photoPendingTemplate?.defaultImage || 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80';
+    setDetails((prev) => ({ ...prev, imageUrl: finalUrl }));
+    setPhotoModalOpen(false);
+    if (photoPendingTemplate) {
+      setPreviewingTemplate(photoPendingTemplate);
+      setPhotoPendingTemplate(null);
+    }
+    showToast('Photo successfully attached to invitation card!', 'success');
   };
 
   const handleConfirmTemplate = () => {
@@ -335,8 +383,7 @@ export default function InvitationWizardModal({
             <div>
               <div className="flex items-center justify-between mb-4">
                 <p className="text-sm text-[var(--color-ink-muted)]">
-                  Preview 10 luxury wedding & celebration designs rendered with your custom details.
-                  Click any card to inspect full preview.
+                  Explore bespoke invitation suites rendered with your live event details. Cards with 📸 support custom couple & honoree photography.
                 </p>
               </div>
 
@@ -347,12 +394,18 @@ export default function InvitationWizardModal({
                     onClick={() => handleChooseTemplateAndPreview(tmpl)}
                     className="group relative cursor-pointer rounded-2xl p-2 border border-[var(--color-line)] bg-[var(--color-surface)] hover:border-[var(--violet)] transition-all duration-200 hover:-translate-y-1 hover:shadow-xl"
                   >
+                    {tmpl.supportsImage && (
+                      <span className="absolute top-4 right-4 z-20 text-[10px] bg-amber-500/20 text-amber-500 border border-amber-500/30 px-2 py-0.5 rounded-full flex items-center gap-1 font-bold shadow-md backdrop-blur-md">
+                        <Camera size={11} /> Photo Suite
+                      </span>
+                    )}
+
                     <div className="pointer-events-none scale-95 origin-top">
                       <InvitationCardPreview template={tmpl} details={details} compact={true} />
                     </div>
                     <div className="p-3 text-left">
                       <div className="flex items-center justify-between">
-                        <h4 className="font-bold text-xs text-[var(--color-ink)]">{tmpl.title}</h4>
+                        <h4 className="font-bold text-xs text-[var(--color-ink)] truncate max-w-[170px]">{tmpl.title}</h4>
                         <span className="text-[10px] text-[var(--violet)] font-bold flex items-center gap-1 group-hover:underline">
                           <Eye size={12} /> Preview
                         </span>
@@ -381,19 +434,35 @@ export default function InvitationWizardModal({
           {/* STEP 4: Send & Dispatch Options */}
           {step === 4 && (
             <div className="max-w-2xl mx-auto space-y-6">
-              <div className="p-4 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-green-500/20 text-green-600 dark:text-green-400 flex items-center justify-center font-bold">
-                  ✓
+              <div className="p-4 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-green-500/20 text-green-600 dark:text-green-400 flex items-center justify-center font-bold">
+                    ✓
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-[var(--color-ink)]">
+                      Card Design Selected: {chosenTemplate.title}
+                    </h4>
+                    <p className="text-xs text-[var(--color-ink-muted)]">
+                      Ready to send to {recipientCount} guest{recipientCount === 1 ? '' : 's'}. Each
+                      guest receives a personalized 3D animated Bahasha invitation link.
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="text-sm font-bold text-[var(--color-ink)]">
-                    Card Design Selected: {chosenTemplate.title}
-                  </h4>
-                  <p className="text-xs text-[var(--color-ink-muted)]">
-                    Ready to send to {recipientCount} guest{recipientCount === 1 ? '' : 's'}. Each
-                    guest receives a personalized 3D animated Bahasha invitation link.
-                  </p>
-                </div>
+
+                {chosenTemplate.supportsImage && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPhotoPendingTemplate(chosenTemplate);
+                      setTempPhotoUrl(details.imageUrl || chosenTemplate.defaultImage || '');
+                      setPhotoModalOpen(true);
+                    }}
+                    className="px-3 py-1.5 rounded-xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 text-xs font-semibold flex items-center gap-1.5 shrink-0 transition"
+                  >
+                    <Camera size={13} /> {details.imageUrl ? 'Change Photo' : 'Upload Photo'}
+                  </button>
+                )}
               </div>
 
               {/* Delivery Channel Picker */}
@@ -561,7 +630,20 @@ export default function InvitationWizardModal({
               <InvitationCardPreview template={previewingTemplate} details={details} />
             </div>
 
-            <div className="mt-6 flex gap-3">
+            <div className="mt-6 flex flex-wrap justify-center gap-3">
+              {previewingTemplate.supportsImage && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPhotoPendingTemplate(previewingTemplate);
+                    setTempPhotoUrl(details.imageUrl || previewingTemplate.defaultImage || '');
+                    setPhotoModalOpen(true);
+                  }}
+                  className="px-4 py-2.5 rounded-xl bg-amber-500/20 border border-amber-500/30 text-amber-300 hover:bg-amber-500/30 transition font-bold text-xs flex items-center gap-1.5"
+                >
+                  <Camera size={14} /> Change Photo
+                </button>
+              )}
               <button
                 onClick={() => setPreviewingTemplate(null)}
                 className="px-5 py-2.5 rounded-xl bg-white/10 text-white hover:bg-white/20 transition font-medium text-xs"
@@ -573,6 +655,125 @@ export default function InvitationWizardModal({
                 className="px-6 py-2.5 rounded-xl bg-[var(--violet)] text-white hover:opacity-90 transition font-bold text-xs flex items-center gap-2 shadow-lg"
               >
                 <Check size={16} /> Use This Template & Proceed
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* PHOTO UPLOAD & CUSTOMIZATION PROMPT MODAL */}
+      {photoModalOpen && (
+        <div className="fixed inset-0 z-70 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+          <div className="relative w-full max-w-lg rounded-3xl bg-[var(--color-surface-elevated)] border border-[var(--color-line)] shadow-2xl p-6 text-left">
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-500 flex items-center justify-center font-bold">
+                  <Camera size={20} />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-[var(--color-ink)] flex items-center gap-2">
+                    Add Featured Photo
+                    <span className="text-[10px] bg-amber-500/20 text-amber-500 border border-amber-500/30 px-2 py-0.5 rounded-full font-semibold">
+                      Required for this suite
+                    </span>
+                  </h3>
+                  <p className="text-xs text-[var(--color-ink-muted)]">
+                    {photoPendingTemplate?.title || chosenTemplate.title} is a photo suite. Upload your photo or pick a curated preset below to finalize.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setPhotoModalOpen(false);
+                  setPhotoPendingTemplate(null);
+                }}
+                className="p-1.5 rounded-lg text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] hover:bg-[var(--color-surface)]"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Photo Preview Thumbnail */}
+            <div className="relative mb-5 rounded-2xl overflow-hidden border border-[var(--color-line)] bg-black/40 h-52 flex items-center justify-center shadow-inner">
+              {tempPhotoUrl ? (
+                <>
+                  <img
+                    src={tempPhotoUrl}
+                    alt="Selected preview"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute bottom-2 left-2 px-2.5 py-1 rounded-md bg-black/60 backdrop-blur-sm text-[10px] text-white flex items-center gap-1.5">
+                    <Sparkles size={11} className="text-amber-400" /> Active Photo Preview
+                  </div>
+                </>
+              ) : (
+                <div className="text-center text-slate-400 text-xs flex flex-col items-center gap-2">
+                  <UploadCloud size={28} className="text-amber-400" />
+                  <span>No photo selected yet</span>
+                </div>
+              )}
+            </div>
+
+            {/* Upload File Input */}
+            <div className="mb-4">
+              <label className="block text-xs font-bold text-[var(--color-ink)] mb-1.5">
+                Upload Custom Photo from Device
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handlePhotoFileUpload}
+                className="w-full text-xs text-slate-400 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-amber-500/20 file:text-amber-500 hover:file:bg-amber-500/30 cursor-pointer border border-[var(--color-line)] rounded-xl p-1 bg-[var(--color-surface)]"
+              />
+            </div>
+
+            {/* Curated Presets */}
+            <div className="mb-6">
+              <span className="block text-xs font-bold text-[var(--color-ink)] mb-2">
+                Or Select from Curated Studio Presets
+              </span>
+              <div className="grid grid-cols-2 gap-2">
+                {PHOTO_PRESETS.map((preset) => (
+                  <button
+                    key={preset.label}
+                    type="button"
+                    onClick={() => setTempPhotoUrl(preset.url)}
+                    className={`flex items-center gap-2.5 p-2 rounded-xl border text-xs text-left transition ${
+                      tempPhotoUrl === preset.url
+                        ? 'border-amber-400 bg-amber-500/15 text-amber-300 ring-2 ring-amber-400/30'
+                        : 'border-[var(--color-line)] bg-[var(--color-surface)] hover:bg-[var(--color-surface-elevated)] text-[var(--color-ink-muted)]'
+                    }`}
+                  >
+                    <img
+                      src={preset.url}
+                      alt={preset.label}
+                      className="w-9 h-9 rounded-lg object-cover shrink-0"
+                    />
+                    <span className="truncate font-semibold">{preset.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Footer Actions */}
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-[var(--color-line)]">
+              <button
+                type="button"
+                onClick={() => {
+                  setPhotoModalOpen(false);
+                  setPhotoPendingTemplate(null);
+                }}
+                className="px-4 py-2 rounded-xl border border-[var(--color-line)] text-xs font-semibold text-[var(--color-ink-muted)] hover:bg-[var(--color-surface)] transition"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmPhoto}
+                className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs flex items-center gap-1.5 shadow-lg shadow-amber-500/20 transition"
+              >
+                <Check size={16} /> Save & Finalize Photo
               </button>
             </div>
           </div>
