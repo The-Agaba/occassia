@@ -13,7 +13,8 @@ Occassia is the guest access and event operations platform created by Cotronix. 
 This information is provided from the business registration certificate supplied for the app profile. 
 
 Contacts
-https://wa.me/255746946232
+
+[WhatsApp](https://wa.me/255746946232) · +255 746 946 232
 
 ## What we care about
 

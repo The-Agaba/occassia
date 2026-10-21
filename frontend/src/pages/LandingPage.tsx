@@ -1,15 +1,10 @@
-import { ArrowRight, CheckCircle2, CreditCard, Radio, QrCode, ShieldCheck, Sparkles } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Radio, ShieldCheck, Sparkles } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ThemeToggle } from '../components/ThemeProvider';
 import SEO from '../components/SEO';
 import { publicApi } from '../api';
-
-const features = [
-  { icon: Radio, title: 'Tap-first entry', text: 'Use Web NFC or a connected reader to move guests through the gate in seconds.' },
-  { icon: QrCode, title: 'A reliable backup', text: 'Every guest has a unique QR token for a graceful fallback when NFC is unavailable.' },
-  { icon: CreditCard, title: 'Cards that stay in sync', text: 'Register cards, assign them to eligible guests, and keep the live event view current.' },
-];
+import HowItWorksCarousel from '../components/HowItWorksCarousel';
 
 export default function LandingPage() {
   const [totalCheckIns, setTotalCheckIns] = useState<number | null>(null);
@@ -65,7 +60,7 @@ export default function LandingPage() {
           <div className="visual-float float-top"><ShieldCheck size={16} /><span>Verified guest</span></div><div className={`visual-float float-bottom ${countPulse ? 'count-pulse' : ''}`}><span className="mini-avatar">A</span><span>{totalCheckIns === null ? 'Loading live count…' : `+ ${totalCheckIns.toLocaleString()} checked in`}</span></div>
         </div>
       </section>
-      <section id="how-it-works" className="feature-grid"><div className="section-intro"><span>01 / OPERATIONS</span><h2>One clear view<br />of the whole welcome.</h2></div>{features.map(({ icon: Icon, title, text }) => <article className="feature-card" key={title}><div className="feature-icon"><Icon size={20} /></div><h3>{title}</h3><p>{text}</p></article>)}</section>
+      <HowItWorksCarousel />
       <footer className="landing-footer"><span>© {new Date().getFullYear()} Cotronix · Occassia</span><span>Designed by Agaba</span><div><Link to="/about">About us</Link><Link to="/terms">Terms & conditions</Link></div></footer>
     </main>
   );
