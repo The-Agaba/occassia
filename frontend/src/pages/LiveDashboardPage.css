@@ -582,3 +582,36 @@
   0%, 100% { opacity: 0.6; }
   50% { opacity: 0.3; }
 }
+
+/* Mobile Responsiveness Enhancements */
+@media (max-width: 640px) {
+  .ldb-container {
+    padding: 14px 16px;
+    gap: 18px;
+  }
+
+  .ldb-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+  }
+
+  .ldb-header-actions {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .ldb-stat-card {
+    padding: 16px 18px;
+  }
+
+  .ldb-panel-header {
+    padding: 14px 16px;
+  }
+
+  .ldb-panel-body {
+    padding: 16px;
+  }
+}
+

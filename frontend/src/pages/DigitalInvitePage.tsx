@@ -282,7 +282,7 @@ export default function DigitalInvitePage() {
                 role="button"
                 tabIndex={0}
                 aria-label="Click to open invitation letter"
-                className="group relative w-[320px] sm:w-[420px] h-[230px] sm:h-[280px] bg-gradient-to-b from-[#202736] to-[#121622] rounded-2xl shadow-2xl border border-amber-500/20 cursor-pointer transition-all duration-500 hover:scale-[1.02] hover:border-amber-400/40 hover:shadow-amber-500/10 hover:shadow-2xl flex items-center justify-center overflow-hidden"
+                className="group relative w-full max-w-[420px] h-[220px] sm:h-[280px] bg-gradient-to-b from-[#202736] to-[#121622] rounded-2xl shadow-2xl border border-amber-500/20 cursor-pointer transition-all duration-500 hover:scale-[1.02] hover:border-amber-400/40 hover:shadow-amber-500/10 hover:shadow-2xl flex items-center justify-center overflow-hidden"
               >
                 {/* Envelope fold textures & subtle Swahili geometric pattern */}
                 <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#d4af37_1px,transparent_1px)] [background-size:16px_16px]" />
@@ -405,14 +405,14 @@ export default function DigitalInvitePage() {
               </div>
 
               {/* Map & Calendar Buttons */}
-              <div className="mt-5 pt-4 border-t border-white/10 flex flex-wrap gap-3">
+              <div className="mt-5 pt-4 border-t border-white/10 flex flex-col sm:flex-row gap-2.5 sm:gap-3">
                 <a
                   href={`https://maps.google.com/?q=${encodeURIComponent(
                     activeDetails.venueName + ' ' + activeDetails.venueAddress
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-1 min-w-[140px] px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-white flex items-center justify-center gap-2 border border-white/10 transition"
+                  className="w-full sm:flex-1 px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-white flex items-center justify-center gap-2 border border-white/10 transition"
                 >
                   <Navigation size={14} className="text-emerald-400" /> Open in Maps
                 </a>
@@ -421,7 +421,7 @@ export default function DigitalInvitePage() {
                   href={getGoogleCalendarUrl()}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-1 min-w-[140px] px-3.5 py-2.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-xs font-semibold text-amber-200 flex items-center justify-center gap-2 border border-amber-400/30 transition"
+                  className="w-full sm:flex-1 px-3.5 py-2.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-xs font-semibold text-amber-200 flex items-center justify-center gap-2 border border-amber-400/30 transition"
                 >
                   <Calendar size={14} className="text-amber-400" /> Add to Calendar
                 </a>
@@ -431,7 +431,7 @@ export default function DigitalInvitePage() {
             {/* ============================================================== */}
             {/* RSVP SECTION */}
             {/* ============================================================== */}
-            <div id="rsvp" className="p-6 sm:p-7 rounded-3xl bg-gradient-to-b from-[#141923] to-[#0d1017] border border-amber-500/20 shadow-2xl relative">
+            <div id="rsvp" className="p-4 sm:p-7 rounded-2xl sm:rounded-3xl bg-gradient-to-b from-[#141923] to-[#0d1017] border border-amber-500/20 shadow-2xl relative">
               <div className="text-center mb-6">
                 <span className="text-[11px] font-semibold uppercase tracking-[0.25em] text-amber-400">
                   Response Requested

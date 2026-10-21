@@ -503,3 +503,36 @@
   0%, 100% { opacity: 0.6; }
   50% { opacity: 0.3; }
 }
+
+/* Mobile Responsiveness Enhancements */
+@media (max-width: 640px) {
+  .rep-container {
+    padding: 14px 16px;
+    gap: 18px;
+  }
+
+  .rep-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+  }
+
+  .rep-export-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .rep-stat-card {
+    padding: 16px 18px;
+  }
+
+  .rep-table-header {
+    padding: 14px 16px;
+  }
+
+  .rep-table th,
+  .rep-table td {
+    padding: 12px 14px;
+  }
+}
+
