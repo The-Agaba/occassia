@@ -36,7 +36,7 @@ export default function GuestsPage() {
 
   const filtered = guests.filter((g) => {
     const matchSearch = g.fullName.toLowerCase().includes(search.toLowerCase());
-    const matchCat = !filterCategory || g.category.id === filterCategory;
+    const matchCat = !filterCategory || g.category?.id === filterCategory;
     return matchSearch && matchCat;
   });
 
@@ -96,7 +96,7 @@ export default function GuestsPage() {
             .details { min-width: 0; text-align: left; }
             .event { color: #66708a; font-size: 7pt; margin-bottom: 2mm; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
             h2 { font-size: 13pt; line-height: 1.08; margin: 0 0 2mm; overflow-wrap: anywhere; }
-            .category { display: inline-block; color: #fff; background: ${qrModalGuest.category.colorHex}; border-radius: 999px; padding: 1.2mm 2mm; font-size: 7pt; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
+            .category { display: inline-block; color: #fff; background: ${qrModalGuest.category?.colorHex || '#6366f1'}; border-radius: 999px; padding: 1.2mm 2mm; font-size: 7pt; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
             .type { color: #66708a; font-size: 7pt; margin-top: 2mm; }
             .plus-one { color: #10182d; font-size: 28pt; line-height: .85; font-weight: 950; letter-spacing: -.08em; margin: 1mm 0 2mm; }
             img { width: 23mm; height: 23mm; display: block; }
@@ -108,7 +108,7 @@ export default function GuestsPage() {
               <div class="event">${event?.name || 'Event'}</div>
               <h2>${qrModalGuest.fullName}</h2>
               ${qrModalGuest.attendanceType === 'PLUS_ONE' ? '<div class="plus-one">+O</div>' : ''}
-              <div class="category">${qrModalGuest.category.name}</div>
+              <div class="category">${qrModalGuest.category?.name || 'General'}</div>
               <div class="type">${qrModalGuest.attendanceType === 'PLUS_ONE' ? 'Plus one' : 'Single'}</div>
             </section>
             <img src="${qrModalUrl}" alt="Guest QR code" onload="window.print();window.close()" />
@@ -162,8 +162,8 @@ export default function GuestsPage() {
                   <img src={qrModalUrl} alt="QR Code" className="w-48 h-48 mb-4 border border-slate-200 rounded-xl p-2 bg-white shadow-sm" />
                 ) : null}
                 
-                <span className="px-3 py-1 text-xs font-medium rounded-full text-white mb-2" style={{ backgroundColor: qrModalGuest.category.colorHex }}>
-                  {qrModalGuest.category.name}
+                <span className="px-3 py-1 text-xs font-medium rounded-full text-white mb-2" style={{ backgroundColor: qrModalGuest.category?.colorHex || '#6366f1' }}>
+                  {qrModalGuest.category?.name || 'General'}
                 </span>
                 <p className="text-slate-500 text-sm">Scan to Check-In</p>
               </div>
@@ -278,9 +278,9 @@ export default function GuestsPage() {
                   <td className="p-3">
                     <span
                       className="px-2 py-0.5 rounded-full text-xs font-medium text-white"
-                      style={{ backgroundColor: g.category.colorHex }}
+                      style={{ backgroundColor: g.category?.colorHex || '#6366f1' }}
                     >
-                      {g.category.name}
+                      {g.category?.name || 'General'}
                     </span>
                   </td>
                   <td className="p-3">{g.attendanceType === 'PLUS_ONE' ? 'Plus one' : 'Single'}</td>

@@ -4,7 +4,21 @@ import Layout from '../components/Layout';
 
 export function ProtectedRoute() {
   const token = useAuthStore((s) => s.token);
-  if (!token) return <Navigate to="/login" replace />;
+  const refreshToken = useAuthStore((s) => s.refreshToken);
+
+  if (!token && !refreshToken) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (!token && refreshToken) {
+    return (
+      <div className="route-loading" role="status" aria-live="polite">
+        <span className="route-loading-spinner" />
+        Restoring session…
+      </div>
+    );
+  }
+
   return (
     <Layout>
       <Outlet />

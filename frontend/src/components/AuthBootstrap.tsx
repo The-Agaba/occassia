@@ -15,9 +15,10 @@ export function AuthBootstrap({ children }: { children: React.ReactNode }) {
         } else if (token) {
           await authApi.me();
         }
-      } catch (error) {
-        // Silently fail - let user see login page if auth fails
-        if (refreshToken) {
+      } catch (error: any) {
+        // Only log out if the backend explicitly rejected credentials (401 / 403)
+        const status = error?.response?.status;
+        if (status === 401 || status === 403) {
           logout();
         }
       }

@@ -81,7 +81,14 @@ public class GuestImportService {
 
                 AttendanceType attendanceType;
                 try {
-                    attendanceType = AttendanceType.valueOf(attendanceStr.trim().toUpperCase());
+                    String cleanType = attendanceStr.trim().toUpperCase().replace(" ", "_");
+                    if ("SINGLE".equals(cleanType) || "0".equals(cleanType)) {
+                        attendanceType = AttendanceType.SINGLE;
+                    } else if ("PLUS_ONE".equals(cleanType) || "PLUSONE".equals(cleanType) || "+1".equals(cleanType) || "1".equals(cleanType)) {
+                        attendanceType = AttendanceType.PLUS_ONE;
+                    } else {
+                        attendanceType = AttendanceType.valueOf(cleanType);
+                    }
                 } catch (IllegalArgumentException e) {
                     errors.add(error(r + 1, "Invalid attendance_type: " + attendanceStr));
                     continue;
@@ -97,7 +104,9 @@ public class GuestImportService {
                 Integer tableNumber = null;
                 String tableStr = getCol(row, colIndex, "table_number");
                 if (tableStr != null && !tableStr.isBlank()) {
-                    tableNumber = Integer.parseInt(tableStr.trim());
+                    try {
+                        tableNumber = Integer.parseInt(tableStr.trim());
+                    } catch (NumberFormatException ignored) {}
                 }
 
                 Guest guest = Guest.builder()

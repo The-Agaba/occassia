@@ -417,10 +417,10 @@ export default function DigitalInvitePage() {
                         onChange={(e) => setHeadcount(Number(e.target.value))}
                         className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:ring-2 focus:ring-amber-500 outline-none"
                       >
-                        <option value={1} className="bg-slate-900">1 Guest (Myself)</option>
-                        <option value={2} className="bg-slate-900">2 Guests (Myself + 1)</option>
-                        <option value={3} className="bg-slate-900">3 Guests</option>
-                        <option value={4} className="bg-slate-900">4 Guests</option>
+                        <option value={1} className="bg-slate-900">1 Guest (Single Attendance)</option>
+                        {invite && invite.plusOnes > 0 && (
+                          <option value={2} className="bg-slate-900">2 Guests (Myself + Plus One)</option>
+                        )}
                       </select>
                     </div>
                   )}

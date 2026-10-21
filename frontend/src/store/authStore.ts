@@ -21,6 +21,9 @@ export const useAuthStore = create<AuthState>()(
       setUser: (user) => set({ user }),
       logout: () => set({ token: null, refreshToken: null, user: null }),
     }),
-    { name: 'occasia-auth', partialize: (s) => ({ refreshToken: s.refreshToken, user: s.user }) }
+    { 
+      name: 'occasia-auth', 
+      partialize: (s) => ({ token: s.token, refreshToken: s.refreshToken, user: s.user }) 
+    }
   )
 );

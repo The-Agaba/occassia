@@ -70,11 +70,11 @@ export default function LiveDashboardPage() {
     };
   }, [id]);
 
-  const chartData = stats?.byCategory.map((c) => ({
-    name: c.name,
-    value: c.checkedIn,
-    color: c.colorHex,
-  })) || [];
+  const chartData = (stats?.byCategory || []).map((c) => ({
+    name: c.name || 'General',
+    value: c.checkedIn || 0,
+    color: c.colorHex || '#6366f1',
+  }));
 
   const ConnectionStatusBanner = () => {
     if (connState === 'CONNECTED') return null;
@@ -163,7 +163,7 @@ export default function LiveDashboardPage() {
                       <p className="text-xs text-slate-500">{a.category}</p>
                     </div>
                     <p className="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded">
-                      {formatDateTime(a.checkedInAt).split(',')[1]}
+                      {a.checkedInAt ? (formatDateTime(a.checkedInAt).includes(',') ? formatDateTime(a.checkedInAt).split(',')[1].trim() : formatDateTime(a.checkedInAt)) : 'Just now'}
                     </p>
                   </div>
                 ))

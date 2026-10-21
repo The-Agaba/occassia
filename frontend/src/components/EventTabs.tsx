@@ -31,7 +31,7 @@ export default function EventTabs() {
     const saved = Number(sessionStorage.getItem(storageKey));
     if (Number.isFinite(saved)) strip.scrollLeft = saved;
     const active = strip.querySelector<HTMLElement>('.event-tab-link.active');
-    active?.scrollIntoView({ behavior: 'auto', block: 'nearest', inline: 'nearest' });
+    active?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
   }, [location.pathname, storageKey]);
 
   return (

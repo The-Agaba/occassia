@@ -76,8 +76,8 @@ export function downloadInvitationTemplate(eventName: string = 'Occassia Event')
     'WhatsApp Number (Optional)',
     'Email Address (Optional)',
     'Guest Category / Tier',
-    'Plus Ones Allowed',
-    'Table Number',
+    'Attendance (0=Single, 1=Plus One)',
+    'Table Number (Optional)',
     'Notes / Special Requests'
   ];
 
@@ -98,8 +98,8 @@ export function downloadInvitationTemplate(eventName: string = 'Occassia Event')
       '0754987654',
       'neema.mwangi@gmail.com',
       'Family',
-      2,
-      2,
+      1,
+      null,
       'Bridal family'
     ],
     [
@@ -161,8 +161,8 @@ export function downloadInvitationTemplate(eventName: string = 'Occassia Event')
     ['WhatsApp Number', 'Optional', '07XXXXXXXX, 06XXXXXXXX, or +255XXXXXXXXX', 'Used for direct WhatsApp Business digital invitation links'],
     ['Email Address', 'Optional', 'valid.email@example.com', 'Used for digital invitation email delivery'],
     ['Guest Category / Tier', 'Optional', 'VIP, Family, Regular, Bridal Party, etc.', 'Groups guests and controls seating/access priority'],
-    ['Plus Ones Allowed', 'Optional', '0, 1, 2, 3...', 'Limits number of guests that can RSVP on this invite (Default 0)'],
-    ['Table Number', 'Optional', 'Number (e.g. 1, 2, 10)', 'Table assigned at reception / gate'],
+    ['Attendance Type', 'Optional', '0 or 1 strictly (0 = Single, 1 = Plus One)', 'Guests are strictly Single or Plus One only'],
+    ['Table Number', 'Optional', 'Number or Blank', 'Completely optional for weddings and open seating'],
     ['Notes / Special Requests', 'Optional', 'Text (Dietary, VIP, etc.)', 'Displayed to event coordinators and gate team'],
     [''],
     ['Tanzania Phone Standardization:', 'All Tanzanian numbers (07xx, 06xx) are automatically formatted to +255 for reliable carrier delivery.'],
@@ -229,7 +229,7 @@ export async function parseInvitationExcel(file: File): Promise<ParsedInvitation
     const whatsappNumber = standardizeTanzaniaPhone(rawWa) || phoneNumber;
     const email = standardizeEmail(rawEmail);
     const categoryName = String(rawCat || 'General').trim() || 'General';
-    const plusOnes = Math.max(0, parseInt(String(rawPlus || '0'), 10) || 0);
+    const plusOnes = Math.min(1, Math.max(0, parseInt(String(rawPlus || '0'), 10) || 0));
     const tableNumber = rawTable ? parseInt(String(rawTable), 10) || null : null;
     const notes = rawNotes ? String(rawNotes).trim() : null;
 

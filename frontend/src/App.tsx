@@ -27,19 +27,23 @@ const UsersPage = lazy(() => import('./pages/UsersPage'));
 const AuditPage = lazy(() => import('./pages/AuditPage'));
 const OrganizationPage = lazy(() => import('./pages/OrganizationPage'));
 
+import ErrorBoundary from './components/ErrorBoundary';
+
 function RouteLoading() {
   return <div className="route-loading" role="status" aria-live="polite"><span className="route-loading-spinner" />Loading workspace…</div>;
 }
 
 export default function App() {
   return (
-    <AuthBootstrap>
-      <NetworkStatus />
-      <InstallAppPrompt />
-      <Toaster />
-      <BrowserRouter>
-        <Suspense fallback={<RouteLoading />}>
-        <Routes>
+    <ErrorBoundary>
+      <AuthBootstrap>
+        <NetworkStatus />
+        <InstallAppPrompt />
+        <Toaster />
+        <BrowserRouter>
+          <Suspense fallback={<RouteLoading />}>
+            <ErrorBoundary>
+              <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/about" element={<MarkdownPage kind="about" />} />
           <Route path="/terms" element={<MarkdownPage kind="terms" />} />
@@ -86,8 +90,10 @@ export default function App() {
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        </ErrorBoundary>
         </Suspense>
       </BrowserRouter>
     </AuthBootstrap>
+    </ErrorBoundary>
   );
 }

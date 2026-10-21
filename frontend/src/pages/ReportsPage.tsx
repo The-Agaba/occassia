@@ -100,7 +100,7 @@ export default function ReportsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {stats.byCategory.map((c) => (
+                  {(stats.byCategory || []).map((c) => (
                     <tr key={c.name} className="border-t">
                       <td className="p-3">
                         <span className="inline-block w-3 h-3 rounded-full mr-2" style={{ backgroundColor: c.colorHex }} />

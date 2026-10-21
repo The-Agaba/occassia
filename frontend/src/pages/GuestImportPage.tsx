@@ -174,9 +174,9 @@ export default function GuestImportPage() {
                 <p><strong>Optional columns:</strong><br/>`attendance_type`, `table_number`, `meal_preference`, `notes`, `phone_number`</p>
                 <div className="bg-slate-200 h-px my-2" />
                 <ul className="list-disc pl-4 space-y-1">
-                  <li>`attendance_type` must be SINGLE or PLUS_ONE</li>
+                  <li>`attendance_type` must be strictly <strong>SINGLE</strong> or <strong>PLUS_ONE</strong> (no other types permitted)</li>
                   <li>`category_name` must match an existing category exactly (case-sensitive)</li>
-                  <li>`table_number` must be a valid integer</li>
+                  <li>`table_number` is optional (leave blank for weddings and open seating)</li>
                 </ul>
               </div>
             </div>
