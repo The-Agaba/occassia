@@ -23,7 +23,7 @@ import {
 import EventTabs from '../components/EventTabs';
 import SEO from '../components/SEO';
 import Spinner from '../components/Spinner';
-import { eventsApi, guestsApi } from '../api';
+import { eventsApi, guestsApi, invitationsApi } from '../api';
 import type { Event, InvitationRecord } from '../types';
 import { useInvitationStore } from '../store/invitationStore';
 import { useAuthStore } from '../store/authStore';
@@ -67,10 +67,14 @@ export default function InvitationsPage() {
   useEffect(() => {
     if (!id) return;
     setLoading(true);
-    Promise.all([eventsApi.get(id), guestsApi.list(id)])
-      .then(([eventRes, guestRes]) => {
+    Promise.all([
+      eventsApi.get(id), 
+      guestsApi.list(id),
+      invitationsApi.list(id).catch(() => ({ data: [] }))
+    ])
+      .then(([eventRes, guestRes, invRes]) => {
         setEvent(eventRes.data);
-        loadInvitations(id, guestRes.data, eventRes.data);
+        loadInvitations(id, guestRes.data, eventRes.data, invRes.data || []);
       })
       .catch((err) => {
         showToast(err.response?.data?.message || 'Failed to load event details', 'error');

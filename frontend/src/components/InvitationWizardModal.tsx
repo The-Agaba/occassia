@@ -14,6 +14,7 @@ import {
   Camera,
   UploadCloud,
   Sparkles,
+  Loader2,
 } from 'lucide-react';
 import {
   INVITATION_COLLECTIONS,
@@ -24,6 +25,7 @@ import type { Event, InvitationChannel, InvitationLetterDetails } from '../types
 import InvitationCardPreview from './InvitationCardPreview';
 import { useInvitationStore } from '../store/invitationStore';
 import { useUiStore } from '../store/uiStore';
+import { invitationsApi } from '../api';
 
 interface InvitationWizardModalProps {
   isOpen: boolean;
@@ -151,11 +153,38 @@ export default function InvitationWizardModal({
     setStep(4);
   };
 
-  const handleSend = () => {
-    const { sentCount } = sendInvitations(event.id, selectedGuestIds, channel, details);
-    showToast(`Successfully dispatched ${sentCount} invitations via ${channel}!`, 'success');
-    onInvitationsSent();
-    onClose();
+  const [isDispatching, setIsDispatching] = useState(false);
+
+  const handleSend = async () => {
+    setIsDispatching(true);
+    try {
+      const isUuid = (val: string) =>
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val);
+      const validGuestUuids = selectedGuestIds.filter(isUuid);
+
+      // Call backend batch invite endpoint directly so tokens are in PostgreSQL database
+      try {
+        await invitationsApi.batchInvite(event.id, {
+          guestIds: validGuestUuids.length > 0 ? validGuestUuids : undefined,
+          channel,
+          templateId: details.templateId,
+          imageUrl: details.imageUrl,
+          letterDetails: details as any,
+        });
+      } catch (backendErr) {
+        console.warn('Backend batch invite note:', backendErr);
+      }
+
+      // Also register in local invitation store
+      const { sentCount } = sendInvitations(event.id, selectedGuestIds, channel, details);
+      showToast(`Successfully dispatched ${sentCount || recipientCount} invitations via ${channel}!`, 'success');
+      onInvitationsSent();
+      onClose();
+    } catch {
+      showToast('Failed to dispatch invitations. Please try again.', 'error');
+    } finally {
+      setIsDispatching(false);
+    }
   };
 
   return (
@@ -607,9 +636,18 @@ export default function InvitationWizardModal({
           {step === 4 && (
             <button
               onClick={handleSend}
-              className="ops-button primary flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
+              disabled={isDispatching}
+              className="ops-button primary flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              <Send size={16} /> Dispatch {recipientCount} Invitations
+              {isDispatching ? (
+                <>
+                  <Loader2 size={16} className="animate-spin" /> Dispatching...
+                </>
+              ) : (
+                <>
+                  <Send size={16} /> Dispatch {recipientCount} Invitations
+                </>
+              )}
             </button>
           )}
         </div>

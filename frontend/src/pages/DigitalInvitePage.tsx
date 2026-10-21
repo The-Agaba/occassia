@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useInvitationStore } from '../store/invitationStore';
+import { publicApi } from '../api';
 import InvitationCardPreview from '../components/InvitationCardPreview';
 import { CARD_TEMPLATES, type CardTemplate } from '../lib/invitationTemplates';
 import type { InvitationRecord, InvitationLetterDetails } from '../types';
-import { Calendar, Clock, MapPin, Phone, MessageSquare, Check, X, Sparkles, Navigation, Heart, ArrowDown } from 'lucide-react';
+import { Calendar, Clock, MapPin, Phone, MessageSquare, Check, X, Sparkles, Navigation, Heart, ArrowDown, Loader2 } from 'lucide-react';
 
 export default function DigitalInvitePage() {
   const { token = '' } = useParams<{ token: string }>();
@@ -12,6 +13,7 @@ export default function DigitalInvitePage() {
   const submitRsvp = useInvitationStore((s) => s.submitRsvp);
 
   const [invite, setInvite] = useState<InvitationRecord | null>(null);
+  const [loading, setLoading] = useState(true);
   const [unsealed, setUnsealed] = useState(false);
   const [cardElevated, setCardElevated] = useState(false);
 
@@ -43,6 +45,8 @@ export default function DigitalInvitePage() {
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // 1. Check local store first
     const found = getInvitationByToken(token);
     if (found) {
       setInvite(found);
@@ -52,6 +56,59 @@ export default function DigitalInvitePage() {
         setHeadcount(found.rsvpHeadcount || 1);
         setSubmitted(true);
       }
+    }
+
+    // 2. Fetch directly from backend publicApi so invite works on any device or fresh browser
+    if (token) {
+      publicApi
+        .getInvitation(token)
+        .then((res) => {
+          const data = res.data;
+          if (data) {
+            const backendDetails: InvitationLetterDetails = (data.letterDetails as any) || {
+              ...defaultDetails,
+              templateId: data.templateId || defaultDetails.templateId,
+              imageUrl: data.imageUrl || defaultDetails.imageUrl,
+            };
+
+            const backendRecord: InvitationRecord = {
+              id: data.id,
+              guestId: data.guestId,
+              eventId: data.eventId,
+              token: data.token,
+              guestName: data.guestName || 'Honored Guest',
+              phoneNumber: data.phoneNumber,
+              whatsappNumber: data.whatsappNumber,
+              email: data.email,
+              categoryName: 'General',
+              plusOnes: data.rsvpHeadcount > 1 ? 1 : 0,
+              deliveryChannel: data.deliveryChannel,
+              deliveryStatus: data.deliveryStatus || 'DELIVERED',
+              rsvpStatus: data.rsvpStatus || 'PENDING',
+              rsvpHeadcount: data.rsvpHeadcount || 1,
+              rsvpDietary: data.rsvpDietary,
+              rsvpMessage: data.rsvpMessage,
+              rsvpConfirmedAt: data.rsvpConfirmedAt,
+              invitationDetails: backendDetails,
+            };
+
+            setInvite(backendRecord);
+            setPhoneConfirm(backendRecord.phoneNumber || '');
+            if (backendRecord.rsvpStatus !== 'PENDING') {
+              setAttendance(backendRecord.rsvpStatus as 'ATTENDING' | 'DECLINED');
+              setHeadcount(backendRecord.rsvpHeadcount || 1);
+              setSubmitted(true);
+            }
+          }
+        })
+        .catch((err) => {
+          console.warn('Backend public invitation fetch note:', err);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    } else {
+      setLoading(false);
     }
   }, [token, getInvitationByToken]);
 
@@ -91,11 +148,40 @@ export default function DigitalInvitePage() {
     }, 700);
   };
 
-  const handleSubmitRsvp = (e: React.FormEvent) => {
+  const handleSubmitRsvp = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const res = submitRsvp(token, {
+    try {
+      // 1. Submit directly to backend publicApi so RSVP is recorded in database
+      const apiRes = await publicApi.submitRsvp(token, {
+        status: attendance,
+        headcount: attendance === 'ATTENDING' ? headcount : 0,
+        dietary,
+        message,
+        phoneConfirm,
+      });
+
+      if (apiRes.data) {
+        setInvite((prev) =>
+          prev
+            ? {
+                ...prev,
+                rsvpStatus: attendance,
+                rsvpHeadcount: attendance === 'ATTENDING' ? headcount : 0,
+                rsvpDietary: dietary,
+                rsvpMessage: message,
+                phoneNumber: phoneConfirm || prev.phoneNumber,
+              }
+            : null
+        );
+      }
+    } catch (err) {
+      console.warn('Backend RSVP note (falling back to local):', err);
+    }
+
+    // 2. Also update local store so offline / host view is synchronized
+    const localRes = submitRsvp(token, {
       status: attendance,
       headcount: attendance === 'ATTENDING' ? headcount : 0,
       dietary,
@@ -103,18 +189,17 @@ export default function DigitalInvitePage() {
       phoneConfirm,
     });
 
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setSubmitted(true);
-      if (attendance === 'ATTENDING') {
-        setSubmitSuccessMsg(`Asante sana ${guestName}! We are overjoyed to celebrate with you.`);
-      } else {
-        setSubmitSuccessMsg(`Thank you ${guestName} for informing us. You will be missed!`);
-      }
-      if (res.invite) {
-        setInvite(res.invite);
-      }
-    }, 600);
+    if (localRes.invite && !invite) {
+      setInvite(localRes.invite);
+    }
+
+    setIsSubmitting(false);
+    setSubmitted(true);
+    if (attendance === 'ATTENDING') {
+      setSubmitSuccessMsg(`Asante sana ${guestName}! We are overjoyed to celebrate with you.`);
+    } else {
+      setSubmitSuccessMsg(`Thank you ${guestName} for informing us. You will be missed!`);
+    }
   };
 
   // Generate Google Calendar Link
@@ -126,6 +211,15 @@ export default function DigitalInvitePage() {
     const location = encodeURIComponent(`${activeDetails.venueName}, ${activeDetails.venueAddress}`);
     return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&details=${details}&location=${location}`;
   };
+
+  if (loading && !invite) {
+    return (
+      <div className="min-h-screen bg-[#080a0f] text-slate-100 flex flex-col items-center justify-center p-6">
+        <Loader2 size={36} className="animate-spin text-amber-400 mb-4" />
+        <p className="text-sm font-medium tracking-wide text-slate-400">Loading your private invitation...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#080a0f] text-slate-100 flex flex-col items-center selection:bg-amber-500/30 font-sans pb-24 overflow-x-hidden">

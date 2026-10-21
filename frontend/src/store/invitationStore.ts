@@ -3,7 +3,7 @@ import type { InvitationRecord, InvitationChannel, InvitationLetterDetails } fro
 
 interface InvitationState {
   invitationsByEvent: Record<string, InvitationRecord[]>;
-  loadInvitations: (eventId: string, backendGuests?: any[], eventDetails?: any) => InvitationRecord[];
+  loadInvitations: (eventId: string, backendGuests?: any[], eventDetails?: any, backendInvitations?: any[]) => InvitationRecord[];
   importGuestsToInvitations: (eventId: string, newGuests: any[], eventDetails?: any) => InvitationRecord[];
   sendInvitations: (
     eventId: string,
@@ -35,7 +35,7 @@ function generateToken(): string {
 export const useInvitationStore = create<InvitationState>((set, get) => ({
   invitationsByEvent: {},
 
-  loadInvitations: (eventId: string, backendGuests = [], eventDetails) => {
+  loadInvitations: (eventId: string, backendGuests = [], eventDetails, backendInvitations = []) => {
     const key = STORAGE_PREFIX + eventId;
     let existing: InvitationRecord[] = [];
     try {
@@ -48,6 +48,7 @@ export const useInvitationStore = create<InvitationState>((set, get) => ({
     }
 
     const existingMap = new Map(existing.map((i) => [i.guestId, i]));
+    const backendInvMap = new Map((backendInvitations || []).map((bi: any) => [bi.guestId, bi]));
 
     // Synchronize with backend guests
     const merged: InvitationRecord[] = [];
@@ -55,19 +56,27 @@ export const useInvitationStore = create<InvitationState>((set, get) => ({
     // Add or merge backend guests
     for (const bg of backendGuests) {
       const match = existingMap.get(bg.id);
+      const serverInv = backendInvMap.get(bg.id);
+
       if (match) {
         merged.push({
           ...match,
+          token: serverInv?.token || match.token,
           guestName: bg.fullName || match.guestName,
           phoneNumber: bg.phoneNumber || match.phoneNumber,
           categoryName: bg.category?.name || match.categoryName,
           tableNumber: bg.tableNumber ?? match.tableNumber,
+          rsvpStatus: serverInv?.rsvpStatus || match.rsvpStatus || (bg.confirmed ? 'ATTENDING' : 'PENDING'),
+          rsvpHeadcount: serverInv?.rsvpHeadcount ?? match.rsvpHeadcount,
+          deliveryChannel: serverInv?.deliveryChannel || match.deliveryChannel,
+          deliveryStatus: serverInv?.deliveryStatus || match.deliveryStatus,
+          invitationDetails: (serverInv?.letterDetails as any) || match.invitationDetails,
         });
         existingMap.delete(bg.id);
       } else {
-        const token = generateToken();
+        const token = serverInv?.token || generateToken();
         merged.push({
-          id: 'inv-' + bg.id,
+          id: serverInv?.id || 'inv-' + bg.id,
           guestId: bg.id,
           eventId,
           token,
@@ -78,19 +87,20 @@ export const useInvitationStore = create<InvitationState>((set, get) => ({
           categoryName: bg.category?.name || 'General',
           tableNumber: bg.tableNumber || null,
           plusOnes: bg.attendanceType === 'PLUS_ONE' ? 1 : 0,
-          deliveryChannel: null,
-          deliveryStatus: 'PENDING',
-          rsvpStatus: bg.confirmed ? 'ATTENDING' : 'PENDING',
-          rsvpHeadcount: bg.confirmed ? 1 : 0,
-          invitationDetails: {
+          deliveryChannel: serverInv?.deliveryChannel || null,
+          deliveryStatus: serverInv?.deliveryStatus || 'PENDING',
+          rsvpStatus: serverInv?.rsvpStatus || (bg.confirmed ? 'ATTENDING' : 'PENDING'),
+          rsvpHeadcount: serverInv?.rsvpHeadcount || (bg.confirmed ? 1 : 0),
+          invitationDetails: (serverInv?.letterDetails as any) || {
             hostNames: eventDetails?.name || 'Hosts',
             headline: 'Celebration Invitation',
             eventDate: eventDetails?.eventDate || 'Coming Soon',
             venueName: eventDetails?.venue || 'Venue',
             venueAddress: eventDetails?.venue || 'Dar es Salaam',
             rsvpPhone: '+255 700 000 000',
-            templateId: 'royal-botanical-gold',
+            templateId: serverInv?.templateId || 'royal-botanical-gold',
             collectionType: 'wedding-invitations',
+            imageUrl: serverInv?.imageUrl,
           },
         });
       }
