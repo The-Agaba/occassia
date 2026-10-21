@@ -10,7 +10,6 @@ The recommended hosting arrangement is:
 
 The API exposes a lightweight `GET /health` endpoint and Render uses it for health checks. This improves deploy/restart detection and avoids loading Swagger for every health probe. It does not remove Render Free-tier suspension: Free web services sleep after 15 minutes without inbound traffic and can take about a minute to wake. Free Postgres can also restart, has no backups or managed connection pooling, and expires after 30 days. For an always-responsive production API, upgrade both the web service and database to paid plans. If you remain on Free, an external monitor can request `/health` every 5–10 minutes as a warm-up mitigation, but that is not a reliability guarantee.
 
-An optional GitHub Actions workflow is included at `.github/workflows/render-warmup.yml`. Add a repository secret named `RENDER_HEALTH_URL` containing the full `/health` URL to run a scheduled warm-up every 10 minutes. Scheduled workflows may be delayed and cannot prevent Render maintenance, database restarts, or Free Postgres expiry.
 
 Spring Boot is not a good fit for a Vercel serverless function without a separate adaptation. Keep the Java API on a long-running container service.
 
