@@ -2,11 +2,12 @@ import { Link, NavLink, useParams, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { useLayoutEffect, useRef } from 'react';
 import { cn } from '../lib/utils';
-import { ArrowLeft, BarChart3, ClipboardList, CreditCard, Gauge, Radio, UsersRound } from 'lucide-react';
+import { ArrowLeft, BarChart3, ClipboardList, CreditCard, Gauge, Mail, Radio, UsersRound } from 'lucide-react';
 
 const tabs = [
   { path: '', label: 'Overview', icon: Gauge },
   { path: '/guests', label: 'Guest list', icon: UsersRound },
+  { path: '/invitations', label: 'Invitations', icon: Mail, roles: ['ADMIN', 'SUPER_ADMIN', 'EVENT_MANAGER'] },
   { path: '/cards', label: 'Card inventory', icon: CreditCard, roles: ['ADMIN', 'SUPER_ADMIN', 'EVENT_MANAGER'] },
   { path: '/cards/register', label: 'Register card', icon: Radio, roles: ['ADMIN', 'EVENT_MANAGER'] },
   { path: '/cards/assign', label: 'Assign card', icon: ClipboardList, roles: ['ADMIN', 'EVENT_MANAGER'] },

@@ -1898,3 +1898,55 @@ button, a, input, select { -webkit-tap-highlight-color: transparent; }
   border-color: transparent;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
 }
+
+/* ==============================================================
+   Occassia v2.0 - 3D Bahasha (Envelope) & Invitation Keyframes
+   ============================================================== */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+@keyframes bahashaFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(0.5deg);
+  }
+}
+
+@keyframes waxPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(212, 175, 55, 0);
+  }
+}
+
+@keyframes letterGlideOut {
+  0% {
+    opacity: 0;
+    transform: translateY(60px) scale(0.92);
+  }
+  60% {
+    opacity: 0.8;
+    transform: translateY(-30px) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-bahasha-float {
+  animation: bahashaFloat 4s ease-in-out infinite;
+}
+
+.animate-wax-pulse {
+  animation: waxPulse 2.5s infinite;
+}
+
+.animate-letter-glide {
+  animation: letterGlideOut 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}

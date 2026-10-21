@@ -255,7 +255,7 @@ export default function HowItWorksCarousel() {
             See how Occassia <em>powers every event.</em>
           </h2>
           <p className="how-subtitle">
-            Shuffle through each step like switching apps on a phone. Drag, scroll with your wheel, or click the arrows to glide through the workflow endlessly.
+            Drag, scroll with your wheel, or click the arrows to glide through the workflow endlessly.
           </p>
         </div>
 

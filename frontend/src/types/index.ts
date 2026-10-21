@@ -131,3 +131,49 @@ export interface ImportResult {
   skipped?: number;
   errors: ImportError[];
 }
+
+export type InvitationChannel = 'WHATSAPP' | 'SMS' | 'EMAIL';
+export type InvitationStatus = 'PENDING' | 'SENT' | 'DELIVERED' | 'FAILED';
+export type RsvpStatus = 'PENDING' | 'ATTENDING' | 'DECLINED';
+
+export interface InvitationLetterDetails {
+  hostNames: string;
+  headline: string;
+  eventDate: string;
+  eventTime?: string;
+  ceremonyTime?: string;
+  receptionTime?: string;
+  venueName: string;
+  venueAddress: string;
+  dressCode?: string;
+  rsvpPhone: string;
+  rsvpDeadline?: string;
+  personalMessage?: string;
+  additionalNotes?: string;
+  templateId: string;
+  collectionType: string;
+}
+
+export interface InvitationRecord {
+  id: string;
+  guestId: string;
+  eventId: string;
+  token: string;
+  guestName: string;
+  phoneNumber?: string | null;
+  whatsappNumber?: string | null;
+  email?: string | null;
+  categoryName?: string;
+  tableNumber?: number | null;
+  plusOnes: number;
+  deliveryChannel?: InvitationChannel | null;
+  deliveryStatus: InvitationStatus;
+  deliveryError?: string | null;
+  sentAt?: string | null;
+  rsvpStatus: RsvpStatus;
+  rsvpHeadcount: number;
+  rsvpDietary?: string | null;
+  rsvpMessage?: string | null;
+  rsvpConfirmedAt?: string | null;
+  invitationDetails: InvitationLetterDetails;
+}

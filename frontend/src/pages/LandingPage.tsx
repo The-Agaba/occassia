@@ -51,7 +51,19 @@ export default function LandingPage() {
           <div className="eyebrow"><Sparkles size={14} /> THE GUEST EXPERIENCE PLATFORM</div>
           <h1>Every arrival,<br /><em>beautifully handled.</em></h1>
           <p>Occassia gives event teams a calm, connected way to welcome guests, manage cards, and see attendance unfold in real time.</p>
-          <div className="hero-actions"><Link to="/login" className="hero-primary">Enter the platform <ArrowRight size={17} /></Link><a href="#how-it-works" className="hero-secondary">See how it works</a></div>
+          <div className="hero-actions">
+            <Link to="/login" className="hero-primary">Enter the platform <ArrowRight size={17} /></Link>
+            <a
+              href="#how-it-works"
+              className="hero-secondary"
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
+              See how it works
+            </a>
+          </div>
           <div className="hero-proof"><CheckCircle2 size={16} /> Built for weddings, venues, and high-volume entrances</div>
         </div>
         <div className="hero-visual" aria-label="Abstract event access illustration">

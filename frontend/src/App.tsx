@@ -21,6 +21,8 @@ const CardsPage = lazy(() => import('./pages/CardsPage'));
 const CardRegistrationPage = lazy(() => import('./pages/CardRegistrationPage'));
 const CardAssignmentPage = lazy(() => import('./pages/CardAssignmentPage'));
 const CheckInPage = lazy(() => import('./pages/CheckInPage'));
+const InvitationsPage = lazy(() => import('./pages/InvitationsPage'));
+const DigitalInvitePage = lazy(() => import('./pages/DigitalInvitePage'));
 const UsersPage = lazy(() => import('./pages/UsersPage'));
 const AuditPage = lazy(() => import('./pages/AuditPage'));
 const OrganizationPage = lazy(() => import('./pages/OrganizationPage'));
@@ -42,6 +44,7 @@ export default function App() {
           <Route path="/about" element={<MarkdownPage kind="about" />} />
           <Route path="/terms" element={<MarkdownPage kind="terms" />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/invite/:token" element={<DigitalInvitePage />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/guide" element={<GuidePage />} />
             <Route path="/dashboard" element={<DashboardPage />} />
@@ -51,6 +54,9 @@ export default function App() {
             } />
             <Route path="/events/:id" element={<EventDetailPage />} />
             <Route path="/events/:id/guests" element={<GuestsPage />} />
+            <Route path="/events/:id/invitations" element={
+              <RoleGuard roles={['ADMIN', 'SUPER_ADMIN', 'EVENT_MANAGER']}><InvitationsPage /></RoleGuard>
+            } />
             <Route path="/events/:id/guests/import" element={
               <RoleGuard roles={['ADMIN', 'EVENT_MANAGER']}><GuestImportPage /></RoleGuard>
             } />
