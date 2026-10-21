@@ -3,19 +3,38 @@ import { useParams } from 'react-router-dom';
 import { eventsApi, reportsApi } from '../api';
 import type { EventStats } from '../types';
 import EventTabs from '../components/EventTabs';
+import SEO from '../components/SEO';
 import { useUiStore } from '../store/uiStore';
-import { Download, Loader2, AlertCircle } from 'lucide-react';
+import { 
+  Download, 
+  Loader2, 
+  AlertCircle, 
+  Users, 
+  UserCheck, 
+  Clock, 
+  TrendingUp, 
+  BarChart3, 
+  Layers 
+} from 'lucide-react';
+import './ReportsPage.css';
 
 export default function ReportsPage() {
   const { id } = useParams<{ id: string }>();
   const [stats, setStats] = useState<EventStats | null>(null);
+  const [loading, setLoading] = useState(true);
   const [isExporting, setIsExporting] = useState(false);
   const [exportError, setExportError] = useState('');
   const showToast = useUiStore((s) => s.showToast);
 
   useEffect(() => {
-    if (id) eventsApi.stats(id).then((r) => setStats(r.data));
-  }, [id]);
+    if (id) {
+      setLoading(true);
+      eventsApi.stats(id)
+        .then((r) => setStats(r.data))
+        .catch(() => showToast('Could not load attendance statistics', 'error'))
+        .finally(() => setLoading(false));
+    }
+  }, [id, showToast]);
 
   const handleExport = async () => {
     if (!id) return;
@@ -30,7 +49,7 @@ export default function ReportsPage() {
       a.click();
       URL.revokeObjectURL(url);
       showToast('Report exported successfully', 'success');
-    } catch (err: any) {
+    } catch {
       const message = 'Failed to generate export. Please try again.';
       setExportError(message);
       showToast(message, 'error');
@@ -39,85 +58,220 @@ export default function ReportsPage() {
     }
   };
 
+  const totalGuests = stats?.totalGuests ?? 0;
+  const checkedIn = stats?.checkedIn ?? 0;
+  const remaining = stats?.remaining ?? 0;
+  const attendanceRate = totalGuests > 0 ? Math.round((checkedIn / totalGuests) * 100) : 0;
+  const categories = stats?.byCategory ?? [];
+
   return (
-    <div>
+    <div className="rep-page-wrapper">
+      <SEO 
+        title="Attendance Report | Occassia" 
+        description="Real-time attendance metrics and guest category breakdown." 
+        noIndex 
+      />
       <EventTabs />
-      <div className="p-4 sm:p-8">
-        
+
+      <div className="rep-container">
         {exportError && (
-          <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center gap-2 text-sm shadow-sm">
+          <div className="rep-error-banner" role="alert">
             <AlertCircle size={18} className="shrink-0" />
             <p>{exportError}</p>
           </div>
         )}
 
-        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-6">
-          <h2 className="text-xl font-bold">Attendance Report</h2>
+        {/* Clean, uncluttered header */}
+        <div className="rep-header">
+          <div>
+            <span className="rep-eyebrow">
+              <BarChart3 size={13} /> Event Analytics
+            </span>
+            <h2 className="rep-title">Attendance Report</h2>
+            <p className="rep-subtitle">Real-time attendance metrics and guest category breakdown.</p>
+          </div>
+
           <button
             onClick={handleExport}
             disabled={isExporting}
-            className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded-lg shadow-sm transition-colors disabled:opacity-70 disabled:cursor-not-allowed self-start sm:self-auto"
+            className="rep-export-btn"
+            title="Download CSV report of guest attendance"
           >
             {isExporting ? (
-              <><Loader2 size={16} className="animate-spin" /> Exporting...</>
+              <>
+                <Loader2 size={16} className="animate-spin" />
+                <span>Exporting...</span>
+              </>
             ) : (
-              <><Download size={16} /> Export CSV</>
+              <>
+                <Download size={16} />
+                <span>Export CSV</span>
+              </>
             )}
           </button>
         </div>
 
-        {stats && (
+        {/* Loading state */}
+        {loading ? (
           <>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-              <div className="bg-white border rounded-xl p-4">
-                <p className="text-2xl font-bold">{stats.totalGuests}</p>
-                <p className="text-sm text-slate-500">Total</p>
+            <div className="rep-stats-grid">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="rep-skeleton-card" />
+              ))}
+            </div>
+            <div className="rep-skeleton-table" />
+          </>
+        ) : stats ? (
+          <>
+            {/* Stat Cards Grid */}
+            <div className="rep-stats-grid">
+              {/* Total Guests */}
+              <div className="rep-stat-card">
+                <div className="rep-stat-top">
+                  <div className="rep-icon-pill total" aria-hidden="true">
+                    <Users size={20} />
+                  </div>
+                  <span className="rep-badge-subtle">Total</span>
+                </div>
+                <div className="rep-stat-main">
+                  <span className="rep-stat-value">{totalGuests}</span>
+                  <span className="rep-stat-label">Total guests</span>
+                </div>
+                <div className="rep-stat-foot">
+                  <span>Registered guests</span>
+                </div>
               </div>
-              <div className="bg-white border rounded-xl p-4">
-                <p className="text-2xl font-bold text-emerald-600">{stats.checkedIn}</p>
-                <p className="text-sm text-slate-500">Arrived</p>
+
+              {/* Checked In / Arrived */}
+              <div className="rep-stat-card">
+                <div className="rep-stat-top">
+                  <div className="rep-icon-pill arrived" aria-hidden="true">
+                    <UserCheck size={20} />
+                  </div>
+                  <span className="rep-badge-subtle">Turnout</span>
+                </div>
+                <div className="rep-stat-main">
+                  <span className="rep-stat-value arrived">{checkedIn}</span>
+                  <span className="rep-stat-label">Arrived</span>
+                </div>
+                <div className="rep-stat-foot">
+                  <span>{totalGuests > 0 ? `${attendanceRate}% verified` : 'Awaiting arrivals'}</span>
+                </div>
               </div>
-              <div className="bg-white border rounded-xl p-4">
-                <p className="text-2xl font-bold text-amber-600">{stats.remaining}</p>
-                <p className="text-sm text-slate-500">No-shows</p>
+
+              {/* No-shows / Pending */}
+              <div className="rep-stat-card">
+                <div className="rep-stat-top">
+                  <div className="rep-icon-pill pending" aria-hidden="true">
+                    <Clock size={20} />
+                  </div>
+                  <span className="rep-badge-subtle">Pending</span>
+                </div>
+                <div className="rep-stat-main">
+                  <span className="rep-stat-value pending">{remaining}</span>
+                  <span className="rep-stat-label">No-shows</span>
+                </div>
+                <div className="rep-stat-foot">
+                  <span>{totalGuests > 0 ? `${100 - attendanceRate}% remaining` : 'Awaiting arrivals'}</span>
+                </div>
               </div>
-              <div className="bg-white border rounded-xl p-4">
-                <p className="text-2xl font-bold">
-                  {stats.totalGuests > 0 ? Math.round((stats.checkedIn / stats.totalGuests) * 100) : 0}%
-                </p>
-                <p className="text-sm text-slate-500">Attendance Rate</p>
+
+              {/* Attendance Rate */}
+              <div className="rep-stat-card">
+                <div className="rep-stat-top">
+                  <div className="rep-icon-pill rate" aria-hidden="true">
+                    <TrendingUp size={20} />
+                  </div>
+                  <span className="rep-badge-subtle">Overall</span>
+                </div>
+                <div className="rep-stat-main">
+                  <span className="rep-stat-value rate">{attendanceRate}%</span>
+                  <span className="rep-stat-label">Attendance rate</span>
+                </div>
+                <div className="rep-rate-progress-track" aria-hidden="true">
+                  <div 
+                    className="rep-rate-progress-fill" 
+                    style={{ width: `${attendanceRate}%` }} 
+                  />
+                </div>
               </div>
             </div>
 
-            <div className="bg-white border rounded-xl overflow-hidden overflow-x-auto">
-              <table className="w-full min-w-[520px] text-sm">
-                <thead className="bg-slate-50">
-                  <tr>
-                    <th className="text-left p-3">Category</th>
-                    <th className="text-right p-3">Total</th>
-                    <th className="text-right p-3">Checked In</th>
-                    <th className="text-right p-3">Rate</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(stats.byCategory || []).map((c) => (
-                    <tr key={c.name} className="border-t">
-                      <td className="p-3">
-                        <span className="inline-block w-3 h-3 rounded-full mr-2" style={{ backgroundColor: c.colorHex }} />
-                        {c.name}
-                      </td>
-                      <td className="p-3 text-right">{c.total}</td>
-                      <td className="p-3 text-right">{c.checkedIn}</td>
-                      <td className="p-3 text-right">
-                        {c.total > 0 ? Math.round((c.checkedIn / c.total) * 100) : 0}%
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            {/* Category Breakdown Table */}
+            <div className="rep-table-card">
+              <div className="rep-table-header">
+                <div className="rep-table-title-group">
+                  <h3 className="rep-table-title">Category Breakdown</h3>
+                  <span className="rep-count-badge">
+                    {categories.length} {categories.length === 1 ? 'Category' : 'Categories'}
+                  </span>
+                </div>
+              </div>
+
+              {categories.length === 0 ? (
+                <div className="rep-empty-state">
+                  <div className="rep-empty-icon" aria-hidden="true">
+                    <Layers size={24} />
+                  </div>
+                  <h4 className="rep-empty-title">No Category Data</h4>
+                  <p className="rep-empty-desc">
+                    Guest categories and their check-in breakdown will appear here once attendees are added to this event.
+                  </p>
+                </div>
+              ) : (
+                <div className="rep-table-scroll">
+                  <table className="rep-table">
+                    <thead>
+                      <tr>
+                        <th>Category</th>
+                        <th className="right">Total</th>
+                        <th className="right">Checked In</th>
+                        <th className="right">Rate</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {categories.map((c) => {
+                        const catRate = c.total > 0 ? Math.round((c.checkedIn / c.total) * 100) : 0;
+                        return (
+                          <tr key={c.name}>
+                            <td>
+                              <div className="rep-category-cell">
+                                <span 
+                                  className="rep-cat-dot" 
+                                  style={{ 
+                                    backgroundColor: c.colorHex || '#6366f1',
+                                    color: c.colorHex || '#6366f1'
+                                  }} 
+                                />
+                                <span className="rep-cat-name">{c.name}</span>
+                              </div>
+                            </td>
+                            <td className="right">{c.total}</td>
+                            <td className="right">{c.checkedIn}</td>
+                            <td className="right">
+                              <div className="rep-rate-cell">
+                                <span className="rep-rate-pct">{catRate}%</span>
+                                <div className="rep-inline-progress-track" aria-hidden="true">
+                                  <div 
+                                    className="rep-inline-progress-bar" 
+                                    style={{ 
+                                      width: `${catRate}%`,
+                                      backgroundColor: c.colorHex || '#6366f1'
+                                    }} 
+                                  />
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           </>
-        )}
+        ) : null}
       </div>
     </div>
   );
