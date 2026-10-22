@@ -2,41 +2,56 @@ services:
   postgres:
     image: postgres:16-alpine
     container_name: occassia-db
+    restart: unless-stopped
     environment:
-      POSTGRES_DB: occassia
-      POSTGRES_USER: occassia
-      POSTGRES_PASSWORD: occassia
+      POSTGRES_DB: ${POSTGRES_DB:-occassia}
+      POSTGRES_USER: ${POSTGRES_USER:-occassia}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-occassia}
     ports:
       - "5432:5432"
     volumes:
       - occassia_pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U occassia -d occassia"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-occassia} -d ${POSTGRES_DB:-occassia}"]
       interval: 5s
       timeout: 5s
       retries: 5
 
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     container_name: occassia-backend
+    restart: unless-stopped
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/occassia
-      SPRING_DATASOURCE_USERNAME: occassia
-      SPRING_DATASOURCE_PASSWORD: occassia
-      JWT_SECRET: occassia-dev-secret-key-change-in-production-min-256-bits-long!!
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL:-jdbc:postgresql://postgres:5432/occassia}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-occassia}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-occassia}
+      JWT_SECRET: ${JWT_SECRET:-occassia-dev-secret-key-change-in-production-min-256-bits-long!!}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:5173,http://localhost:80,http://localhost,http://127.0.0.1:5173}
     depends_on:
       postgres:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
     container_name: occassia-frontend
+    restart: unless-stopped
     ports:
       - "5173:80"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
 
 volumes:
   occassia_pgdata:

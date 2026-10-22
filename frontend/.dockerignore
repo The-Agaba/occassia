@@ -1,5 +1,7 @@
 node_modules
 dist
-.idea
-*.log
 .env*
+.idea
+.vscode
+.git
+*.log
