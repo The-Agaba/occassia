@@ -57,7 +57,7 @@ const steps: Step[] = [
     title: 'Digital Invitations & RSVP',
     eyebrow: 'INVITE & CONFIRM',
     description: 'Design personalized digital invitations and broadcast links via WhatsApp or SMS. Guests open their invite, confirm attendance, dietary needs, and headcount in seconds.',
-    detail: 'Every guest receives a unique invitation link. They open it on any device and RSVP with headcount, dietary preferences, and a personal message — all synced live to your dashboard.',
+    detail: 'Every guest receives a unique invitation link. They open it on any device and RSVP with headcount, dietary preferences, and a personal message - all synced live to your dashboard.',
     icon: Mail,
     tone: 'violet',
     action: { label: 'Explore invitations', to: '/dashboard' },

@@ -274,7 +274,7 @@ export default function GuestsPage() {
               {filtered.map((g) => (
                 <tr key={g.id} className="border-b last:border-0 hover:bg-slate-50">
                   <td className="p-3 font-medium">{g.fullName}</td>
-                  <td className="p-3 text-slate-600">{g.phoneNumber || '—'}</td>
+                  <td className="p-3 text-slate-600">{g.phoneNumber || '-'}</td>
                   <td className="p-3">
                     <span
                       className="px-2 py-0.5 rounded-full text-xs font-medium text-white"
@@ -291,7 +291,7 @@ export default function GuestsPage() {
                       {g.checkedIn && <span className="text-xs bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded">Checked in</span>}
                     </div>
                   </td>
-                  <td className="p-3 text-slate-500 font-mono text-xs">{g.nfcCardUid || '—'}</td>
+                  <td className="p-3 text-slate-500 font-mono text-xs">{g.nfcCardUid || '-'}</td>
                   <td className="p-3">
                     <div className="flex gap-1">
                       {canManage && !g.confirmed && (

@@ -61,7 +61,7 @@ export default class ErrorBoundary extends Component<Props, State> {
             {this.props.fallbackTitle || 'Something unexpected occurred in this view'}
           </h2>
           <p className="text-sm text-[var(--color-ink-muted)] mb-6 max-w-md mx-auto leading-relaxed">
-            This page hit a snag while loading. Your data is safe — please try again, and if the problem continues, contact support.
+            This page hit a snag while loading. Your data is safe. Please try again, and if the problem continues, contact support.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-3 mb-6">

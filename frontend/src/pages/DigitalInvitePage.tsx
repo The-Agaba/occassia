@@ -297,7 +297,7 @@ export default function DigitalInvitePage() {
           {isHost ? <Eye size={24} className="text-amber-400" /> : <Lock size={24} className="text-amber-400" />}
         </div>
         <h1 className="text-xl font-serif font-semibold text-white">
-          {isHost ? 'Guest link — hosts can preview only' : 'Invitation unavailable'}
+          {isHost ? 'Guest link: hosts can preview only' : 'Invitation unavailable'}
         </h1>
         <p className="text-sm text-slate-400 mt-2 max-w-sm">
           {isHost
@@ -583,7 +583,7 @@ export default function DigitalInvitePage() {
                   <div className="w-10 h-10 rounded-full bg-amber-500/20 text-amber-300 mx-auto flex items-center justify-center">
                     <Eye size={18} />
                   </div>
-                  <h4 className="text-sm font-bold text-white">Host preview — view only</h4>
+                  <h4 className="text-sm font-bold text-white">Host preview (view only)</h4>
                   <p className="text-xs text-slate-300 max-w-md mx-auto">
                     Only {guestName} can respond to this invitation.{' '}
                     {invite?.rsvpStatus === 'PENDING'
