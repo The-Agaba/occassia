@@ -1,8 +1,26 @@
 import axios from 'axios';
 
+const TECHNICAL_PATTERN =
+  /minified react error|react\.dev\/errors|typeerror|referenceerror|syntaxerror|rangeerror|cannot read propert|is not a function|is not defined|is not iterable|undefined|\bnull\b|exception|stack ?trace|\bat [\w.$]+\(|java\.|org\.springframework|com\.occassia|hibernate|jdbc|sql|constraint|nullpointer|unexpected token|json|\.js:\d+|\.tsx?:\d+/i;
+
+/** True when text looks like a developer-facing error rather than something an end user should read. */
+export function isTechnicalMessage(text: unknown): boolean {
+  if (typeof text !== 'string') return true;
+  const trimmed = text.trim();
+  return trimmed.length === 0 || trimmed.length > 220 || TECHNICAL_PATTERN.test(trimmed);
+}
+
+/** Returns the message only if it is safe to show to users, otherwise the fallback. */
+export function safeUserMessage(text: unknown, fallback: string): string {
+  return isTechnicalMessage(text) ? fallback : (text as string);
+}
+
 export function apiErrorMessage(error: unknown, fallback = 'The request could not be completed.') {
   if (!axios.isAxiosError(error)) {
-    if (error instanceof Error) return error.message;
+    if (error instanceof Error) {
+      console.error('[Error]', error);
+      return safeUserMessage(error.message, fallback);
+    }
     return fallback;
   }
 
@@ -29,7 +47,8 @@ export function apiErrorMessage(error: unknown, fallback = 'The request could no
 
   const status = error.response.status;
   const payload = error.response.data as any;
-  const serverMsg = typeof payload === 'object' && payload !== null ? payload.message : undefined;
+  const rawServerMsg = typeof payload === 'object' && payload !== null ? payload.message : undefined;
+  const serverMsg = isTechnicalMessage(rawServerMsg) ? undefined : (rawServerMsg as string);
 
   // HTTP status handling
   if (status >= 300 && status < 400) {
@@ -69,8 +88,8 @@ export function apiErrorMessage(error: unknown, fallback = 'The request could no
     return 'The server is temporarily unavailable or restarting. Please wait a few seconds and try again.';
   }
   if (status >= 500) {
-    return serverMsg || 'A server error occurred. Our team has been notified. Please try again shortly.';
+    return 'A server error occurred. Our team has been notified. Please try again shortly.';
   }
 
-  return serverMsg || fallback;
+  return serverMsg || (isTechnicalMessage(fallback) ? 'Something went wrong. Please try again.' : fallback);
 }

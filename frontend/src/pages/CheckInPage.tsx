@@ -228,7 +228,8 @@ export default function CheckInPage() {
         setNfcPermissionState('denied');
         setError('NFC permission denied. Use an external NFC reader or the QR backup.');
       } else {
-        setError('Failed to start NFC scanner: ' + error.message);
+        console.error('[CheckIn] NFC scanner failed', error);
+        setError('Could not start the NFC scanner. Make sure NFC is enabled and permission is granted, then try again.');
       }
     }
   };

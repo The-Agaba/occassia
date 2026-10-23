@@ -82,6 +82,7 @@ export default function InvitationWizardModal({
   const [photoModalOpen, setPhotoModalOpen] = useState(false);
   const [photoPendingTemplate, setPhotoPendingTemplate] = useState<CardTemplate | null>(null);
   const [tempPhotoUrl, setTempPhotoUrl] = useState<string>(details.imageUrl || '');
+  const [isDispatching, setIsDispatching] = useState(false);
 
   const PHOTO_PRESETS = [
     { label: 'Golden Hour Couple', url: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80' },
@@ -159,8 +160,6 @@ export default function InvitationWizardModal({
     setStep(4);
   };
 
-  const [isDispatching, setIsDispatching] = useState(false);
-
   const handleSend = async () => {
     setIsDispatching(true);
     try {
@@ -194,7 +193,7 @@ export default function InvitationWizardModal({
       onClose();
     } catch (err: any) {
       console.error('[InvitationWizard Dispatch Error]', err);
-      showToast(err?.message || 'Failed to dispatch invitations. Please try again.', 'error');
+      showToast(apiErrorMessage(err, 'Failed to dispatch invitations. Please try again.'), 'error');
     } finally {
       setIsDispatching(false);
     }

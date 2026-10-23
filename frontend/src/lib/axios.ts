@@ -26,7 +26,7 @@ api.interceptors.response.use(
     const message = apiErrorMessage(error, 'The request could not be completed.');
     console.error('[API]', { method: error.config?.method?.toUpperCase(), url: error.config?.url, status: error.response?.status ?? 'NETWORK_ERROR', message, details: error.response?.data || error.message });
     if (error.response) {
-      error.response.data = { ...(typeof error.response.data === 'object' ? error.response.data : {}), message: error.response.data?.message || message };
+      error.response.data = { ...(typeof error.response.data === 'object' && error.response.data ? error.response.data : {}), message };
     } else {
       error.response = { data: { message } } as any;
     }

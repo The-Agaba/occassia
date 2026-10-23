@@ -61,7 +61,7 @@ export default class ErrorBoundary extends Component<Props, State> {
             {this.props.fallbackTitle || 'Something unexpected occurred in this view'}
           </h2>
           <p className="text-sm text-[var(--color-ink-muted)] mb-6 max-w-md mx-auto leading-relaxed">
-            {this.state.error?.message || 'The application encountered an unexpected state while rendering. Your data is safe.'}
+            This page hit a snag while loading. Your data is safe — please try again, and if the problem continues, contact support.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-3 mb-6">
@@ -79,7 +79,8 @@ export default class ErrorBoundary extends Component<Props, State> {
             </a>
           </div>
 
-          {/* Collapsible Technical Details for Developer / Operator Debugging */}
+          {/* Technical details are only available in development builds */}
+          {import.meta.env.DEV && (
           <div className="mt-4 pt-4 border-t border-[var(--color-line)] text-left">
             <button
               type="button"
@@ -109,6 +110,7 @@ export default class ErrorBoundary extends Component<Props, State> {
               </div>
             )}
           </div>
+          )}
         </div>
       );
     }

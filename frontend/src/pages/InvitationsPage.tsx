@@ -35,7 +35,7 @@ import {
   exportDeliveryReportsXlsx,
 } from '../lib/invitationExcel';
 import InvitationWizardModal from '../components/InvitationWizardModal';
-import { apiErrorMessage } from '../lib/errorMessages';
+import { apiErrorMessage, safeUserMessage } from '../lib/errorMessages';
 
 export default function InvitationsPage() {
   const { id } = useParams<{ id: string }>();
@@ -106,7 +106,8 @@ export default function InvitationsPage() {
       showToast(`Successfully imported & standardized ${parsedRows.length} guests!`, 'success');
       if (fileInputRef.current) fileInputRef.current.value = '';
     } catch (err: any) {
-      showToast(`Import error: ${err.message || 'Check spreadsheet columns'}`, 'error');
+      console.error('[Invitations] Import failed', err);
+      showToast(`Import failed: ${safeUserMessage(err?.message, 'Please check the spreadsheet columns and try again')}`, 'error');
     }
   };
 
