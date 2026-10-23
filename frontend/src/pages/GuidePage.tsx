@@ -54,10 +54,10 @@ const steps: Step[] = [
   },
   {
     number: '03',
-    title: 'Digital 3D invitations & RSVP',
+    title: 'Digital Invitations & RSVP',
     eyebrow: 'INVITE & CONFIRM',
-    description: 'Design luxury invitation suites and broadcast links via WhatsApp or SMS with interactive 3D Bahasha envelopes.',
-    detail: 'Recipients unseal a bespoke wax-sealed envelope on any device, confirming attendance headcount, dietary preferences, and personal wishes live into PostgreSQL.',
+    description: 'Design personalized digital invitations and broadcast links via WhatsApp or SMS. Guests open their invite, confirm attendance, dietary needs, and headcount in seconds.',
+    detail: 'Every guest receives a unique invitation link. They open it on any device and RSVP with headcount, dietary preferences, and a personal message — all synced live to your dashboard.',
     icon: Mail,
     tone: 'violet',
     action: { label: 'Explore invitations', to: '/dashboard' },
@@ -119,9 +119,9 @@ export default function GuidePage() {
           <div className="guide-hero-copy">
             <span className="eyebrow-label"><Sparkles size={12} /> OCCASSIA 2.0 OPERATOR GUIDE</span>
             <h2>From first invitation to gate check-in, in one clear flow.</h2>
-            <p>Occassia manages bespoke 3D digital invitations, fast NFC gate access, and real-time attendance telemetry without losing the personal touch.</p>
+            <p>Occassia manages personalized digital invitations, fast NFC gate access, and real-time attendance telemetry without losing the personal touch.</p>
             <div className="guide-hero-meta">
-              <span><CheckCircle2 size={15} /> 3D Bahasha RSVP suite</span>
+              <span><CheckCircle2 size={15} /> Digital invite &amp; RSVP suite</span>
               <span><Radio size={15} /> Sub-second NFC entrance</span>
             </div>
           </div>

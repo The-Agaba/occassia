@@ -388,7 +388,7 @@ export default function InvitationsPage() {
                           target="_blank"
                           rel="noreferrer"
                           onClick={(e) => e.stopPropagation()}
-                          title="Preview Interactive Bahasha"
+                          title="Preview digital invitation"
                           className="p-1.5 rounded-lg text-[var(--color-ink-muted)] hover:text-[var(--violet)] hover:bg-[var(--color-surface)] transition"
                         >
                           <ExternalLink size={14} />

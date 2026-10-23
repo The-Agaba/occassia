@@ -50,13 +50,13 @@ const steps: HowItWorksStep[] = [
   {
     number: '03',
     badge: 'DIGITAL INVITATIONS',
-    title: '3D Bahasha & Live RSVP',
+    title: 'Digital Invitations & Live RSVP',
     description:
-      'Design luxury invitations, dispatch personalized links via WhatsApp or SMS, and collect real-time RSVPs with interactive wax-seal envelope animations.',
+      'Design personalized digital invitations, dispatch links via WhatsApp or SMS, and collect real-time RSVPs with headcount, dietary preferences, and personal messages.',
     icon: Mail,
     color: '#f43f5e',
     accent: 'rgba(244, 63, 94, 0.22)',
-    highlights: ['Interactive 3D Bahasha unsealing', 'Direct WhatsApp & SMS dispatch', 'Live dietary & headcount sync'],
+    highlights: ['Personalized digital invite link', 'Direct WhatsApp & SMS dispatch', 'Live dietary & headcount sync'],
   },
   {
     number: '04',

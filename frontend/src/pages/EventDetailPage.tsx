@@ -245,7 +245,7 @@ export default function EventDetailPage() {
               </div>
               <div className="edp-shortcut-text">
                 <strong>Digital Invitations</strong>
-                <span>RSVP, Bahasha & delivery</span>
+                <span>Digital invites &amp; delivery</span>
               </div>
               <ArrowRight size={14} className="ml-auto opacity-50" />
             </Link>

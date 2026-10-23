@@ -487,7 +487,7 @@ export default function InvitationWizardModal({
                     </h4>
                     <p className="text-xs text-[var(--color-ink-muted)]">
                       Ready to send to {recipientCount} guest{recipientCount === 1 ? '' : 's'}. Each
-                      guest receives a personalized 3D animated Bahasha invitation link.
+                      guest receives a personalized digital invitation link.
                     </p>
                   </div>
                 </div>

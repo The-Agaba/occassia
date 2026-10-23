@@ -271,7 +271,7 @@ export default function DigitalInvitePage() {
               {/* Animated Prompt Arrow */}
               <div className="flex flex-col items-center gap-1 mb-4 animate-bounce text-amber-300 cursor-pointer" onClick={handleOpenBahasha}>
                 <span className="text-xs uppercase tracking-widest font-semibold bg-amber-500/20 px-4 py-1.5 rounded-full border border-amber-500/30 shadow-lg backdrop-blur-md">
-                  Tap the Bahasha to Open
+                  Tap to open your invitation
                 </span>
                 <ArrowDown size={20} className="text-amber-400 animate-pulse mt-1" />
               </div>
@@ -333,7 +333,7 @@ export default function DigitalInvitePage() {
                 {/* Status chip */}
                 <div className="mb-4 flex items-center gap-2 text-xs text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3.5 py-1 rounded-full">
                   <Sparkles size={13} />
-                  <span>Bahasha Opened • Digital Invitation Card</span>
+                  <span>Invitation Opened • Digital Invite</span>
                 </div>
 
                 {/* The Unfolded Invitation Card */}
