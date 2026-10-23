@@ -61,6 +61,9 @@ export default function App() {
             <Route path="/events/:id/invitations" element={
               <RoleGuard roles={['ADMIN', 'SUPER_ADMIN']}><InvitationsPage /></RoleGuard>
             } />
+            <Route path="/events/:id/invitations/:invId/preview" element={
+              <RoleGuard roles={['ADMIN', 'SUPER_ADMIN']}><DigitalInvitePage /></RoleGuard>
+            } />
             <Route path="/events/:id/guests/import" element={
               <RoleGuard roles={['ADMIN', 'EVENT_MANAGER']}><GuestImportPage /></RoleGuard>
             } />

@@ -21,6 +21,11 @@ public final class SecurityUtils {
         return principal;
     }
 
+    public static boolean isStaffAuthenticated() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return auth != null && auth.getPrincipal() instanceof UserPrincipal;
+    }
+
     public static void requireRole(UserRole... roles) {
         UserPrincipal user = currentUser();
         Set<UserRole> allowed = Set.of(roles);

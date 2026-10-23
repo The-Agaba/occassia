@@ -68,8 +68,8 @@ export const useInvitationStore = create<InvitationState>((set, get) => ({
           tableNumber: bg.tableNumber ?? match.tableNumber,
           rsvpStatus: serverInv?.rsvpStatus || match.rsvpStatus || (bg.confirmed ? 'ATTENDING' : 'PENDING'),
           rsvpHeadcount: serverInv?.rsvpHeadcount ?? match.rsvpHeadcount,
-          deliveryChannel: serverInv?.deliveryChannel || match.deliveryChannel,
-          deliveryStatus: serverInv?.deliveryStatus || match.deliveryStatus,
+          deliveryChannel: serverInv?.deliveryChannel || null,
+          deliveryStatus: serverInv?.deliveryStatus || 'PENDING',
           invitationDetails: (serverInv?.letterDetails as any) || match.invitationDetails,
         });
         existingMap.delete(bg.id);

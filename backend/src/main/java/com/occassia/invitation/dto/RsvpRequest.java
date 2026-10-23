@@ -11,4 +11,6 @@ public class RsvpRequest {
     private String dietary;
     private String message;
     private String phoneConfirm;
+    /** Phone the guest used to unlock the invitation; must match the recipient on file. */
+    private String verifyPhone;
 }

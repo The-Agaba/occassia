@@ -15,8 +15,13 @@ export const authApi = {
 
 export const publicApi = {
   metrics: () => api.get<{ totalCheckIns: number }>('/public/metrics'),
-  getInvitation: (token: string) => api.get<any>(`/public/invitations/${token}`),
-  submitRsvp: (token: string, data: { status: string; headcount?: number; dietary?: string; message?: string; phoneConfirm?: string }) =>
+  /** Step 1: who is this invitation for, and is a phone check needed? */
+  getInvitation: (token: string) =>
+    api.get<{ guestName: string; phoneRequired: boolean; phoneHint?: string | null }>(`/public/invitations/${token}`),
+  /** Step 2: only the intended recipient (matching phone) receives the full invitation. */
+  verifyRecipient: (token: string, phone: string) =>
+    api.post<any>(`/public/invitations/${token}/verify`, { phone }),
+  submitRsvp: (token: string, data: { status: string; headcount?: number; dietary?: string; message?: string; phoneConfirm?: string; verifyPhone?: string }) =>
     api.post<any>(`/public/invitations/${token}/rsvp`, data),
 };
 

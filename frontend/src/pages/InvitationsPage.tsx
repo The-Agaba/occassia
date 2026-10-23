@@ -111,6 +111,9 @@ export default function InvitationsPage() {
     }
   };
 
+  // Share/copy/preview only exist once the host has picked a template and dispatched the invitation
+  const isDispatched = (g: InvitationRecord) => g.deliveryStatus === 'DELIVERED';
+
   const handleCopyLink = (token: string, e: React.MouseEvent) => {
     e.stopPropagation();
     const link = `${window.location.origin}/invite/${token}`;
@@ -368,7 +371,8 @@ export default function InvitationsPage() {
                         )}
                       </div>
 
-                      {/* Action Links */}
+                      {/* Action Links (available only after the invitation was sent) */}
+                      {isDispatched(guest) ? (
                       <div className="flex items-center gap-1.5">
                         <button
                           onClick={(e) => handleOpenWhatsApp(guest, e)}
@@ -385,16 +389,19 @@ export default function InvitationsPage() {
                           <Copy size={14} />
                         </button>
                         <Link
-                          to={`/invite/${guest.token}`}
+                          to={`/events/${id}/invitations/${guest.guestId}/preview`}
                           target="_blank"
                           rel="noreferrer"
                           onClick={(e) => e.stopPropagation()}
-                          title="Preview digital invitation"
+                          title="Preview invitation (view only)"
                           className="p-1.5 rounded-lg text-[var(--color-ink-muted)] hover:text-[var(--violet)] hover:bg-[var(--color-surface)] transition"
                         >
                           <ExternalLink size={14} />
                         </Link>
                       </div>
+                      ) : (
+                        <span className="text-[10px] text-[var(--color-ink-muted)]">Not sent yet</span>
+                      )}
                     </div>
                   </div>
                 );
@@ -605,7 +612,8 @@ export default function InvitationsPage() {
                           )}
                         </div>
 
-                        {/* Direct link & preview */}
+                        {/* Direct link & preview (available only after the invitation was sent) */}
+                        {isDispatched(guest) ? (
                         <div className="flex items-center gap-1.5">
                           <button
                             onClick={(e) => handleOpenWhatsApp(guest, e)}
@@ -622,15 +630,18 @@ export default function InvitationsPage() {
                             <Copy size={15} />
                           </button>
                           <Link
-                            to={`/invite/${guest.token}`}
+                            to={`/events/${id}/invitations/${guest.guestId}/preview`}
                             target="_blank"
                             rel="noreferrer"
-                            title="Open digital invitation"
+                            title="Preview invitation (view only)"
                             className="p-1.5 rounded-lg text-[var(--color-ink-muted)] hover:text-[var(--violet)] transition"
                           >
                             <ExternalLink size={15} />
                           </Link>
                         </div>
+                        ) : (
+                          <span className="text-[10px] text-[var(--color-ink-muted)] w-[70px] text-right">Not sent yet</span>
+                        )}
                       </div>
                     </div>
                   ))
@@ -675,6 +686,12 @@ export default function InvitationsPage() {
           totalGuestsCount={totalCount}
           onInvitationsSent={() => {
             setSelectedGuestIds([]);
+            // Reload so every row carries the real server-issued token
+            if (id) {
+              Promise.all([guestsApi.list(id), invitationsApi.list(id)])
+                .then(([guestRes, invRes]) => loadInvitations(id, guestRes.data, event, invRes.data || []))
+                .catch((err) => console.error('[Invitations] Refresh after send failed', err));
+            }
           }}
         />
       )}

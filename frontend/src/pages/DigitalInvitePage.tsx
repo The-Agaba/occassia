@@ -1,19 +1,61 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { useInvitationStore } from '../store/invitationStore';
-import { publicApi } from '../api';
+import { publicApi, invitationsApi } from '../api';
+import { useAuthStore } from '../store/authStore';
+import { useUiStore } from '../store/uiStore';
+import { apiErrorMessage } from '../lib/errorMessages';
 import InvitationCardPreview from '../components/InvitationCardPreview';
 import { CARD_TEMPLATES, type CardTemplate } from '../lib/invitationTemplates';
 import type { InvitationRecord, InvitationLetterDetails } from '../types';
-import { Calendar, Clock, MapPin, Phone, MessageSquare, Check, X, Sparkles, Navigation, Heart, ArrowDown, Loader2 } from 'lucide-react';
+import { Calendar, Clock, MapPin, Phone, MessageSquare, Check, X, Sparkles, Navigation, Heart, ArrowDown, Loader2, Lock, Eye } from 'lucide-react';
+
+type Stage = 'loading' | 'gate' | 'host' | 'error' | 'ready';
+
+/** Map a backend invitation payload to the client record used by the page. */
+function toRecord(data: any, fallback: InvitationLetterDetails): InvitationRecord {
+  const details: InvitationLetterDetails = (data.letterDetails as any) || {
+    ...fallback,
+    templateId: data.templateId || fallback.templateId,
+    imageUrl: data.imageUrl || fallback.imageUrl,
+  };
+  return {
+    id: data.id,
+    guestId: data.guestId,
+    eventId: data.eventId,
+    token: data.token,
+    guestName: data.guestName || 'Honored Guest',
+    phoneNumber: data.phoneNumber,
+    whatsappNumber: data.whatsappNumber,
+    email: data.email,
+    categoryName: 'General',
+    plusOnes: data.rsvpHeadcount > 1 ? 1 : 0,
+    deliveryChannel: data.deliveryChannel,
+    deliveryStatus: data.deliveryStatus || 'DELIVERED',
+    rsvpStatus: data.rsvpStatus || 'PENDING',
+    rsvpHeadcount: data.rsvpHeadcount || 1,
+    rsvpDietary: data.rsvpDietary,
+    rsvpMessage: data.rsvpMessage,
+    rsvpConfirmedAt: data.rsvpConfirmedAt,
+    invitationDetails: details,
+  };
+}
 
 export default function DigitalInvitePage() {
-  const { token = '' } = useParams<{ token: string }>();
-  const getInvitationByToken = useInvitationStore((s) => s.getInvitationByToken);
-  const submitRsvp = useInvitationStore((s) => s.submitRsvp);
+  const { token = '', id: eventId = '', invId = '' } = useParams<{ token: string; id: string; invId: string }>();
+  const showToast = useUiStore((s) => s.showToast);
+  const staffUser = useAuthStore((s) => s.user);
+
+  // Host preview route: /events/:id/invitations/:invId/preview (view only, never responds)
+  const isPreview = Boolean(invId);
+  const viewOnly = isPreview;
 
   const [invite, setInvite] = useState<InvitationRecord | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [stage, setStage] = useState<Stage>('loading');
+  const [gateInfo, setGateInfo] = useState<{ guestName: string; phoneRequired: boolean; phoneHint?: string | null } | null>(null);
+  const [gatePhone, setGatePhone] = useState('');
+  const [verifiedPhone, setVerifiedPhone] = useState('');
+  const [gateError, setGateError] = useState('');
+  const [verifying, setVerifying] = useState(false);
   const [unsealed, setUnsealed] = useState(false);
   const [cardElevated, setCardElevated] = useState(false);
 
@@ -43,74 +85,109 @@ export default function DigitalInvitePage() {
     collectionType: 'wedding-invitations',
   };
 
+  const applyRecord = useCallback((record: InvitationRecord) => {
+    setInvite(record);
+    setPhoneConfirm(record.phoneNumber || '');
+    if (record.rsvpStatus !== 'PENDING') {
+      setAttendance(record.rsvpStatus as 'ATTENDING' | 'DECLINED');
+      setHeadcount(record.rsvpHeadcount || 1);
+      setSubmitted(true);
+    }
+    setStage('ready');
+  }, []);
+
+  /** Ask the server to confirm this phone belongs to the person the invitation was sent to. */
+  const unlock = useCallback(
+    async (phone: string) => {
+      setVerifying(true);
+      setGateError('');
+      try {
+        const res = await publicApi.verifyRecipient(token, phone);
+        setVerifiedPhone(phone);
+        try {
+          sessionStorage.setItem(`occ_verified_${token}`, phone);
+        } catch {
+          // sessionStorage optional
+        }
+        applyRecord(toRecord(res.data, defaultDetails));
+      } catch (err: any) {
+        console.error('[Invite] Verification failed', err);
+        try {
+          sessionStorage.removeItem(`occ_verified_${token}`);
+        } catch {
+          // ignore
+        }
+        setGateError(
+          err?.response?.status === 403
+            ? 'That phone number does not match this invitation. Please use the number this invitation was sent to.'
+            : apiErrorMessage(err, 'We could not open this invitation. Please try again.')
+        );
+        setStage('gate');
+      } finally {
+        setVerifying(false);
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [token, applyRecord]
+  );
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    // 1. Check local store first
-    const found = getInvitationByToken(token);
-    if (found) {
-      setInvite(found);
-      setPhoneConfirm(found.phoneNumber || '');
-      if (found.rsvpStatus !== 'PENDING') {
-        setAttendance(found.rsvpStatus as 'ATTENDING' | 'DECLINED');
-        setHeadcount(found.rsvpHeadcount || 1);
-        setSubmitted(true);
-      }
-    }
-
-    // 2. Fetch directly from backend publicApi so invite works on any device or fresh browser
-    if (token) {
-      publicApi
-        .getInvitation(token)
+    // Host preview: read-only, loaded through the authenticated dashboard API
+    if (isPreview) {
+      invitationsApi
+        .list(eventId)
         .then((res) => {
-          const data = res.data;
-          if (data) {
-            const backendDetails: InvitationLetterDetails = (data.letterDetails as any) || {
-              ...defaultDetails,
-              templateId: data.templateId || defaultDetails.templateId,
-              imageUrl: data.imageUrl || defaultDetails.imageUrl,
-            };
-
-            const backendRecord: InvitationRecord = {
-              id: data.id,
-              guestId: data.guestId,
-              eventId: data.eventId,
-              token: data.token,
-              guestName: data.guestName || 'Honored Guest',
-              phoneNumber: data.phoneNumber,
-              whatsappNumber: data.whatsappNumber,
-              email: data.email,
-              categoryName: 'General',
-              plusOnes: data.rsvpHeadcount > 1 ? 1 : 0,
-              deliveryChannel: data.deliveryChannel,
-              deliveryStatus: data.deliveryStatus || 'DELIVERED',
-              rsvpStatus: data.rsvpStatus || 'PENDING',
-              rsvpHeadcount: data.rsvpHeadcount || 1,
-              rsvpDietary: data.rsvpDietary,
-              rsvpMessage: data.rsvpMessage,
-              rsvpConfirmedAt: data.rsvpConfirmedAt,
-              invitationDetails: backendDetails,
-            };
-
-            setInvite(backendRecord);
-            setPhoneConfirm(backendRecord.phoneNumber || '');
-            if (backendRecord.rsvpStatus !== 'PENDING') {
-              setAttendance(backendRecord.rsvpStatus as 'ATTENDING' | 'DECLINED');
-              setHeadcount(backendRecord.rsvpHeadcount || 1);
-              setSubmitted(true);
-            }
+          const match = (res.data || []).find((i: any) => i.guestId === invId || i.id === invId);
+          if (match && match.templateId) {
+            applyRecord(toRecord(match, defaultDetails));
+          } else {
+            setStage('error');
           }
         })
         .catch((err) => {
-          console.warn('Backend public invitation fetch note:', err);
-        })
-        .finally(() => {
-          setLoading(false);
+          console.error('[Invite] Preview load failed', err);
+          setStage('error');
         });
-    } else {
-      setLoading(false);
+      return;
     }
-  }, [token, getInvitationByToken]);
+
+    if (!token) {
+      setStage('error');
+      return;
+    }
+
+    // Signed-in hosts can never open or answer a guest's private link
+    if (staffUser) {
+      setStage('host');
+      return;
+    }
+
+    publicApi
+      .getInvitation(token)
+      .then((res) => {
+        setGateInfo(res.data);
+        let saved = '';
+        try {
+          saved = sessionStorage.getItem(`occ_verified_${token}`) || '';
+        } catch {
+          // ignore
+        }
+        if (!res.data.phoneRequired) {
+          unlock('');
+        } else if (saved) {
+          unlock(saved);
+        } else {
+          setStage('gate');
+        }
+      })
+      .catch((err) => {
+        console.error('[Invite] Gate load failed', err);
+        setStage('error');
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token, eventId, invId, isPreview, staffUser]);
 
   const activeDetails: InvitationLetterDetails = invite?.invitationDetails || defaultDetails;
   const guestName = invite?.guestName || 'Honored Guest';
@@ -150,16 +227,18 @@ export default function DigitalInvitePage() {
 
   const handleSubmitRsvp = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (viewOnly) return; // hosts can only view
     setIsSubmitting(true);
 
     try {
-      // 1. Submit directly to backend publicApi so RSVP is recorded in database
+      // RSVP is recorded server-side and only accepted from the verified recipient
       const apiRes = await publicApi.submitRsvp(token, {
         status: attendance,
         headcount: attendance === 'ATTENDING' ? headcount : 0,
         dietary,
         message,
         phoneConfirm,
+        verifyPhone: verifiedPhone,
       });
 
       if (apiRes.data) {
@@ -176,29 +255,18 @@ export default function DigitalInvitePage() {
             : null
         );
       }
+
+      setSubmitted(true);
+      if (attendance === 'ATTENDING') {
+        setSubmitSuccessMsg(`Asante sana ${guestName}! We are overjoyed to celebrate with you.`);
+      } else {
+        setSubmitSuccessMsg(`Thank you ${guestName} for informing us. You will be missed!`);
+      }
     } catch (err) {
-      console.warn('Backend RSVP note (falling back to local):', err);
-    }
-
-    // 2. Also update local store so offline / host view is synchronized
-    const localRes = submitRsvp(token, {
-      status: attendance,
-      headcount: attendance === 'ATTENDING' ? headcount : 0,
-      dietary,
-      message,
-      phoneConfirm,
-    });
-
-    if (localRes.invite && !invite) {
-      setInvite(localRes.invite);
-    }
-
-    setIsSubmitting(false);
-    setSubmitted(true);
-    if (attendance === 'ATTENDING') {
-      setSubmitSuccessMsg(`Asante sana ${guestName}! We are overjoyed to celebrate with you.`);
-    } else {
-      setSubmitSuccessMsg(`Thank you ${guestName} for informing us. You will be missed!`);
+      console.error('[Invite] RSVP failed', err);
+      showToast(apiErrorMessage(err, 'We could not record your response. Please try again.'), 'error');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -212,11 +280,75 @@ export default function DigitalInvitePage() {
     return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&details=${details}&location=${location}`;
   };
 
-  if (loading && !invite) {
+  if (stage === 'loading' || (stage === 'ready' && !invite)) {
     return (
       <div className="min-h-screen bg-[#080a0f] text-slate-100 flex flex-col items-center justify-center p-6">
         <Loader2 size={36} className="animate-spin text-amber-400 mb-4" />
         <p className="text-sm font-medium tracking-wide text-slate-400">Loading your private invitation...</p>
+      </div>
+    );
+  }
+
+  if (stage === 'error' || stage === 'host') {
+    const isHost = stage === 'host';
+    return (
+      <div className="min-h-screen bg-[#080a0f] text-slate-100 flex flex-col items-center justify-center p-6 text-center">
+        <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-400/20 flex items-center justify-center mb-4">
+          {isHost ? <Eye size={24} className="text-amber-400" /> : <Lock size={24} className="text-amber-400" />}
+        </div>
+        <h1 className="text-xl font-serif font-semibold text-white">
+          {isHost ? 'Guest link — hosts can preview only' : 'Invitation unavailable'}
+        </h1>
+        <p className="text-sm text-slate-400 mt-2 max-w-sm">
+          {isHost
+            ? 'You are signed in as a host. Guest links are private to the invited person. Open the Invitations tab of your event and use the preview button instead.'
+            : 'This invitation link is not valid, or the host has not sent it yet.'}
+        </p>
+        <Link to={isHost ? '/dashboard' : '/'} className="mt-6 px-5 py-2.5 rounded-xl bg-amber-500 text-slate-950 text-xs font-bold uppercase tracking-wider">
+          {isHost ? 'Back to dashboard' : 'Go to Occassia'}
+        </Link>
+      </div>
+    );
+  }
+
+  if (stage === 'gate') {
+    return (
+      <div className="min-h-screen bg-[#080a0f] text-slate-100 flex flex-col items-center justify-center p-6">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (gatePhone.trim()) unlock(gatePhone.trim());
+          }}
+          className="w-full max-w-sm p-6 rounded-3xl bg-gradient-to-b from-[#141923] to-[#0d1017] border border-amber-500/20 shadow-2xl text-center"
+        >
+          <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-400/20 flex items-center justify-center mx-auto mb-4">
+            <Lock size={20} className="text-amber-400" />
+          </div>
+          <span className="text-[11px] uppercase tracking-[0.25em] text-amber-400">Private invitation</span>
+          <h1 className="text-xl font-serif font-semibold text-white mt-1">{gateInfo?.guestName || 'Honored Guest'}</h1>
+          <p className="text-xs text-slate-400 mt-2">
+            To confirm this invitation is yours, enter the phone number it was sent to
+            {gateInfo?.phoneHint ? ` (${gateInfo.phoneHint})` : ''}.
+          </p>
+          <input
+            id="invite-verify-phone"
+            type="tel"
+            autoFocus
+            value={gatePhone}
+            onChange={(e) => setGatePhone(e.target.value)}
+            placeholder="+255 7XX XXX XXX"
+            className="w-full mt-4 px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm text-center focus:ring-2 focus:ring-amber-500 outline-none"
+          />
+          {gateError && <p role="alert" className="text-xs text-rose-400 mt-3">{gateError}</p>}
+          <button
+            id="invite-verify-submit"
+            type="submit"
+            disabled={verifying || !gatePhone.trim()}
+            className="w-full mt-4 py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider disabled:opacity-50 flex items-center justify-center gap-2"
+          >
+            {verifying ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />} Open my invitation
+          </button>
+        </form>
       </div>
     );
   }
@@ -446,7 +578,20 @@ export default function DigitalInvitePage() {
                 )}
               </div>
 
-              {submitted ? (
+              {viewOnly ? (
+                <div className="p-5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-center space-y-2">
+                  <div className="w-10 h-10 rounded-full bg-amber-500/20 text-amber-300 mx-auto flex items-center justify-center">
+                    <Eye size={18} />
+                  </div>
+                  <h4 className="text-sm font-bold text-white">Host preview — view only</h4>
+                  <p className="text-xs text-slate-300 max-w-md mx-auto">
+                    Only {guestName} can respond to this invitation.{' '}
+                    {invite?.rsvpStatus === 'PENDING'
+                      ? 'No response has been recorded yet.'
+                      : `Their response: ${invite?.rsvpStatus}${invite?.rsvpStatus === 'ATTENDING' ? ` (${invite?.rsvpHeadcount} seat${invite?.rsvpHeadcount === 1 ? '' : 's'})` : ''}.`}
+                  </p>
+                </div>
+              ) : submitted ? (
                 <div className="p-6 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-center space-y-3">
                   <div className="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 mx-auto flex items-center justify-center">
                     <Check size={24} />

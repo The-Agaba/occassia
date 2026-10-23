@@ -83,6 +83,8 @@ export default function InvitationWizardModal({
   const [photoPendingTemplate, setPhotoPendingTemplate] = useState<CardTemplate | null>(null);
   const [tempPhotoUrl, setTempPhotoUrl] = useState<string>(details.imageUrl || '');
   const [isDispatching, setIsDispatching] = useState(false);
+  // Set only when the creator confirms a design in step 3; sending is blocked until then
+  const [templateConfirmed, setTemplateConfirmed] = useState(false);
 
   const PHOTO_PRESETS = [
     { label: 'Golden Hour Couple', url: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80' },
@@ -157,15 +159,22 @@ export default function InvitationWizardModal({
 
   const handleConfirmTemplate = () => {
     setPreviewingTemplate(null);
+    setTemplateConfirmed(true);
     setStep(4);
   };
 
   const handleSend = async () => {
+    if (!templateConfirmed || !details.templateId) {
+      showToast('Please select and confirm an invitation design before sending.', 'error');
+      setStep(3);
+      return;
+    }
     setIsDispatching(true);
     try {
       const isUuid = (val: string) =>
         /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val);
-      const validGuestUuids = selectedGuestIds.filter(isUuid);
+      // Rows are keyed 'inv-<guestUuid>' locally; the API needs the guest UUID itself
+      const validGuestUuids = selectedGuestIds.map((x) => (x.startsWith('inv-') ? x.slice(4) : x)).filter(isUuid);
 
       // Call backend batch invite endpoint directly so tokens are in PostgreSQL database
       try {
