@@ -26,6 +26,7 @@ import InvitationCardPreview from './InvitationCardPreview';
 import { useInvitationStore } from '../store/invitationStore';
 import { useUiStore } from '../store/uiStore';
 import { invitationsApi } from '../api';
+import { apiErrorMessage } from '../lib/errorMessages';
 
 interface InvitationWizardModalProps {
   isOpen: boolean;
@@ -51,21 +52,26 @@ export default function InvitationWizardModal({
   const [selectedCollection, setSelectedCollection] = useState<string>('wedding-invitations');
 
   // Pre-fill event details
-  const [details, setDetails] = useState<InvitationLetterDetails>({
-    hostNames: event.name.replace(/wedding|ndoa|harusi/gi, '').trim() || 'Mariam & Amani',
-    headline: event.type === 'WEDDING' ? 'The Wedding Celebration Of' : `Invitation to ${event.name}`,
-    eventDate: event.eventDate || 'Saturday, 12th December 2026',
-    ceremonyTime: event.startTime || '2:00 PM',
-    receptionTime: '6:00 PM',
-    venueName: event.venue || 'Mlimani City Conference Hall',
-    venueAddress: 'Dar es Salaam, Tanzania',
-    dressCode: 'Black Tie / Elegant Traditional',
-    rsvpPhone: '+255 712 345 678',
-    rsvpDeadline: '1st December 2026',
-    personalMessage:
-      'Together with our families, we joyfully invite you to share our happiness and celebrate this special milestone.',
-    templateId: 'royal-botanical-gold',
-    collectionType: 'wedding-invitations',
+  const [details, setDetails] = useState<InvitationLetterDetails>(() => {
+    const rawName = event?.name || '';
+    const hostNames = rawName.replace(/wedding|ndoa|harusi/gi, '').trim() || 'Mariam & Amani';
+    const headline = event?.type === 'WEDDING' ? 'The Wedding Celebration Of' : `Invitation to ${rawName || 'the Event'}`;
+    return {
+      hostNames,
+      headline,
+      eventDate: event?.eventDate || 'Saturday, 12th December 2026',
+      ceremonyTime: event?.startTime || '2:00 PM',
+      receptionTime: '6:00 PM',
+      venueName: event?.venue || 'Mlimani City Conference Hall',
+      venueAddress: 'Dar es Salaam, Tanzania',
+      dressCode: 'Black Tie / Elegant Traditional',
+      rsvpPhone: '+255 712 345 678',
+      rsvpDeadline: '1st December 2026',
+      personalMessage:
+        'Together with our families, we joyfully invite you to share our happiness and celebrate this special milestone.',
+      templateId: 'royal-botanical-gold',
+      collectionType: 'wedding-invitations',
+    };
   });
 
   const [chosenTemplate, setChosenTemplate] = useState<CardTemplate>(CARD_TEMPLATES[0]);
@@ -171,8 +177,14 @@ export default function InvitationWizardModal({
           imageUrl: details.imageUrl,
           letterDetails: details as any,
         });
-      } catch (backendErr) {
-        console.warn('Backend batch invite note:', backendErr);
+      } catch (backendErr: any) {
+        console.error('[InvitationWizard] Backend batch invite error:', backendErr);
+        const status = backendErr?.response?.status;
+        // Rethrow for any non-404 HTTP error (including 3xx redirects like 310, 4xx, 5xx)
+        if (status && status !== 404) {
+          throw new Error(apiErrorMessage(backendErr, 'Server error while generating digital invitations'));
+        }
+        // 404 = guests not yet in DB, fall through to local store
       }
 
       // Also register in local invitation store
@@ -180,8 +192,9 @@ export default function InvitationWizardModal({
       showToast(`Successfully dispatched ${sentCount || recipientCount} invitations via ${channel}!`, 'success');
       onInvitationsSent();
       onClose();
-    } catch {
-      showToast('Failed to dispatch invitations. Please try again.', 'error');
+    } catch (err: any) {
+      console.error('[InvitationWizard Dispatch Error]', err);
+      showToast(err?.message || 'Failed to dispatch invitations. Please try again.', 'error');
     } finally {
       setIsDispatching(false);
     }

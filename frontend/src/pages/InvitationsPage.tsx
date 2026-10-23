@@ -35,6 +35,7 @@ import {
   exportDeliveryReportsXlsx,
 } from '../lib/invitationExcel';
 import InvitationWizardModal from '../components/InvitationWizardModal';
+import { apiErrorMessage } from '../lib/errorMessages';
 
 export default function InvitationsPage() {
   const { id } = useParams<{ id: string }>();
@@ -77,7 +78,7 @@ export default function InvitationsPage() {
         loadInvitations(id, guestRes.data, eventRes.data, invRes.data || []);
       })
       .catch((err) => {
-        showToast(err.response?.data?.message || 'Failed to load event details', 'error');
+        showToast(apiErrorMessage(err, 'Failed to load event details'), 'error');
       })
       .finally(() => setLoading(false));
   }, [id, loadInvitations, showToast]);
@@ -114,6 +115,18 @@ export default function InvitationsPage() {
     const link = `${window.location.origin}/invite/${token}`;
     navigator.clipboard.writeText(link);
     showToast('Digital invitation link copied to clipboard!', 'success');
+  };
+
+  const handleOpenWhatsApp = (guest: InvitationRecord, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const phone = (guest.whatsappNumber || guest.phoneNumber || '').replace(/[^0-9]/g, '');
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const inviteUrl = `${origin}/invite/${guest.token}`;
+    const text = encodeURIComponent(
+      `Habari ${guest.guestName}! You are cordially invited to celebrate ${event?.name || 'our special occasion'}. Please open your personalized digital invitation and RSVP here: ${inviteUrl} ✨`
+    );
+    const targetUrl = phone ? `https://wa.me/${phone}?text=${text}` : `https://api.whatsapp.com/send?text=${text}`;
+    window.open(targetUrl, '_blank', 'noopener,noreferrer');
   };
 
   // Stats calculation
@@ -355,11 +368,18 @@ export default function InvitationsPage() {
                       </div>
 
                       {/* Action Links */}
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          onClick={(e) => handleOpenWhatsApp(guest, e)}
+                          title="Share directly via WhatsApp"
+                          className="p-1.5 rounded-lg text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 transition"
+                        >
+                          <MessageSquare size={14} />
+                        </button>
                         <button
                           onClick={(e) => handleCopyLink(guest.token, e)}
                           title="Copy Digital Invitation Link"
-                          className="p-1.5 rounded-lg text-[var(--color-ink-muted)] hover:text-[var(--violet)] hover:bg-[var(--color-surface)]"
+                          className="p-1.5 rounded-lg text-[var(--color-ink-muted)] hover:text-[var(--violet)] hover:bg-[var(--color-surface)] transition"
                         >
                           <Copy size={14} />
                         </button>
@@ -369,7 +389,7 @@ export default function InvitationsPage() {
                           rel="noreferrer"
                           onClick={(e) => e.stopPropagation()}
                           title="Preview Interactive Bahasha"
-                          className="p-1.5 rounded-lg text-[var(--color-ink-muted)] hover:text-[var(--violet)] hover:bg-[var(--color-surface)]"
+                          className="p-1.5 rounded-lg text-[var(--color-ink-muted)] hover:text-[var(--violet)] hover:bg-[var(--color-surface)] transition"
                         >
                           <ExternalLink size={14} />
                         </Link>
@@ -422,6 +442,10 @@ export default function InvitationsPage() {
 
                 <button
                   onClick={() => {
+                    if (totalCount === 0) {
+                      showToast('No guests found in this event. Please import or add guests first.', 'info');
+                      return;
+                    }
                     setSelectedGuestIds([]);
                     setWizardOpen(true);
                   }}
@@ -583,9 +607,16 @@ export default function InvitationsPage() {
                         {/* Direct link & preview */}
                         <div className="flex items-center gap-1.5">
                           <button
+                            onClick={(e) => handleOpenWhatsApp(guest, e)}
+                            title="Share on WhatsApp"
+                            className="p-1.5 rounded-lg text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 transition"
+                          >
+                            <MessageSquare size={15} />
+                          </button>
+                          <button
                             onClick={(e) => handleCopyLink(guest.token, e)}
                             title="Copy link"
-                            className="p-1.5 rounded-lg text-[var(--color-ink-muted)] hover:text-[var(--violet)]"
+                            className="p-1.5 rounded-lg text-[var(--color-ink-muted)] hover:text-[var(--violet)] transition"
                           >
                             <Copy size={15} />
                           </button>
@@ -594,7 +625,7 @@ export default function InvitationsPage() {
                             target="_blank"
                             rel="noreferrer"
                             title="Open digital invitation"
-                            className="p-1.5 rounded-lg text-[var(--color-ink-muted)] hover:text-[var(--violet)]"
+                            className="p-1.5 rounded-lg text-[var(--color-ink-muted)] hover:text-[var(--violet)] transition"
                           >
                             <ExternalLink size={15} />
                           </Link>

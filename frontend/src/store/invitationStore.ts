@@ -193,16 +193,16 @@ export const useInvitationStore = create<InvitationState>((set, get) => ({
     const targetSet = new Set(guestIds);
     let sentCount = 0;
 
-    const now = new Date().toISOString();
+    const isAll = !guestIds || guestIds.length === 0;
 
     const updated = current.map((item) => {
-      if (targetSet.has(item.id) || targetSet.has(item.guestId)) {
+      if (isAll || targetSet.has(item.id) || targetSet.has(item.guestId)) {
         sentCount++;
         return {
           ...item,
           deliveryChannel: channel,
           deliveryStatus: 'DELIVERED' as const,
-          sentAt: now,
+          sentAt: new Date().toISOString(),
           invitationDetails: details,
         };
       }
@@ -222,7 +222,7 @@ export const useInvitationStore = create<InvitationState>((set, get) => ({
       },
     }));
 
-    const sampleGuest = updated.find((u) => targetSet.has(u.id) || targetSet.has(u.guestId));
+    const sampleGuest = updated.find((u) => isAll || targetSet.has(u.id) || targetSet.has(u.guestId)) || updated[0];
     const token = sampleGuest?.token || 'sample-token';
     const origin = typeof window !== 'undefined' ? window.location.origin : 'https://occassia.com';
     const inviteUrl = `${origin}/invite/${token}`;

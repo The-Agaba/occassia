@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import {
   Gauge,
   UsersRound,
+  Mail,
   CreditCard,
   Radio,
   BarChart3,
@@ -40,14 +41,25 @@ const steps: HowItWorksStep[] = [
     badge: 'GUEST LIST',
     title: 'Import & Organize Guests',
     description:
-      'Upload prepared Excel or CSV spreadsheets in seconds. Occassia instantly creates a unique cryptographic QR backup pass for every guest.',
+      'Upload prepared Excel or CSV spreadsheets in seconds. Occassia automatically standardizes phone numbers and generates unique backup QR passes.',
     icon: UsersRound,
     color: '#4bd6ce',
     accent: 'rgba(75, 214, 206, 0.22)',
-    highlights: ['Spreadsheet bulk upload', 'Unique QR backup pass', 'Plus-one & payment tracking'],
+    highlights: ['Excel spreadsheet bulk upload', 'Unique QR backup pass', 'Plus-one & payment tracking'],
   },
   {
     number: '03',
+    badge: 'DIGITAL INVITATIONS',
+    title: '3D Bahasha & Live RSVP',
+    description:
+      'Design luxury invitations, dispatch personalized links via WhatsApp or SMS, and collect real-time RSVPs with interactive wax-seal envelope animations.',
+    icon: Mail,
+    color: '#f43f5e',
+    accent: 'rgba(244, 63, 94, 0.22)',
+    highlights: ['Interactive 3D Bahasha unsealing', 'Direct WhatsApp & SMS dispatch', 'Live dietary & headcount sync'],
+  },
+  {
+    number: '04',
     badge: 'NFC PROVISIONING',
     title: 'Pair Physical NFC Cards',
     description:
@@ -58,7 +70,7 @@ const steps: HowItWorksStep[] = [
     highlights: ['Zero manual UID typing', 'Phone & USB bridge support', 'Recycled card release'],
   },
   {
-    number: '04',
+    number: '05',
     badge: 'GATE CHECK-IN',
     title: 'Check In Under 1 Second',
     description:
@@ -69,11 +81,11 @@ const steps: HowItWorksStep[] = [
     highlights: ['Sub-second NFC arrival', 'Instant camera QR fallback', 'Duplicate tap protection'],
   },
   {
-    number: '05',
+    number: '06',
     badge: 'LIVE MONITORING',
     title: 'Live Sync & Audit Reports',
     description:
-      'Follow attendance counts as they happen with WebSocket live feeds across all staff devices. Export comprehensive PDF or CSV audit reports.',
+      'Follow attendance counts as they happen with WebSocket live feeds across all staff devices. Export comprehensive attendance and delivery reports.',
     icon: BarChart3,
     color: '#ec4899',
     accent: 'rgba(236, 72, 153, 0.22)',
@@ -379,7 +391,7 @@ export default function HowItWorksCarousel() {
                         <span className="indicator-text">
                           {isActive ? 'Active Stage' : 'Click to bring to front'}
                         </span>
-                        {isActive && <span className="stage-progress">{step.number} / 05</span>}
+                        {isActive && <span className="stage-progress">{step.number} / 06</span>}
                       </div>
                     </div>
                   </article>

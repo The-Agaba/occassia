@@ -11,6 +11,7 @@ import java.util.UUID;
 public interface InvitationRepository extends JpaRepository<Invitation, UUID> {
     List<Invitation> findByEventIdOrderByCreatedAtDesc(UUID eventId);
     Optional<Invitation> findByToken(String token);
+    Optional<Invitation> findFirstByEventIdAndGuestId(UUID eventId, UUID guestId);
     Optional<Invitation> findByEventIdAndGuestId(UUID eventId, UUID guestId);
     List<Invitation> findByEventIdAndRsvpStatus(UUID eventId, String rsvpStatus);
 }

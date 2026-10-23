@@ -53,7 +53,7 @@ public class InvitationService {
 
         List<Invitation> savedList = new ArrayList<>();
         for (Guest guest : targetGuests) {
-            Invitation invitation = invitationRepository.findByEventIdAndGuestId(eventId, guest.getId())
+            Invitation invitation = invitationRepository.findFirstByEventIdAndGuestId(eventId, guest.getId())
                     .orElseGet(() -> Invitation.builder()
                             .event(event)
                             .guest(guest)

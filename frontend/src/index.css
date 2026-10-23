@@ -1950,3 +1950,22 @@ button, a, input, select { -webkit-tap-highlight-color: transparent; }
 .animate-letter-glide {
   animation: letterGlideOut 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* Tablet & intermediate viewport navigation alignment */
+@media (min-width: 801px) and (max-width: 1200px) {
+  .event-workspace-nav {
+    left: 0 !important;
+  }
+}
+
+/* Mobile dialog & action buttons fluid wrapping */
+@media (max-width: 640px) {
+  .ops-heading-actions {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .ops-heading-actions .ops-button {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+}
